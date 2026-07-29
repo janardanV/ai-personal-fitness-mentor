@@ -4,21 +4,21 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const COLORS = {
-  bg: "#0B0B0B",
+  bg: "#0A0A0A",
   surface: "#151515",
-  accent: "#C8FF00",
+  accent: "#22C55E",
   secondary: "#A0A0A0",
   text: "#FFFFFF",
   border: "#252525",
   surfaceHover: "#1C1C1C",
-  accentDim: "rgba(200, 255, 0, 0.15)",
+  accentDim: "rgba(255, 255, 255, 0.06)",
 };
 
 const EXPORT_TYPES = [
-  { id: "workouts", label: "Workout History", icon: "🏋️" },
-  { id: "nutrition", label: "Nutrition", icon: "🥗" },
-  { id: "progress", label: "Progress", icon: "📈" },
-  { id: "running", label: "Running", icon: "🏃" },
+  { id: "workouts", label: "Workout History", icon: "" },
+  { id: "nutrition", label: "Nutrition", icon: "" },
+  { id: "progress", label: "Progress", icon: "" },
+  { id: "running", label: "Running", icon: "" },
 ];
 
 const FORMAT_OPTIONS = [
@@ -87,7 +87,7 @@ const exportWorkoutPDF = (workouts, from, to, userName) => {
     head: [["Date", "Workout Name", "Exercises", "Total Volume", "Duration"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [200, 255, 0], textColor: [11, 11, 11], fontStyle: "bold" },
+    headStyles: { fillColor: [34, 197, 94], textColor: [10, 10, 10], fontStyle: "bold" },
     styles: { fontSize: 9, cellPadding: 3 },
     alternateRowStyles: { fillColor: [245, 245, 245] },
   });
@@ -149,7 +149,7 @@ const exportNutritionPDF = (nutrition, from, to, userName) => {
     head: [["Date", "Food", "Meal Type", "Calories", "Protein", "Carbs", "Fat"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [200, 255, 0], textColor: [11, 11, 11], fontStyle: "bold" },
+    headStyles: { fillColor: [34, 197, 94], textColor: [10, 10, 10], fontStyle: "bold" },
     styles: { fontSize: 9, cellPadding: 3 },
     alternateRowStyles: { fillColor: [245, 245, 245] },
   });
@@ -212,7 +212,7 @@ const exportProgressPDF = (bodyWeight, personalRecords, userName) => {
       head: [["Date", "Weight"]],
       body: bwData,
       theme: "grid",
-      headStyles: { fillColor: [200, 255, 0], textColor: [11, 11, 11], fontStyle: "bold" },
+      headStyles: { fillColor: [34, 197, 94], textColor: [10, 10, 10], fontStyle: "bold" },
       styles: { fontSize: 9, cellPadding: 3 },
       alternateRowStyles: { fillColor: [245, 245, 245] },
     });
@@ -237,7 +237,7 @@ const exportProgressPDF = (bodyWeight, personalRecords, userName) => {
         fmtDate(pr.date),
       ]),
       theme: "grid",
-      headStyles: { fillColor: [200, 255, 0], textColor: [11, 11, 11], fontStyle: "bold" },
+      headStyles: { fillColor: [34, 197, 94], textColor: [10, 10, 10], fontStyle: "bold" },
       styles: { fontSize: 9, cellPadding: 3 },
       alternateRowStyles: { fillColor: [245, 245, 245] },
     });
@@ -297,7 +297,7 @@ const exportRunningPDF = (runs, from, to, userName) => {
     head: [["Date", "Distance (km)", "Duration", "Avg Pace", "Calories"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [200, 255, 0], textColor: [11, 11, 11], fontStyle: "bold" },
+    headStyles: { fillColor: [34, 197, 94], textColor: [10, 10, 10], fontStyle: "bold" },
     styles: { fontSize: 9, cellPadding: 3 },
     alternateRowStyles: { fillColor: [245, 245, 245] },
   });
@@ -621,7 +621,7 @@ export default function ExportReports({ state, dispatch }) {
           }}>
             {preview.empty ? (
               <div style={{ textAlign: "center", padding: "16px 0" }}>
-                <span style={{ fontSize: 24, display: "block", marginBottom: 8 }}>📭</span>
+                <span style={{ fontSize: 24, display: "block", marginBottom: 8 }}></span>
                 <span style={{ fontSize: 13, color: COLORS.secondary }}>No data found for the selected range</span>
               </div>
             ) : (
@@ -670,7 +670,7 @@ export default function ExportReports({ state, dispatch }) {
               style={{ display: "inline-block", width: 16, height: 16, border: `2px solid ${COLORS.bg}`, borderTopColor: "transparent", borderRadius: "50%" }}
             />
           ) : (
-            "⬇"
+            ""
           )}
           {exporting ? "Exporting..." : `Export ${format.toUpperCase()}`}
         </motion.button>
@@ -720,8 +720,8 @@ export default function ExportReports({ state, dispatch }) {
                       fontWeight: 700,
                       padding: "3px 8px",
                       borderRadius: 6,
-                      background: e.format === "PDF" ? "rgba(255, 71, 87, 0.15)" : "rgba(46, 213, 115, 0.15)",
-                      color: e.format === "PDF" ? "#FF4757" : "#2ED573",
+                      background: e.format === "PDF" ? "rgba(239, 68, 68, 0.15)" : "rgba(46, 213, 115, 0.15)",
+                      color: e.format === "PDF" ? "#EF4444" : "#2ED573",
                     }}>
                       {e.format}
                     </div>

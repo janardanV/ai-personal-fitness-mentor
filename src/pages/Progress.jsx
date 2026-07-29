@@ -65,7 +65,7 @@ const Progress = ({ state }) => {
             <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
             <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
             <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-            <Bar dataKey="volume" fill="#C8FF00" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="volume" fill="#22C55E" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>

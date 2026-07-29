@@ -370,21 +370,21 @@ export default function WorkoutPlanner({ state, dispatch }) {
     header: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 },
     title: { fontSize: 22, fontWeight: 800, color: "#FFFFFF" },
     subtitle: { fontSize: 13, color: "#A0A0A0", marginTop: 2 },
-    tabs: { display: "flex", gap: 4, padding: 4, background: "#151515", borderRadius: 12, border: "1px solid rgba(200,255,0,0.06)" },
+    tabs: { display: "flex", gap: 4, padding: 4, background: "#151515", borderRadius: 12, border: "1px solid rgba(255,255,255,0.04)" },
     tab: { padding: "8px 18px", borderRadius: 8, fontSize: 13, fontWeight: 500, background: "none", color: "#A0A0A0", cursor: "pointer", transition: "all 0.2s", border: "none" },
-    tabActive: { background: "rgba(200,255,0,0.12)", color: "#C8FF00" },
+    tabActive: { background: "rgba(255,255,255,0.06)", color: "#22C55E" },
     dayBar: { display: "flex", gap: 6, marginBottom: 20, overflowX: "auto", paddingBottom: 4 },
     dayBtn: (isToday, isActive, hasEx) => ({
       minWidth: 56,
       padding: "10px 12px",
       borderRadius: 12,
-      border: `1.5px solid ${isActive ? "rgba(200,255,0,0.4)" : isToday ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.04)"}`,
+      border: `1.5px solid ${isActive ? "rgba(255,255,255,0.15)" : isToday ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`,
       background: isActive
-        ? "rgba(200,255,0,0.1)"
+        ? "rgba(255,255,255,0.04)"
         : hasEx
-          ? "rgba(200,255,0,0.03)"
+          ? "rgba(255,255,255,0.02)"
           : "#151515",
-      color: isActive ? "#C8FF00" : isToday ? "#E8E8E8" : "#A0A0A0",
+      color: isActive ? "#22C55E" : isToday ? "#E8E8E8" : "#A0A0A0",
       cursor: "pointer",
       transition: "all 0.2s",
       textAlign: "center",
@@ -395,7 +395,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
     dayCount: (has) => ({
       fontSize: 10,
       fontWeight: 600,
-      color: has ? "#C8FF00" : "rgba(160,160,160,0.3)",
+      color: has ? "#22C55E" : "rgba(160,160,160,0.3)",
       marginTop: 4,
     }),
     todayDot: {
@@ -405,12 +405,12 @@ export default function WorkoutPlanner({ state, dispatch }) {
       width: 7,
       height: 7,
       borderRadius: "50%",
-      background: "#C8FF00",
-      boxShadow: "0 0 8px rgba(200,255,0,0.4)",
+      background: "#22C55E",
+      boxShadow: "0 0 8px rgba(255,255,255,0.15)",
     },
     panel: {
       background: "#151515",
-      border: "1px solid rgba(200,255,0,0.06)",
+      border: "1px solid rgba(255,255,255,0.04)",
       borderRadius: 16,
       padding: 20,
       minHeight: 200,
@@ -418,12 +418,12 @@ export default function WorkoutPlanner({ state, dispatch }) {
     },
     panelDrop: {
       background: "#151515",
-      border: "1px solid rgba(200,255,0,0.25)",
+      border: "1px solid rgba(255,255,255,0.12)",
       borderRadius: 16,
       padding: 20,
       minHeight: 200,
       transition: "all 0.2s",
-      boxShadow: "0 0 24px rgba(200,255,0,0.06)",
+      boxShadow: "0 0 24px rgba(255,255,255,0.04)",
     },
     dayTitle: { fontSize: 15, fontWeight: 700, color: "#FFFFFF", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" },
     dayTitleLeft: { display: "flex", alignItems: "center", gap: 8 },
@@ -432,8 +432,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
       alignItems: "center",
       gap: 10,
       padding: "10px 12px",
-      background: isDragging ? "rgba(200,255,0,0.06)" : "rgba(255,255,255,0.02)",
-      border: `1px solid ${isDragging ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.03)"}`,
+      background: isDragging ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+      border: `1px solid ${isDragging ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)"}`,
       borderRadius: 10,
       marginBottom: 6,
       cursor: "grab",
@@ -452,7 +452,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
       textAlign: "center",
       borderRadius: 6,
       background: "#1D1D1D",
-      border: "1px solid rgba(200,255,0,0.08)",
+      border: "1px solid rgba(255,255,255,0.04)",
       color: "#FFFFFF",
       fontFamily: "'JetBrains Mono', monospace",
       outline: "none",
@@ -464,7 +464,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
       borderRadius: 6,
       background: "none",
       border: "none",
-      color: "rgba(255,71,87,0.5)",
+      color: "rgba(239,68,68,0.5)",
       cursor: "pointer",
       display: "flex",
       alignItems: "center",
@@ -480,8 +480,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
       padding: "8px 14px",
       borderRadius: 8,
       background: "none",
-      border: "1px dashed rgba(200,255,0,0.2)",
-      color: "#C8FF00",
+      border: "1px dashed rgba(255,255,255,0.08)",
+      color: "#22C55E",
       fontSize: 12,
       fontWeight: 600,
       cursor: "pointer",
@@ -494,8 +494,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
     neonBtn: {
       padding: "10px 20px",
       borderRadius: 10,
-      background: "#C8FF00",
-      color: "#0B0B0B",
+      background: "#22C55E",
+      color: "#0A0A0A",
       fontWeight: 700,
       fontSize: 13,
       border: "none",
@@ -506,7 +506,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
       padding: "10px 16px",
       borderRadius: 10,
       background: "#1D1D1D",
-      border: "1px solid rgba(200,255,0,0.1)",
+      border: "1px solid rgba(255,255,255,0.04)",
       color: "#A0A0A0",
       fontSize: 12,
       fontWeight: 500,
@@ -516,9 +516,9 @@ export default function WorkoutPlanner({ state, dispatch }) {
     dangerBtn: {
       padding: "10px 16px",
       borderRadius: 10,
-      background: "rgba(255,71,87,0.08)",
-      border: "1px solid rgba(255,71,87,0.2)",
-      color: "#FF4757",
+      background: "rgba(239,68,68,0.08)",
+      border: "1px solid rgba(239,68,68,0.2)",
+      color: "#EF4444",
       fontSize: 12,
       fontWeight: 500,
       cursor: "pointer",
@@ -541,7 +541,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
       maxHeight: "85vh",
       overflowY: "auto",
       background: "rgba(15,15,15,0.98)",
-      border: "1px solid rgba(200,255,0,0.12)",
+      border: "1px solid rgba(255,255,255,0.06)",
       borderRadius: 20,
       padding: 28,
     },
@@ -561,9 +561,9 @@ export default function WorkoutPlanner({ state, dispatch }) {
       borderRadius: 20,
       fontSize: 12,
       fontWeight: 500,
-      background: active ? "rgba(200,255,0,0.1)" : "#1D1D1D",
-      border: `1px solid ${active ? "rgba(200,255,0,0.25)" : "rgba(200,255,0,0.06)"}`,
-      color: active ? "#C8FF00" : "#A0A0A0",
+      background: active ? "rgba(255,255,255,0.04)" : "#1D1D1D",
+      border: `1px solid ${active ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)"}`,
+      color: active ? "#22C55E" : "#A0A0A0",
       cursor: "pointer",
       transition: "all 0.2s",
     }),
@@ -572,7 +572,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
       padding: 16,
       borderRadius: 14,
       background: "#151515",
-      border: "1px solid rgba(200,255,0,0.06)",
+      border: "1px solid rgba(255,255,255,0.04)",
       cursor: "pointer",
       transition: "all 0.2s",
     },
@@ -582,7 +582,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
       padding: 16,
       borderRadius: 14,
       background: "#151515",
-      border: "1px solid rgba(200,255,0,0.06)",
+      border: "1px solid rgba(255,255,255,0.04)",
       marginBottom: 8,
       transition: "all 0.2s",
     },
@@ -590,7 +590,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
     savedMeta: { fontSize: 11, color: "#A0A0A0", marginBottom: 10 },
     statRow: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 },
     stat: { fontSize: 12, color: "#A0A0A0" },
-    statVal: { color: "#C8FF00", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
+    statVal: { color: "#22C55E", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
   };
 
   const renderExercises = (day) => {
@@ -650,8 +650,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
             <button
               style={s.exRemove}
               onClick={() => removeExercise(day, ex.uid)}
-              onMouseEnter={(e) => (e.target.style.color = "#FF4757")}
-              onMouseLeave={(e) => (e.target.style.color = "rgba(255,71,87,0.5)")}
+              onMouseEnter={(e) => (e.target.style.color = "#EF4444")}
+              onMouseLeave={(e) => (e.target.style.color = "rgba(239,68,68,0.5)")}
             >
               ✕
             </button>
@@ -711,8 +711,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
                 ...s.ghostBtn,
                 fontSize: 12,
                 padding: "8px 14px",
-                color: week[activeDay].length > 0 ? "#C8FF00" : "#A0A0A0",
-                borderColor: week[activeDay].length > 0 ? "rgba(200,255,0,0.25)" : undefined,
+                color: week[activeDay].length > 0 ? "#22C55E" : "#A0A0A0",
+                borderColor: week[activeDay].length > 0 ? "rgba(255,255,255,0.12)" : undefined,
               }}
               onClick={startTodaysWorkout}
               disabled={week[activeDay].length === 0}
@@ -746,7 +746,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
               <div style={s.dayTitleLeft}>
                 <span>{activeDay}</span>
                 {activeDay === currentDayName && (
-                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontWeight: 600 }}>
+                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: "rgba(255,255,255,0.04)", color: "#22C55E", fontWeight: 600 }}>
                     TODAY
                   </span>
                 )}
@@ -798,7 +798,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     style={s.savedCard}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ borderColor: "rgba(200,255,0,0.12)" }}
+                    whileHover={{ borderColor: "rgba(255,255,255,0.06)" }}
                   >
                     <div style={s.savedName}>{t.name}</div>
                     <div style={s.savedMeta}>
@@ -806,7 +806,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
                       {DAYS.filter((d) => (t.days?.[d] || []).length > 0).map((d) => (
-                        <span key={d} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: "rgba(200,255,0,0.08)", color: "#C8FF00", fontWeight: 600 }}>
+                        <span key={d} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: "rgba(255,255,255,0.04)", color: "#22C55E", fontWeight: 600 }}>
                           {d}: {(t.days?.[d] || []).length} ex
                         </span>
                       ))}
@@ -860,7 +860,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                 </button>
               </div>
               <input
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", color: "#FFFFFF", fontSize: 14, outline: "none", marginBottom: 12 }}
+                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", color: "#FFFFFF", fontSize: 14, outline: "none", marginBottom: 12 }}
                 placeholder="Search exercises..."
                 value={pickerSearch}
                 onChange={(e) => setPickerSearch(e.target.value)}
@@ -872,14 +872,14 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     key={ex.id}
                     style={s.pickerItem}
                     onClick={() => addExercise(ex)}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200,255,0,0.06)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
                   >
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{ex.name}</div>
                       <div style={{ fontSize: 11, color: "#A0A0A0" }}>{ex.primary} · {ex.sets}×{ex.reps}</div>
                     </div>
-                    <span style={{ color: "rgba(200,255,0,0.4)", fontSize: 16 }}>+</span>
+                    <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 16 }}>+</span>
                   </div>
                 ))}
                 {pickerResults.length === 0 && (
@@ -923,7 +923,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     <motion.div
                       key={key}
                       style={s.templateCard}
-                      whileHover={{ borderColor: "rgba(200,255,0,0.2)", transform: "translateY(-2px)" }}
+                      whileHover={{ borderColor: "rgba(255,255,255,0.08)", transform: "translateY(-2px)" }}
                       onClick={() => applyTemplate(key)}
                     >
                       <div style={s.templateName}>{tmpl.name}</div>
@@ -934,7 +934,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                         {Object.entries(tmpl.days)
                           .filter(([, e]) => e.length > 0)
                           .map(([day]) => (
-                            <span key={day} style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>
+                            <span key={day} style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "rgba(255,255,255,0.04)", color: "#22C55E" }}>
                               {day}
                             </span>
                           ))}
@@ -960,7 +960,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
             >
               <div style={s.modalTitle}>Save Routine</div>
               <input
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", color: "#FFFFFF", fontSize: 14, outline: "none", marginBottom: 16 }}
+                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", color: "#FFFFFF", fontSize: 14, outline: "none", marginBottom: 16 }}
                 placeholder="Routine name..."
                 value={routineName}
                 onChange={(e) => setRoutineName(e.target.value)}

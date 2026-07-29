@@ -54,7 +54,6 @@ const WorkoutHistory = ({ state }) => {
 
       <div style={{ display: "flex", gap: 8 }}>
         <div className="wm-search-bar" style={{ flex: 1 }}>
-          <span className="search-icon">🔍</span>
           <input placeholder="Search workouts, exercises..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ width: 140, height: 42 }}>
@@ -73,7 +72,7 @@ const WorkoutHistory = ({ state }) => {
               <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#A0A0A0" }} />
               <YAxis tick={{ fontSize: 11, fill: "#A0A0A0" }} />
               <Tooltip contentStyle={{ background: "rgba(15,15,15,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 12 }} />
-              <Bar dataKey="volume" fill="#C8FF00" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="volume" fill="#22C55E" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -81,7 +80,7 @@ const WorkoutHistory = ({ state }) => {
 
       {workouts.length === 0 ? (
         <div className="wm-empty">
-          <div className="wm-empty-icon">📋</div>
+          <div className="wm-empty-icon" />
           <div className="wm-empty-title">No Workouts Yet</div>
           <div className="wm-empty-desc">Complete your first workout to see it here.</div>
         </div>
@@ -98,14 +97,14 @@ const WorkoutHistory = ({ state }) => {
                   <div style={{ fontSize: 12, color: "#A0A0A0", marginTop: 2 }}>{w.date}{w.duration ? ` · ${w.duration} min` : ""}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#C8FF00" }}>{fmt(w.totalVolume)}<span style={{ fontSize: 11, color: "#A0A0A0" }}> kg</span></div>
+                  <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#22C55E" }}>{fmt(w.totalVolume)}<span style={{ fontSize: 11, color: "#A0A0A0" }}> kg</span></div>
                   {w.calories ? <div style={{ fontSize: 11, color: "#A0A0A0" }}>{w.calories} kcal</div> : null}
                 </div>
               </div>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8 }}>
                 {w.exercises?.slice(0, isExpanded ? 99 : 4).map((e, j) => (
-                  <span key={j} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>
+                  <span key={j} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(255,255,255,0.06)", color: "#A0A0A0" }}>
                     {e.name} {e.sets?.filter(s => s.done !== false).length || e.sets?.length || 0}×{e.sets?.[0]?.reps || "?"}@{e.sets?.[0]?.weight || "?"}kg
                   </span>
                 ))}
@@ -113,10 +112,10 @@ const WorkoutHistory = ({ state }) => {
               </div>
 
               {isExpanded && prev && (
-                <div style={{ marginTop: 12, padding: 10, background: "rgba(200,255,0,0.04)", borderRadius: 8 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "#C8FF00", marginBottom: 6 }}>vs Previous ({prev.date})</div>
+                <div style={{ marginTop: 12, padding: 10, background: "rgba(255,255,255,0.04)", borderRadius: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#22C55E", marginBottom: 6 }}>vs Previous ({prev.date})</div>
                   <div style={{ display: "flex", gap: 16, fontSize: 12 }}>
-                    <span style={{ color: (w.totalVolume || 0) > (prev.totalVolume || 0) ? "#A5E600" : "#FF4757" }}>
+                    <span style={{ color: (w.totalVolume || 0) > (prev.totalVolume || 0) ? "#22C55E" : "#EF4444" }}>
                       Volume: {fmt(w.totalVolume)} vs {fmt(prev.totalVolume)} ({(w.totalVolume || 0) > (prev.totalVolume || 0) ? "+" : ""}{fmt(((w.totalVolume || 0) / Math.max(prev.totalVolume || 1, 1) - 1) * 100, 1)}%)
                     </span>
                   </div>
@@ -126,7 +125,7 @@ const WorkoutHistory = ({ state }) => {
               {isExpanded && w.prs && w.prs.length > 0 && (
                 <div style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
                   {w.prs.map((pr, j) => (
-                    <span key={j} className="wm-pr-card" style={{ padding: "4px 8px", fontSize: 10 }}>🏆 {pr}</span>
+                    <span key={j} className="wm-pr-card" style={{ padding: "4px 8px", fontSize: 10 }}>{pr}</span>
                   ))}
                 </div>
               )}

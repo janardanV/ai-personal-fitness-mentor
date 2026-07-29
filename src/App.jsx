@@ -198,24 +198,23 @@ export default function App() {
         <GlobalStyles />
         <Toast />
         <AuthModal open={authModalOpen} onClose={() => { setAuthModalOpen(false); }} onAuthSuccess={handleAuthSuccess} />
-        <div style={{ display: "flex", minHeight: "100vh", background: "#0B0B0B" }}>
+        <div style={{ display: "flex", minHeight: "100vh", background: "#0A0A0A" }}>
           <Sidebar
             sidebarOpen={sidebarOpen}
             onToggle={() => setSidebarOpen(p => !p)}
             page={page}
             onNavigate={(id) => navigate("/" + id)}
             footer={(
-              <div style={{ padding: "16px 14px", borderTop: "1px solid rgba(200,255,0,0.06)" }}>
+              <div style={{ padding: "16px 14px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,255,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#C8FF00" }}>G</div>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(34,197,94,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#22C55E" }}>G</div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>Guest</div>
                     <div style={{ fontSize: 11, color: "#A0A0A0" }}>Sign in to save</div>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.1)" }}>
-                  <span style={{ fontSize: 14 }}>🔥</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#C8FF00" }}>{streak} day streak</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#22C55E" }}>{streak} day streak</span>
                 </div>
               </div>
             )}
@@ -226,13 +225,13 @@ export default function App() {
             <div className="topbar">
               <span className="topbar-title">{PAGES.find(p => p.id === page)?.label || "Dashboard"}</span>
               <div className="topbar-right">
-                <button onClick={() => setAuthModalOpen(true)} style={{
-                  background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.1)",
+                  <button onClick={() => setAuthModalOpen(true)} style={{
+                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
                   color: "#A0A0A0", borderRadius: 10, padding: "6px 14px", fontSize: 12, fontWeight: 500,
                   cursor: "pointer", fontFamily: "'Inter', sans-serif", transition: "all 0.2s",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(200,255,0,0.1)"; e.currentTarget.style.color = "#C8FF00"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(200,255,0,0.06)"; e.currentTarget.style.color = "#A0A0A0"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#FFFFFF"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "#A0A0A0"; }}
                 >
                   Sign in to sync
                 </button>
@@ -326,16 +325,16 @@ export default function App() {
       <GlobalStyles />
       <Toast />
       <ConfirmDialog />
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0B0B0B" }}>
+      <div style={{ display: "flex", minHeight: "100vh", background: "#0A0A0A" }}>
         <Sidebar
           sidebarOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(p => !p)}
           page={page}
           onNavigate={(id) => navigate("/" + id)}
           footer={(
-            <div style={{ padding: "16px 14px", borderTop: "1px solid rgba(200,255,0,0.06)" }}>
+            <div style={{ padding: "16px 14px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,255,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#C8FF00" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(34,197,94,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#22C55E" }}>
                   {(user?.displayName || appState.profile?.name || "U")[0].toUpperCase()}
                 </div>
                 <div>
@@ -343,9 +342,8 @@ export default function App() {
                   <div style={{ fontSize: 11, color: "#A0A0A0" }}>Lv. {appState.level} · {appState.xp} XP</div>
                 </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.1)" }}>
-                <span style={{ fontSize: 14 }}>🔥</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#C8FF00" }}>{streak} day streak</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#22C55E" }}>{streak} day streak</span>
               </div>
             </div>
           )}

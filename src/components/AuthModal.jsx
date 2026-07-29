@@ -85,16 +85,16 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: "100%", maxWidth: 400,
-              background: "rgba(15,15,15,0.98)", border: "1px solid rgba(200,255,0,0.1)",
+              background: "rgba(15,15,15,0.98)", border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: 20, padding: 32,
               boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
             }}
           >
             <div style={{
               width: 48, height: 48, borderRadius: 14, margin: "0 auto 16px",
-              background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.2)",
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22,
-            }}>⚡</div>
+            }}></div>
 
             <h2 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", textAlign: "center", marginBottom: 6 }}>
               Sign in to save your progress
@@ -113,8 +113,8 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                   Continue with Google
                 </button>
 
-                <button onClick={() => { setMode(MODES.EMAIL); setError(""); }} style={{ ...btnBase, background: "transparent", border: "1px solid rgba(200,255,0,0.2)", color: "#C8FF00" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(200,255,0,0.06)"; }}
+                <button onClick={() => { setMode(MODES.EMAIL); setError(""); }} style={{ ...btnBase, background: "transparent", border: "1px solid rgba(255,255,255,0.12)", color: "#22C55E" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                 >
                   Sign in with Email
@@ -149,23 +149,23 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                 </button>
 
                 {error && (
-                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)", color: "#FF4757", fontSize: 13, fontWeight: 500 }}>{error}</div>
+                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444", fontSize: 13, fontWeight: 500 }}>{error}</div>
                 )}
 
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Email address</label>
                   <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email"
-                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(200,255,0,0.1)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
+                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
                 </div>
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Password</label>
                   <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" autoComplete="current-password"
-                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(200,255,0,0.1)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
+                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
                 </div>
 
                 <button type="submit" disabled={busy} style={{
                   width: "100%", padding: "14px", borderRadius: 14, fontSize: 14, fontWeight: 700,
-                  background: "#C8FF00", color: "#0B0B0B", border: "none", cursor: busy ? "not-allowed" : "pointer",
+                  background: "#22C55E", color: "#0A0A0A", border: "none", cursor: busy ? "not-allowed" : "pointer",
                   opacity: busy ? 0.6 : 1, fontFamily: "'Inter', sans-serif",
                 }}>
                   {busy ? "Signing in..." : "Sign In"}
@@ -180,28 +180,28 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                 </button>
 
                 {error && (
-                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)", color: "#FF4757", fontSize: 13, fontWeight: 500 }}>{error}</div>
+                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444", fontSize: 13, fontWeight: 500 }}>{error}</div>
                 )}
 
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Full name</label>
                   <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" autoComplete="name"
-                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(200,255,0,0.1)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
+                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
                 </div>
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Email address</label>
                   <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email"
-                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(200,255,0,0.1)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
+                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
                 </div>
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Password</label>
                   <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" autoComplete="new-password"
-                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(200,255,0,0.1)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
+                    style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "#1D1D1D", color: "#FFFFFF", fontSize: 14, outline: "none" }} />
                 </div>
 
                 <button type="submit" disabled={busy} style={{
                   width: "100%", padding: "14px", borderRadius: 14, fontSize: 14, fontWeight: 700,
-                  background: "#C8FF00", color: "#0B0B0B", border: "none", cursor: busy ? "not-allowed" : "pointer",
+                  background: "#22C55E", color: "#0A0A0A", border: "none", cursor: busy ? "not-allowed" : "pointer",
                   opacity: busy ? 0.6 : 1, fontFamily: "'Inter', sans-serif",
                 }}>
                   {busy ? "Creating account..." : "Create Account"}

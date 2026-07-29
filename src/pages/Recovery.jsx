@@ -65,7 +65,7 @@ const Recovery = ({ state, dispatch }) => {
           <Card>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <span style={{ fontSize: 13, fontWeight: 600 }}>AI Recovery Coach</span>
-              <button className="ghost-btn" onClick={getRecAdvice} disabled={loading} style={{ fontSize: 12 }}>{loading ? "..." : "Advise ⚡"}</button>
+              <button className="ghost-btn" onClick={getRecAdvice} disabled={loading} style={{ fontSize: 12 }}>{loading ? "..." : "Advise"}</button>
             </div>
             {aiRec ? <p style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.6 }}>{aiRec}</p> : <p style={{ fontSize: 13, color: "#A0A0A0" }}>Get AI-powered recovery recommendations.</p>}
           </Card>

@@ -38,12 +38,12 @@ export default function ForgotPassword() {
       {/* Background decorations */}
       <div style={{
         position: "absolute", top: "10%", left: "15%", width: 300, height: 300,
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(200,255,0,0.04) 0%, transparent 70%)",
+        borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)",
         filter: "blur(60px)", pointerEvents: "none",
       }} />
       <div style={{
         position: "absolute", bottom: "10%", right: "15%", width: 250, height: 250,
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(165,230,0,0.03) 0%, transparent 70%)",
+        borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)",
         filter: "blur(50px)", pointerEvents: "none",
       }} />
 
@@ -54,9 +54,9 @@ export default function ForgotPassword() {
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 16, margin: "0 auto 16px",
-            background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.2)",
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
-          }}>🔐</div>
+            }}></div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 8 }}>Reset your password</h2>
           <p style={{ fontSize: 14, color: "rgba(160,160,160,0.6)", lineHeight: 1.6 }}>
             Enter your email address and we&apos;ll send you a link to reset your password.
@@ -67,11 +67,11 @@ export default function ForgotPassword() {
           <div style={{ animation: "fadeIn 0.3s ease" }}>
             <div style={{
               padding: "16px", borderRadius: 12, marginBottom: 24,
-              background: "rgba(165,230,0,0.08)", border: "1px solid rgba(165,230,0,0.2)",
+              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
               textAlign: "center",
             }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>📧</div>
-              <p style={{ fontSize: 14, color: "#A5E600", fontWeight: 600, marginBottom: 4 }}>Check your email</p>
+              <div style={{ fontSize: 32, marginBottom: 8 }}></div>
+              <p style={{ fontSize: 14, color: "#22C55E", fontWeight: 600, marginBottom: 4 }}>Check your email</p>
               <p style={{ fontSize: 13, color: "rgba(160,160,160,0.7)", lineHeight: 1.5 }}>
                 We sent a password reset link to <strong style={{ color: "#FFFFFF" }}>{email}</strong>.
                 Check your inbox and follow the instructions.
@@ -86,7 +86,7 @@ export default function ForgotPassword() {
             </button>
 
             <p style={{ textAlign: "center", fontSize: 14, color: "rgba(160,160,160,0.6)" }}>
-              <Link to="/login" style={{ color: "#C8FF00", fontWeight: 600, textDecoration: "none" }}>Back to Sign In</Link>
+              <Link to="/login" style={{ color: "#22C55E", fontWeight: 600, textDecoration: "none" }}>Back to Sign In</Link>
             </p>
           </div>
         ) : (
@@ -94,16 +94,15 @@ export default function ForgotPassword() {
             {error && (
               <div style={{
                 padding: "12px 16px", borderRadius: 12, marginBottom: 20,
-                background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)",
-                color: "#FF4757", fontSize: 13, fontWeight: 500, animation: "fadeIn 0.2s ease",
+                background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+                color: "#EF4444", fontSize: 13, fontWeight: 500, animation: "fadeIn 0.2s ease",
               }}>{error}</div>
             )}
 
             <form onSubmit={handleSubmit}>
               <div className="onb-input-wrap">
                 <input type="email" placeholder=" " value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-                <span className="onb-icon">✉</span>
-                <label className="onb-float">Email address</label>
+              <label className="onb-float">Email address</label>
               </div>
 
               <button type="submit" className="onb-grad-btn" disabled={loading} style={{ marginBottom: 16 }}>
@@ -118,7 +117,7 @@ export default function ForgotPassword() {
 
             <p style={{ textAlign: "center", fontSize: 14, color: "rgba(160,160,160,0.6)" }}>
               Remember your password?{" "}
-              <Link to="/login" style={{ color: "#C8FF00", fontWeight: 600, textDecoration: "none" }}>Back to Sign In</Link>
+              <Link to="/login" style={{ color: "#22C55E", fontWeight: 600, textDecoration: "none" }}>Back to Sign In</Link>
             </p>
           </>
         )}

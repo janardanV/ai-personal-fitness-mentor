@@ -36,7 +36,7 @@ const PersonalRecords = ({ state }) => {
 
       {recentPRs.length > 0 && (
         <div className="glass" style={{ padding: "20px", borderRadius: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#FFD700", marginBottom: 10 }}>🏆 New PRs This Month</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#FFD700", marginBottom: 10 }}>New PRs This Month</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {recentPRs.map(pr => (
               <span key={pr.exerciseId} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.2)", fontSize: 12, color: "#FFD700" }}>
@@ -49,7 +49,7 @@ const PersonalRecords = ({ state }) => {
 
       {prEntries.length === 0 ? (
         <div className="wm-empty">
-          <div className="wm-empty-icon">🏆</div>
+          <div className="wm-empty-icon" />
           <div className="wm-empty-title">No Records Yet</div>
           <div className="wm-empty-desc">Complete workouts to track your personal records automatically.</div>
         </div>
@@ -57,15 +57,15 @@ const PersonalRecords = ({ state }) => {
         <>
           {Object.entries(e1rmByMuscle).map(([muscle, exercises]) => (
             <div key={muscle}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#C8FF00", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{muscle}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#22C55E", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{muscle}</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 }}>
                 {exercises.map(pr => (
                   <motion.div key={pr.exerciseId} className="wm-pr-card" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF", marginBottom: 6 }}>{pr.name}</div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <span className="pr-badge" style={{ marginRight: 6 }}>🏆 PR</span>
-                        <span style={{ fontSize: 18, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#C8FF00" }}>{pr.weight}<span style={{ fontSize: 12, color: "#A0A0A0" }}>kg</span></span>
+                        <span className="pr-badge" style={{ marginRight: 6 }}>PR</span>
+                        <span style={{ fontSize: 18, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#22C55E" }}>{pr.weight}<span style={{ fontSize: 12, color: "#A0A0A0" }}>kg</span></span>
                         <span style={{ fontSize: 13, color: "#A0A0A0", marginLeft: 6 }}>×{pr.reps}</span>
                       </div>
                       <div style={{ fontSize: 11, color: "rgba(160,160,160,0.4)" }}>{pr.date}</div>

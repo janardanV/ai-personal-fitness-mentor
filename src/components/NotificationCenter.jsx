@@ -2,11 +2,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const COLORS = {
-  bg: "#0B0B0B",
+  bg: "#0A0A0A",
   surface: "#151515",
   surfaceHover: "#1C1C1C",
-  accent: "#C8FF00",
-  accentDim: "rgba(200,255,0,0.15)",
+  accent: "#22C55E",
+  accentDim: "rgba(255,255,255,0.06)",
   text: "#FFFFFF",
   secondary: "#A0A0A0",
   danger: "#FF4D4D",

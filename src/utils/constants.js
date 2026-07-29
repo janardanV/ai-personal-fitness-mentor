@@ -99,14 +99,14 @@ export const EXERCISE_CATEGORIES = [...new Set(EXERCISE_DB.map(e => e.cat))].sor
 
 export const GOAL_LABELS = { muscle: "Build Muscle", fat_loss: "Fat Loss", strength: "Strength", endurance: "Endurance", powerlifting: "Powerlifting", bodybuilding: "Bodybuilding", general: "General Fitness" };
 export const BADGE_DEFS = [
-  { id: "first_workout", icon: "\u{1F3CB}\u{FE0F}", label: "First Workout", desc: "Logged your first session" },
-  { id: "week_streak", icon: "\u{1F525}", label: "7-Day Streak", desc: "7 consecutive active days" },
-  { id: "ten_workouts", icon: "\u{1F4AA}", label: "10 Workouts", desc: "Completed 10 workouts" },
-  { id: "hundred_workouts", icon: "\u{1F3C6}", label: "100 Workouts", desc: "Century club" },
-  { id: "volume_1000", icon: "\u26A1", label: "1000kg Volume", desc: "1000kg in a single session" },
-  { id: "nutrition_week", icon: "\u{1F957}", label: "Nutrition Week", desc: "7 days of nutrition tracking" },
+  { id: "first_workout", label: "First Workout", desc: "Logged your first session" },
+  { id: "week_streak", label: "7-Day Streak", desc: "7 consecutive active days" },
+  { id: "ten_workouts", label: "10 Workouts", desc: "Completed 10 workouts" },
+  { id: "hundred_workouts", label: "100 Workouts", desc: "Century club" },
+  { id: "volume_1000", label: "1000kg Volume", desc: "1000kg in a single session" },
+  { id: "nutrition_week", label: "Nutrition Week", desc: "7 days of nutrition tracking" },
 ];
-export const COLORS = { primary: "#C8FF00", cyan: "#C8FF00", green: "#A5E600", amber: "#D9FF4D", red: "#FF4757", surface: "rgba(200,255,0,0.05)", border: "rgba(200,255,0,0.12)" };
+export const COLORS = { primary: "#22C55E", cyan: "#22C55E", green: "#22C55E", amber: "#F59E0B", red: "#EF4444", blue: "#3B82F6", gold: "#FFD700", surface: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.08)" };
 export const SAVE_ACTIONS = new Set([
   "ADD_WORKOUT", "FINISH_SESSION",
   "ADD_NUTRITION", "EDIT_NUTRITION", "DELETE_NUTRITION", "DUPLICATE_NUTRITION",
@@ -129,27 +129,27 @@ export const GUEST_PROFILE = {
 export const ACTIVITY_MULTIPLIERS = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very_active: 1.9 };
 
 export const PAGES = [
-  { id: "dashboard", label: "Dashboard", icon: "\u{1F3E0}", group: "main" },
-  { id: "workout", label: "Workouts", icon: "\u{1F3CB}\u{FE0F}", group: "training" },
-  { id: "exercise-library", label: "Exercise Library", icon: "\u{1F4DA}", group: "training" },
-  { id: "planner", label: "Workout Planner", icon: "\u{1F4CB}", group: "training" },
-  { id: "running", label: "Running", icon: "\u{1F3C3}", group: "training" },
-  { id: "programs", label: "Programs", icon: "\u{1F4CA}", group: "training" },
-  { id: "nutrition", label: "Nutrition", icon: "\u{1F957}", group: "health" },
-  { id: "smart-nutrition", label: "Smart Nutrition", icon: "\u{1F37D}\u{FE0F}", group: "health" },
-  { id: "water-tracker", label: "Water Tracker", icon: "\u{1F4A7}", group: "health" },
-  { id: "calculator", label: "BMI Calculator", icon: "\u{1F9EE}", group: "health" },
-  { id: "recovery", label: "Recovery", icon: "\u{1F634}", group: "health" },
-  { id: "bodyweight", label: "Body Weight", icon: "\u2696\u{FE0F}", group: "health" },
-  { id: "goals", label: "Goals", icon: "\u{1F3AF}", group: "analytics" },
-  { id: "achievements", label: "Achievements", icon: "\u{1F3C6}", group: "analytics" },
-  { id: "progress", label: "Progress", icon: "\u{1F4C8}", group: "analytics" },
-  { id: "coach", label: "AI Coach", icon: "\u{1F916}", group: "analytics" },
-  { id: "notifications", label: "Notifications", icon: "\u{1F514}", group: "tools" },
-  { id: "export", label: "Export Reports", icon: "\u{1F4E4}", group: "tools" },
-  { id: "admin", label: "Analytics", icon: "\u{1F4CA}", group: "tools" },
-  { id: "settings", label: "Settings", icon: "\u2699\u{FE0F}", group: "account" },
-  { id: "profile", label: "Profile", icon: "\u{1F464}", group: "account" },
+  { id: "dashboard", label: "Dashboard", group: "main" },
+  { id: "workout", label: "Workouts", group: "training" },
+  { id: "exercise-library", label: "Exercise Library", group: "training" },
+  { id: "planner", label: "Workout Planner", group: "training" },
+  { id: "running", label: "Running", group: "training" },
+  { id: "programs", label: "Programs", group: "training" },
+  { id: "nutrition", label: "Nutrition", group: "health" },
+  { id: "smart-nutrition", label: "Smart Nutrition", group: "health" },
+  { id: "water-tracker", label: "Water Tracker", group: "health" },
+  { id: "calculator", label: "BMI Calculator", group: "health" },
+  { id: "recovery", label: "Recovery", group: "health" },
+  { id: "bodyweight", label: "Body Weight", group: "health" },
+  { id: "goals", label: "Goals", group: "analytics" },
+  { id: "achievements", label: "Achievements", group: "analytics" },
+  { id: "progress", label: "Progress", group: "analytics" },
+  { id: "coach", label: "AI Coach", group: "analytics" },
+  { id: "notifications", label: "Notifications", group: "tools" },
+  { id: "export", label: "Export Reports", group: "tools" },
+  { id: "admin", label: "Analytics", group: "tools" },
+  { id: "settings", label: "Settings", group: "account" },
+  { id: "profile", label: "Profile", group: "account" },
 ];
 
 export const SIDEBAR_GROUPS = [

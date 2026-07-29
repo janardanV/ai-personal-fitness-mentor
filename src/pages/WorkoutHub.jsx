@@ -12,11 +12,11 @@ const WORKOUT_TAB_MAP = { workout: "library", session: "session", library: "libr
 const WorkoutHub = ({ state, dispatch, page }) => {
   const [tab, setTab] = useState(WORKOUT_TAB_MAP[page] || (state.activeSession ? "session" : "library"));
   const tabs = [
-    { id: "library", label: "Exercise Library", icon: "📚" },
-    { id: "templates", label: "Templates", icon: "📋" },
-    { id: "session", label: "Active Workout", icon: "🏋️" },
-    { id: "history", label: "History", icon: "📅" },
-    { id: "prs", label: "Personal Records", icon: "🏆" },
+    { id: "library", label: "Exercise Library" },
+    { id: "templates", label: "Templates" },
+    { id: "session", label: "Active Workout" },
+    { id: "history", label: "History" },
+    { id: "prs", label: "Personal Records" },
   ];
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const WorkoutHub = ({ state, dispatch, page }) => {
       <div className="wm-tab-bar">
         {tabs.map(t => (
           <button key={t.id} className={`wm-tab ${tab === t.id ? "active" : ""}`} onClick={() => setTab(t.id)}>
-            {t.icon} {t.label}
+            {t.label}
           </button>
         ))}
       </div>
@@ -55,7 +55,7 @@ const WorkoutHub = ({ state, dispatch, page }) => {
       {tab === "library" && (
         <div>
           <div style={{ marginBottom: 16 }}>
-            <button className="neon-btn" onClick={startQuickWorkout} style={{ fontSize: 13, padding: "10px 20px" }}>🚀 Start Quick Workout</button>
+            <button className="neon-btn" onClick={startQuickWorkout} style={{ fontSize: 13, padding: "10px 20px" }}>Start Quick Workout</button>
           </div>
            <ExerciseLibraryBase state={state} dispatch={dispatch} />
         </div>

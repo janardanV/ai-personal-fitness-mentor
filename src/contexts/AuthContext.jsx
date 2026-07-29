@@ -26,13 +26,13 @@ export const AuthProvider = ({ children }) => {
     return (
       <div style={{
         minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-        background: "#0B0B0F", flexDirection: "column", gap: 16,
+        background: "#0A0A0A", flexDirection: "column", gap: 16,
       }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16, background: "rgba(200,255,0,0.1)",
-          border: "1px solid rgba(200,255,0,0.2)", display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: 24,
-        }}>⚡</div>
+          width: 56, height: 56, borderRadius: 16, background: "rgba(34,197,94,0.1)",
+          border: "1px solid rgba(34,197,94,0.2)", display: "flex", alignItems: "center",
+          justifyContent: "center", fontSize: 24, fontWeight: 700, color: "#22C55E",
+        }}>F</div>
         <div style={{ color: "#A0A0A0", fontSize: 13, letterSpacing: "0.05em" }}>Loading...</div>
       </div>
     );

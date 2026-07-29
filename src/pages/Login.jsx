@@ -69,41 +69,40 @@ export default function Login() {
       }}>
         <div style={{
           position: "absolute", inset: 0, opacity: 0.5,
-          background: "radial-gradient(ellipse at 20% 50%, rgba(200,255,0,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(165,230,0,0.04) 0%, transparent 50%)",
+          background: "radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%)",
           animation: "gradientShift 12s ease infinite", backgroundSize: "200% 200%",
         }} />
         <div style={{
           position: "absolute", top: "10%", left: "8%", width: 200, height: 200,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(200,255,0,0.05) 0%, transparent 70%)",
+          borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)",
           filter: "blur(40px)", animation: "float 8s ease-in-out infinite", pointerEvents: "none",
         }} />
         <div style={{
           position: "absolute", bottom: "15%", right: "10%", width: 160, height: 160,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(165,230,0,0.04) 0%, transparent 70%)",
+          borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)",
           filter: "blur(35px)", animation: "float2 10s ease-in-out infinite", pointerEvents: "none",
         }} />
         <div style={{ position: "relative", zIndex: 1, animation: "fadeInLeft 0.8s ease both" }}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px",
-            borderRadius: 100, background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.12)",
+            borderRadius: 100, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
             marginBottom: 32,
           }}>
-            <span style={{ fontSize: 14 }}>⚡</span>
-            <span style={{ fontSize: 12, fontWeight: 500, color: "#C8FF00", letterSpacing: "0.05em", textTransform: "uppercase" }}>AI-Powered Fitness</span>
+            <span style={{ fontSize: 12, fontWeight: 500, color: "#22C55E", letterSpacing: "0.05em", textTransform: "uppercase" }}>AI-Powered Fitness</span>
           </div>
           <h1 style={{ fontSize: 44, fontWeight: 900, lineHeight: 1.1, letterSpacing: "-0.03em", marginBottom: 20, color: "#FFFFFF" }}>
             Welcome back to{" "}
-            <span style={{ background: "linear-gradient(135deg, #C8FF00 0%, #A5E600 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI Fitness</span>{" "}
-            <span style={{ background: "linear-gradient(135deg, #A5E600 0%, #C8FF00 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Mentor</span>
+            <span style={{ background: "linear-gradient(135deg, #22C55E 0%, #22C55E 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI Fitness</span>{" "}
+            <span style={{ background: "linear-gradient(135deg, #22C55E 0%, #22C55E 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Mentor</span>
           </h1>
           <p style={{ fontSize: 17, color: "rgba(160,160,160,0.7)", lineHeight: 1.6, marginBottom: 48, maxWidth: 440, fontWeight: 400 }}>
             Track workouts, optimize nutrition, and accelerate recovery with your AI-powered coach.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, animation: "fadeInUp 0.8s ease 0.5s both" }}>
             {[
-              { icon: "🏋️", title: "Smart Workout Tracking", desc: "Generate adaptive workouts and monitor strength progression.", color: "#C8FF00" },
-              { icon: "🥗", title: "AI Nutrition Coach", desc: "Track calories and macros with intelligent recommendations.", color: "#A5E600" },
-              { icon: "📈", title: "Progress Analytics", desc: "Visualize your fitness journey with interactive insights.", color: "#C8FF00" },
+              { icon: "", title: "Smart Workout Tracking", desc: "Generate adaptive workouts and monitor strength progression.", color: "#22C55E" },
+              { icon: "", title: "AI Nutrition Coach", desc: "Track calories and macros with intelligent recommendations.", color: "#22C55E" },
+              { icon: "", title: "Progress Analytics", desc: "Visualize your fitness journey with interactive insights.", color: "#22C55E" },
             ].map((f, i) => (
               <div className="onb-feature-card" key={i} style={{ animation: `fadeInUp 0.6s ease ${0.6 + i * 0.1}s both` }}>
                 <div className="feat-icon" style={{ background: `${f.color}10` }}><span>{f.icon}</span></div>
@@ -125,10 +124,9 @@ export default function Login() {
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <div style={{
               width: 56, height: 56, borderRadius: 16, margin: "0 auto 16px",
-              background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.2)",
+              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
-              animation: "glowPulse 3s ease infinite",
-            }}>⚡</div>
+            }}></div>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>Sign in to your account</h2>
             <p style={{ fontSize: 14, color: "rgba(160,160,160,0.6)" }}>Enter your credentials to continue</p>
           </div>
@@ -136,8 +134,8 @@ export default function Login() {
           {error && (
             <div style={{
               padding: "12px 16px", borderRadius: 12, marginBottom: 20,
-              background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)",
-              color: "#FF4757", fontSize: 13, fontWeight: 500, animation: "fadeIn 0.2s ease",
+              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+              color: "#EF4444", fontSize: 13, fontWeight: 500, animation: "fadeIn 0.2s ease",
             }}>{error}</div>
           )}
 
@@ -148,7 +146,6 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
               />
-              <span className="onb-icon">✉</span>
               <label className="onb-float">Email address</label>
             </div>
 
@@ -158,7 +155,6 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
               />
-              <span className="onb-icon">🔒</span>
               <label className="onb-float">Password</label>
               <button
                 type="button" onClick={() => setShowPassword(!showPassword)}
@@ -171,7 +167,7 @@ export default function Login() {
             </div>
 
             <div style={{ textAlign: "right", marginBottom: 20 }}>
-              <Link to="/forgot-password" style={{ color: "#C8FF00", fontSize: 13, textDecoration: "none", fontWeight: 500 }}>
+              <Link to="/forgot-password" style={{ color: "#22C55E", fontSize: 13, textDecoration: "none", fontWeight: 500 }}>
                 Forgot password?
               </Link>
             </div>
@@ -212,7 +208,7 @@ export default function Login() {
 
           <p style={{ textAlign: "center", marginTop: 28, fontSize: 14, color: "rgba(160,160,160,0.6)" }}>
             Don&apos;t have an account?{" "}
-            <Link to="/signup" style={{ color: "#C8FF00", fontWeight: 600, textDecoration: "none" }}>Create account</Link>
+            <Link to="/signup" style={{ color: "#22C55E", fontWeight: 600, textDecoration: "none" }}>Create account</Link>
           </p>
         </div>
       </div>

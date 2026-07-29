@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const s = {
   container: {
     minHeight: "100vh",
-    background: "#0B0B0B",
+    background: "#0A0A0A",
     color: "#FFFFFF",
     padding: "20px",
     paddingBottom: "100px",
@@ -72,7 +72,7 @@ const s = {
     padding: 0,
   },
   toggleOn: {
-    background: "#C8FF00",
+    background: "#22C55E",
   },
   toggleOff: {
     background: "#333333",
@@ -129,8 +129,8 @@ const s = {
     textAlign: "center",
   },
   toggleBtnActive: {
-    background: "#C8FF00",
-    color: "#0B0B0B",
+    background: "#22C55E",
+    color: "#0A0A0A",
   },
   toggleBtnInactive: {
     background: "transparent",
@@ -140,7 +140,7 @@ const s = {
     width: "14px",
     height: "14px",
     borderRadius: "50%",
-    background: "#C8FF00",
+    background: "#22C55E",
     marginRight: "10px",
     flexShrink: 0,
   },
@@ -161,8 +161,8 @@ const s = {
     transition: "opacity 0.2s ease",
   },
   btnPrimary: {
-    background: "#C8FF00",
-    color: "#0B0B0B",
+    background: "#22C55E",
+    color: "#0A0A0A",
   },
   btnSecondary: {
     background: "#1E1E1E",
@@ -170,18 +170,18 @@ const s = {
     border: "1px solid #2A2A2A",
   },
   btnDanger: {
-    background: "#FF3B30",
+    background: "#EF4444",
     color: "#FFFFFF",
   },
   btnOutlineDanger: {
     background: "transparent",
-    color: "#FF3B30",
+    color: "#EF4444",
     border: "1px solid #FF3B30",
   },
   overlay: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.8)",
+    background: "rgba(0,0,0,0.85)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -231,7 +231,7 @@ const s = {
     borderRadius: "8px",
     padding: "6px 12px",
     fontSize: "13px",
-    color: "#C8FF00",
+    color: "#22C55E",
     fontWeight: "600",
   },
   warningBox: {
@@ -336,7 +336,7 @@ function ConfirmModal({ open, title, message, confirmLabel, onConfirm, onCancel,
               <button
                 style={{
                   ...s.modalBtn,
-                  background: "#FF3B30",
+                  background: "#EF4444",
                   color: "#FFFFFF",
                 }}
                 onClick={onConfirm}
@@ -493,7 +493,7 @@ export default function Settings({ state, dispatch }) {
           <div style={s.accentDot} />
           <div>
             <div style={s.label}>Accent Color</div>
-            <div style={{ ...s.sublabel, color: "#C8FF00" }}>#C8FF00</div>
+            <div style={{ ...s.sublabel, color: "#22C55E" }}>#22C55E</div>
           </div>
         </div>
       </motion.div>
@@ -691,7 +691,7 @@ export default function Settings({ state, dispatch }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.35 }}
       >
-        <div style={{ ...s.sectionTitle, color: "#FF3B30" }}>Danger Zone</div>
+        <div style={{ ...s.sectionTitle, color: "#EF4444" }}>Danger Zone</div>
         <div style={s.warningBox}>
           <div style={s.warningText}>
             Deleting your account is permanent. All your data, progress, and settings will be
@@ -753,7 +753,7 @@ export default function Settings({ state, dispatch }) {
                 <input
                   style={{
                     ...s.input,
-                    borderColor: deleteEmail && deleteEmail !== profile.email ? "#FF3B30" : "#2A2A2A",
+                    borderColor: deleteEmail && deleteEmail !== profile.email ? "#EF4444" : "#2A2A2A",
                   }}
                   value={deleteEmail}
                   onChange={(e) => setDeleteEmail(e.target.value)}
@@ -777,7 +777,7 @@ export default function Settings({ state, dispatch }) {
                 <button
                   style={{
                     ...s.modalBtn,
-                    background: deleteEmail === profile.email ? "#FF3B30" : "#333333",
+                    background: deleteEmail === profile.email ? "#EF4444" : "#333333",
                     color: deleteEmail === profile.email ? "#FFFFFF" : "#666666",
                     cursor: deleteEmail === profile.email ? "pointer" : "not-allowed",
                   }}

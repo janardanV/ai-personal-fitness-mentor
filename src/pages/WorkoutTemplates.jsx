@@ -81,7 +81,6 @@ const WorkoutTemplates = ({ state, dispatch }) => {
 
       {(state.workoutTemplates || []).length === 0 && !showCreate ? (
         <div className="wm-empty">
-          <div className="wm-empty-icon">📋</div>
           <div className="wm-empty-title">No Templates Yet</div>
           <div className="wm-empty-desc">Create reusable workout templates to start sessions quickly.</div>
           <button className="neon-btn" onClick={() => openCreate()}>Create Your First Template</button>
@@ -97,7 +96,7 @@ const WorkoutTemplates = ({ state, dispatch }) => {
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
                 {t.exercises?.slice(0, 5).map((e, i) => (
-                  <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>{e.exerciseName}</span>
+                  <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(255,255,255,0.04)", color: "#22C55E" }}>{e.exerciseName}</span>
                 ))}
                 {(t.exercises?.length || 0) > 5 && <span style={{ fontSize: 10, color: "#A0A0A0" }}>+{t.exercises.length - 5} more</span>}
               </div>
@@ -105,7 +104,7 @@ const WorkoutTemplates = ({ state, dispatch }) => {
                 <button className="neon-btn" onClick={() => startFromTemplate(t)} style={{ flex: 1, fontSize: 12, padding: "8px 0" }}>Start Workout</button>
                 <button className="ghost-btn" onClick={() => openCreate(t)} style={{ fontSize: 12, padding: "8px 12px" }}>Edit</button>
                 <button className="ghost-btn" onClick={() => { if (confirm('Delete "' + t.name + '"?')) dispatch({ type: "DELETE_TEMPLATE", payload: t.id }); }}
-                  style={{ fontSize: 12, padding: "8px 10px", color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}>✕</button>
+                  style={{ fontSize: 12, padding: "8px 10px", color: "#EF4444", borderColor: "rgba(239,68,68,0.3)" }}>✕</button>
               </div>
             </motion.div>
           ))}
@@ -133,7 +132,7 @@ const WorkoutTemplates = ({ state, dispatch }) => {
                 <span style={{ fontSize: 11, color: "#A0A0A0" }}>× </span>
                 <input className="wm-set-input" type="number" value={ex.defaultReps} style={{ width: 50 }} placeholder="Reps"
                   onChange={e => setTmplExercises(p => p.map((x, j) => j === i ? { ...x, defaultReps: +e.target.value } : x))} />
-                <button onClick={() => setTmplExercises(p => p.filter((_, j) => j !== i))} style={{ background: "none", color: "#FF4757", fontSize: 16, padding: 4 }}>×</button>
+                <button onClick={() => setTmplExercises(p => p.filter((_, j) => j !== i))} style={{ background: "none", color: "#EF4444", fontSize: 16, padding: 4 }}>×</button>
               </div>
             ))}
             <div style={{ position: "relative", marginTop: 8 }}>

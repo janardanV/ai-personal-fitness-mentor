@@ -13,7 +13,7 @@ export const Toast = () => {
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); } }, [toast]);
   if (!toast) return null;
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#C8FF00", color: "#0B0B0B", padding: "12px 24px", borderRadius: 12, fontWeight: 700, fontSize: 14, boxShadow: "0 8px 32px rgba(200,255,0,0.2)", animation: "slideUp 0.3s ease-out" }}>
+    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#22C55E", color: "#0A0A0A", padding: "12px 24px", borderRadius: 12, fontWeight: 700, fontSize: 14, boxShadow: "0 8px 32px rgba(34,197,94,0.2)", animation: "slideUp 0.3s ease-out" }}>
       {toast}
     </div>
   );
@@ -27,7 +27,7 @@ export const ConfirmDialog = () => {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={() => close(false)}>
       <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
-        style={{ background: "#151515", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 16, padding: 28, maxWidth: 380, width: "90%", backdropFilter: "blur(20px)", boxShadow: "0 16px 48px rgba(0,0,0,0.5)" }}
+        style={{ background: "#151515", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 28, maxWidth: 380, width: "90%", backdropFilter: "blur(20px)", boxShadow: "0 16px 48px rgba(0,0,0,0.5)" }}
         onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 18, fontWeight: 800, color: "#FFFFFF", marginBottom: 8 }}>Confirm Action</div>
         <p style={{ fontSize: 14, color: "#A0A0A0", lineHeight: 1.6, marginBottom: 24 }}>{state.msg}</p>

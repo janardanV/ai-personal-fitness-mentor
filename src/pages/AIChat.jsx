@@ -40,9 +40,9 @@ const AIChat = ({ state }) => {
         <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>AI Coach</h2>
         <span style={{
           fontSize: 10, padding: "2px 8px", borderRadius: 10,
-          background: isUsingMock() ? "rgba(255,180,0,0.15)" : "rgba(0,200,80,0.15)",
-          color: isUsingMock() ? "#FFB400" : "#00C850",
-          border: `1px solid ${isUsingMock() ? "rgba(255,180,0,0.3)" : "rgba(0,200,80,0.3)"}`,
+          background: isUsingMock() ? "rgba(255,180,0,0.15)" : "rgba(34,197,94,0.15)",
+          color: isUsingMock() ? "#FFB400" : "#22C55E",
+          border: `1px solid ${isUsingMock() ? "rgba(255,180,0,0.3)" : "rgba(34,197,94,0.3)"}`,
           textTransform: "uppercase", letterSpacing: "0.06em",
         }}>
           {isUsingMock() ? "Mock Mode" : "Claude"}
@@ -54,8 +54,8 @@ const AIChat = ({ state }) => {
           <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
             <div style={{
               maxWidth: "80%",
-              background: m.role === "user" ? "rgba(200,255,0,0.08)" : "rgba(255,255,255,0.03)",
-              border: `1px solid ${m.role === "user" ? "rgba(200,255,0,0.15)" : "rgba(255,255,255,0.06)"}`,
+              background: m.role === "user" ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
+              border: `1px solid ${m.role === "user" ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.06)"}`,
               borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
               padding: "12px 16px",
             }}>
