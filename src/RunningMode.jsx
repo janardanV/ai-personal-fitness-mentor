@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import React from "react";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
+import { pick, fmtPace, fmtDuration, fmtDurationLong, calcCalories, haversine, today, fmt as fmt2 } from "./utils/helpers";
 
 // ── Constants ───────────────────────────────────────────────────────────────
 const RUNNING_BADGE_DEFS = [
@@ -48,60 +48,7 @@ const MOCK_RUN_COACHING = {
   ],
 };
 
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
 // ── Helpers ─────────────────────────────────────────────────────────────────
-const fmt2 = (n, dec = 0) => Number(n).toFixed(dec);
-const fmtPace = (minPerKm) => {
-  if (!minPerKm || !isFinite(minPerKm) || minPerKm <= 0) return "--:--";
-  const min = Math.floor(minPerKm);
-  const sec = Math.round((minPerKm - min) * 60);
-  if (sec === 60) return `${min + 1}:00`;
-  return `${min}:${String(sec).padStart(2, "0")}`;
-};
-const fmtDuration = (seconds) => {
-  if (!seconds || seconds <= 0) return "00:00";
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return h > 0
-    ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
-    : `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-};
-const fmtDurationLong = (seconds) => {
-  if (!seconds || seconds <= 0) return "0h 0m";
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-};
-
-const calcCalories = (distanceKm, durationSeconds, weightKg = 70) => {
-  const hours = durationSeconds / 3600;
-  const speed = distanceKm / (hours || 0.001);
-  let met = 8.0;
-  if (speed >= 16) met = 16.0;
-  else if (speed >= 14) met = 13.5;
-  else if (speed >= 12.5) met = 12.0;
-  else if (speed >= 11) met = 11.0;
-  else if (speed >= 10) met = 9.8;
-  else if (speed >= 8) met = 8.3;
-  else if (speed >= 6.5) met = 7.0;
-  else if (speed >= 5) met = 6.0;
-  else if (speed >= 4) met = 4.5;
-  else met = 3.5;
-  return Math.round(0.0175 * met * weightKg * (durationSeconds / 60));
-};
-
-const haversine = (lat1, lon1, lat2, lon2) => {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
-
 const calcTotalDistance = (coords) => {
   let total = 0;
   for (let i = 1; i < coords.length; i++) {
@@ -147,8 +94,6 @@ const generateSplits = (distance, duration, route) => {
   }
   return splits;
 };
-
-const today = () => new Date().toISOString().split("T")[0];
 
 const generateAIReport = (run, prevRun) => {
   const feedback = pick(MOCK_RUN_COACHING.post_run);

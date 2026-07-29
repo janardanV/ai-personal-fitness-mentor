@@ -19,6 +19,10 @@ const Onboarding = ({ onComplete }) => {
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleFinish = async () => {
+    if (!form.name.trim()) { alert("Please enter your name."); return; }
+    if (form.age < 10 || form.age > 120) { alert("Please enter a valid age (10-120)."); return; }
+    if (form.height < 50 || form.height > 300) { alert("Please enter a valid height (50-300 cm)."); return; }
+    if (form.weight < 20 || form.weight > 500) { alert("Please enter a valid weight (20-500 kg)."); return; }
     const bmi = form.weight / ((form.height / 100) ** 2);
     const mult = ACTIVITY_MULTIPLIERS[form.activity] || 1.55;
     const tdee = form.gender === "male"

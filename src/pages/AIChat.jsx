@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import React from "react";
-import { useAICoach, fmt } from "../utils/helpers";
+import { useAICoach, fmt, isUsingMock } from "../utils/helpers";
 
 const Card = ({ children, style, className = "" }) => (
   <div className={`glass ${className}`} style={{ padding: "20px", ...style }}>{children}</div>
@@ -36,7 +36,18 @@ const AIChat = ({ state }) => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 140px)" }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>AI Coach</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>AI Coach</h2>
+        <span style={{
+          fontSize: 10, padding: "2px 8px", borderRadius: 10,
+          background: isUsingMock() ? "rgba(255,180,0,0.15)" : "rgba(0,200,80,0.15)",
+          color: isUsingMock() ? "#FFB400" : "#00C850",
+          border: `1px solid ${isUsingMock() ? "rgba(255,180,0,0.3)" : "rgba(0,200,80,0.3)"}`,
+          textTransform: "uppercase", letterSpacing: "0.06em",
+        }}>
+          {isUsingMock() ? "Mock Mode" : "Claude"}
+        </span>
+      </div>
 
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, marginBottom: 12, paddingRight: 4 }}>
         {messages.map((m, i) => (
