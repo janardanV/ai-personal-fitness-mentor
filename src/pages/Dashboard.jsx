@@ -390,8 +390,14 @@ const Dashboard = ({ state, dispatch, page }) => {
     return workouts.reduce((best, w) => (w.totalVolume > (best?.totalVolume || 0) ? w : best), workouts[0]);
   }, [workouts]);
 
+  const recoveryScore = Math.round(
+    ((calcRecovery?.(state.userProfile?.lastSleep) || 50) / 100) * 0.4 +
+    ((calcRecovery?.(state.userProfile?.lastStress) || 50) / 100) * 0.3 +
+    0.3
+  );
+
   return (
-    <motion.div className="dash-bento" style={{ display: "flex", flexDirection: "column", gap: 20 }}
+    <motion.div style={{ maxWidth: 1100, margin: "0 auto" }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
 
       {/* ════════════════════════════════════════════ */}
