@@ -6,21 +6,21 @@ import { pick, fmtPace, fmtDuration, fmtDurationLong, calcCalories, haversine, t
 
 // ── Constants ───────────────────────────────────────────────────────────────
 const RUNNING_BADGE_DEFS = [
-  { id: "first_run", icon: "", label: "First Run", desc: "Complete your first run" },
-  { id: "run_5k", icon: "", label: "5K Runner", desc: "Run 5 km in a single session" },
-  { id: "run_10k", icon: "", label: "10K Champion", desc: "Run 10 km in a single session" },
-  { id: "half_marathon", icon: "", label: "Half Marathon", desc: "Run 21.1 km in a single session" },
-  { id: "marathon", icon: "", label: "Marathon Finisher", desc: "Run 42.2 km in a single session" },
-  { id: "speed_demon", icon: "", label: "Speed Demon", desc: "Achieve pace faster than 4:30/km" },
-  { id: "streak_3", icon: "", label: "3-Day Streak", desc: "Run 3 consecutive days" },
-  { id: "streak_7", icon: "", label: "7-Day Streak", desc: "Run 7 consecutive days" },
-  { id: "total_100km", icon: "", label: "Century KM", desc: "Run a total of 100 km" },
-  { id: "total_500km", icon: "", label: "500KM Club", desc: "Run a total of 500 km" },
-  { id: "early_bird", icon: "", label: "Early Bird", desc: "Run before 7 AM" },
-  { id: "night_runner", icon: "", label: "Night Runner", desc: "Run after 9 PM" },
-  { id: "calorie_burner", icon: "", label: "Calorie Burner", desc: "Burn 1000 calories in one run" },
-  { id: "ten_runs", icon: "", label: "10 Runs", desc: "Complete 10 runs" },
-  { id: "fifty_runs", icon: "", label: "50 Runs", desc: "Complete 50 runs" },
+  { id: "first_run", icon: "🏃", label: "First Run", desc: "Complete your first run" },
+  { id: "run_5k", icon: "🏅", label: "5K Runner", desc: "Run 5 km in a single session" },
+  { id: "run_10k", icon: "🥇", label: "10K Champion", desc: "Run 10 km in a single session" },
+  { id: "half_marathon", icon: "🥈", label: "Half Marathon", desc: "Run 21.1 km in a single session" },
+  { id: "marathon", icon: "🏆", label: "Marathon Finisher", desc: "Run 42.2 km in a single session" },
+  { id: "speed_demon", icon: "⚡", label: "Speed Demon", desc: "Achieve pace faster than 4:30/km" },
+  { id: "streak_3", icon: "🔥", label: "3-Day Streak", desc: "Run 3 consecutive days" },
+  { id: "streak_7", icon: "🔥", label: "7-Day Streak", desc: "Run 7 consecutive days" },
+  { id: "total_100km", icon: "💯", label: "Century KM", desc: "Run a total of 100 km" },
+  { id: "total_500km", icon: "🌟", label: "500KM Club", desc: "Run a total of 500 km" },
+  { id: "early_bird", icon: "🌅", label: "Early Bird", desc: "Run before 7 AM" },
+  { id: "night_runner", icon: "🌙", label: "Night Runner", desc: "Run after 9 PM" },
+  { id: "calorie_burner", icon: "🔥", label: "Calorie Burner", desc: "Burn 1000 calories in one run" },
+  { id: "ten_runs", icon: "💪", label: "10 Runs", desc: "Complete 10 runs" },
+  { id: "fifty_runs", icon: "🎖️", label: "50 Runs", desc: "Complete 50 runs" },
 ];
 
 const MOCK_RUN_COACHING = {
@@ -108,9 +108,16 @@ const generateAIReport = (run, prevRun) => {
   return { feedback, tips: tips.slice(0, 3) };
 };
 
+// ── RunningMode CSS (injected) ──────────────────────────────────────────────
+const RUNNING_STYLES = `
+  @keyframes runPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.3); } 50% { box-shadow: 0 0 0 12px rgba(200,255,0,0); } }
+  @keyframes runGlow { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+  .run-live-pulse { animation: runPulse 2s ease-in-out infinite; }
+  .run-glow { animation: runGlow 2s ease-in-out infinite; }
+`;
 
 // ── Reusable Running Components ─────────────────────────────────────────────
-const RunMetricCard = ({ icon, label, value, unit, color = "#22C55E", sub }) => (
+const RunMetricCard = ({ icon, label, value, unit, color = "#C8FF00", sub }) => (
   <div className="run-metric-card" style={{ "--accent": color }}>
     <div className="run-metric-icon" style={{ background: `${color}15` }}>{icon}</div>
     <div className="run-metric-value" style={{ color }}>{value}<span style={{ fontSize: 12, fontWeight: 400, color: "#A0A0A0", marginLeft: 4 }}>{unit}</span></div>
@@ -173,7 +180,7 @@ const RunMap = ({ route, height = 300, showMarker = true, fitBounds = true }) =>
     if (route && route.length > 0) {
       const latlngs = route.map((p) => [p.lat, p.lng]);
       layerRef.current = L.polyline(latlngs, {
-        color: "#22C55E",
+        color: "#C8FF00",
         weight: 4,
         opacity: 0.85,
         lineJoin: "round",
@@ -188,7 +195,7 @@ const RunMap = ({ route, height = 300, showMarker = true, fitBounds = true }) =>
           className: "",
         });
         const endIcon = L.divIcon({
-          html: '<div style="width:14px;height:14px;background:#EF4444;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(239,68,68,0.3);"></div>',
+          html: '<div style="width:14px;height:14px;background:#FF4757;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(255,71,87,0.4);"></div>',
           iconSize: [14, 14],
           iconAnchor: [7, 7],
           className: "",
@@ -224,9 +231,9 @@ const RunMap = ({ route, height = 300, showMarker = true, fitBounds = true }) =>
     <div className="run-map-container" style={{ height }}>
       <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
       {!route || route.length === 0 ? (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(10,10,10,0.8)", zIndex: 500, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(11,11,11,0.8)", zIndex: 500, pointerEvents: "none" }}>
           <div style={{ textAlign: "center", color: "#A0A0A0" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}></div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🗺️</div>
             <div style={{ fontSize: 13, fontWeight: 500 }}>Start a run to see your route</div>
           </div>
         </div>
@@ -413,7 +420,7 @@ const ActiveRun = ({ state, dispatch, onSummary, onCancel }) => {
     lastPosRef.current = null;
   };
 
-  const gpsColor = gpsStatus === "active" ? "#00C853" : gpsStatus === "searching" || gpsStatus === "initializing" ? "#FFA500" : "#EF4444";
+  const gpsColor = gpsStatus === "active" ? "#00C853" : gpsStatus === "searching" || gpsStatus === "initializing" ? "#FFA500" : "#FF4757";
   const gpsLabel = { initializing: "Initializing GPS...", searching: "Searching for signal", active: "GPS Active", denied: "GPS Permission Denied", unavailable: "GPS Unavailable", timeout: "GPS Timeout" }[gpsStatus] || "Unknown";
 
   return (
@@ -423,18 +430,18 @@ const ActiveRun = ({ state, dispatch, onSummary, onCancel }) => {
         <RunMap route={route} height={320} showMarker={false} fitBounds={false} />
         {/* GPS Badge */}
         <div style={{ position: "absolute", top: 12, left: 12, zIndex: 500, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, border: `1px solid ${gpsColor}30` }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: gpsColor, boxShadow: `0 0 8px ${gpsColor}60` }} />
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: gpsColor, boxShadow: `0 0 8px ${gpsColor}60` }} className={gpsStatus === "active" ? "run-glow" : ""} />
           <span style={{ fontSize: 11, fontWeight: 600, color: gpsColor }}>{gpsLabel}</span>
         </div>
         {/* Live pace overlay */}
-        <div style={{ position: "absolute", bottom: 12, right: 12, zIndex: 500, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px", border: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ position: "absolute", bottom: 12, right: 12, zIndex: 500, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px", border: "1px solid rgba(200,255,0,0.1)" }}>
           <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pace</div>
-          <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: "#22C55E" }}>{fmtPace(avgPace)}</div>
+          <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: "#C8FF00" }}>{fmtPace(avgPace)}</div>
         </div>
       </div>
 
       {/* Live Display */}
-      <div className="run-live-display" style={{ background: "#151515", borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)", padding: "28px 20px", marginBottom: 20 }}>
+      <div className="run-live-display" style={{ background: "#151515", borderRadius: 16, border: "1px solid rgba(200,255,0,0.08)", padding: "28px 20px", marginBottom: 20 }}>
         <div className="run-live-label">Current Pace</div>
         <div className="run-live-pace mono">{fmtPace(avgPace)}</div>
         <div className="mono" style={{ fontSize: 14, color: "#A0A0A0", marginTop: 8 }}>{fmtDuration(elapsed)}</div>
@@ -442,31 +449,31 @@ const ActiveRun = ({ state, dispatch, onSummary, onCancel }) => {
 
       {/* Metrics Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
-        <RunMetricCard icon="" label="Distance" value={fmt2(distance, 2)} unit="km" color="#22C55E" />
-        <RunMetricCard icon="" label="Duration" value={fmtDuration(elapsed)} unit="" color="#A0A0A0" />
-        <RunMetricCard icon="" label="Avg Pace" value={fmtPace(avgPace)} unit="/km" color="#22C55E" />
-        <RunMetricCard icon="" label="Calories" value={calories} unit="kcal" color="#EF4444" />
-        <RunMetricCard icon="" label="Speed" value={fmt2(speed, 1)} unit="km/h" color="#00C853" />
-        <RunMetricCard icon="" label="Top Speed" value={fmt2(topSpeed, 1)} unit="km/h" color="#FFA500" />
-        <RunMetricCard icon="" label="Steps" value={steps.toLocaleString()} unit="" color="#22C55E" />
-        <RunMetricCard icon="" label="Cadence" value={cadence} unit="spm" color="#22C55E" />
-        <RunMetricCard icon="" label="Heart Rate" value={heartRate.current || "--"} unit="bpm" color="#EF4444" sub={`Avg: ${heartRate.avg || "--"} | Max: ${heartRate.max || "--"}`} />
-        <RunMetricCard icon="" label="Elevation" value={fmt2(elevationGain, 0)} unit="m" color="#00BCD4" />
+        <RunMetricCard icon="📏" label="Distance" value={fmt2(distance, 2)} unit="km" color="#C8FF00" />
+        <RunMetricCard icon="⏱️" label="Duration" value={fmtDuration(elapsed)} unit="" color="#A0A0A0" />
+        <RunMetricCard icon="📊" label="Avg Pace" value={fmtPace(avgPace)} unit="/km" color="#C8FF00" />
+        <RunMetricCard icon="🔥" label="Calories" value={calories} unit="kcal" color="#FF4757" />
+        <RunMetricCard icon="⚡" label="Speed" value={fmt2(speed, 1)} unit="km/h" color="#00C853" />
+        <RunMetricCard icon="🚀" label="Top Speed" value={fmt2(topSpeed, 1)} unit="km/h" color="#FFA500" />
+        <RunMetricCard icon="👣" label="Steps" value={steps.toLocaleString()} unit="" color="#A5E600" />
+        <RunMetricCard icon="💫" label="Cadence" value={cadence} unit="spm" color="#D9FF4D" />
+        <RunMetricCard icon="❤️" label="Heart Rate" value={heartRate.current || "--"} unit="bpm" color="#FF4757" sub={`Avg: ${heartRate.avg || "--"} | Max: ${heartRate.max || "--"}`} />
+        <RunMetricCard icon="⛰️" label="Elevation" value={fmt2(elevationGain, 0)} unit="m" color="#00BCD4" />
       </div>
 
       {/* Controls */}
       <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         {!running && elapsed === 0 ? (
-          <RunControlBtn className="start" onClick={handleStart}>Start Run</RunControlBtn>
+          <RunControlBtn className="start" onClick={handleStart}>▶ Start Run</RunControlBtn>
         ) : (
           <>
             {!paused ? (
-              <RunControlBtn className="pause" onClick={handlePause}>Pause</RunControlBtn>
+              <RunControlBtn className="pause" onClick={handlePause}>⏸ Pause</RunControlBtn>
             ) : (
-              <RunControlBtn className="resume" onClick={handleResume}>Resume</RunControlBtn>
+              <RunControlBtn className="resume" onClick={handleResume}>▶ Resume</RunControlBtn>
             )}
-            <RunControlBtn className="finish" onClick={handleFinish}>Finish</RunControlBtn>
-            <RunControlBtn className="reset" onClick={handleReset} disabled={running}>Reset</RunControlBtn>
+            <RunControlBtn className="finish" onClick={handleFinish}>⏹ Finish</RunControlBtn>
+            <RunControlBtn className="reset" onClick={handleReset} disabled={running}>↻ Reset</RunControlBtn>
           </>
         )}
         <RunControlBtn className="ghost" onClick={onCancel}>✕ Cancel</RunControlBtn>
@@ -501,7 +508,7 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
     <div className="run-summary-overlay">
       <motion.div className="run-summary-card" initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>{isPR ? "" : ""}</div>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>{isPR ? "🏆" : "🎉"}</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 }}>Run Complete!</h2>
           {isPR && <div style={{ fontSize: 13, color: "#FFD700", fontWeight: 600 }}>New Personal Record!</div>}
         </div>
@@ -509,7 +516,7 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
           <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Distance</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#22C55E" }}>{fmt2(run.distance, 2)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>km</span></div>
+            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#C8FF00" }}>{fmt2(run.distance, 2)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>km</span></div>
           </div>
           <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Time</div>
@@ -517,7 +524,7 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
           </div>
           <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Avg Pace</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#22C55E" }}>{fmtPace(run.avgPace)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>/km</span></div>
+            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#C8FF00" }}>{fmtPace(run.avgPace)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>/km</span></div>
           </div>
           <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Fastest Pace</div>
@@ -525,7 +532,7 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
           </div>
           <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Calories</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#EF4444" }}>{run.calories} <span style={{ fontSize: 12, color: "#A0A0A0" }}>kcal</span></div>
+            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#FF4757" }}>{run.calories} <span style={{ fontSize: 12, color: "#A0A0A0" }}>kcal</span></div>
           </div>
           <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Avg Speed</div>
@@ -563,13 +570,13 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
         {/* AI Coach Feedback */}
         <div className="dash-ai-card" style={{ marginBottom: 20, padding: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}></div>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#22C55E" }}>AI Running Coach</span>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,255,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🤖</div>
+            <span style={{ fontSize: 14, fontWeight: 700, color: "#C8FF00" }}>AI Running Coach</span>
           </div>
           <p style={{ fontSize: 13, color: "#D0D0D0", lineHeight: 1.6, marginBottom: 12 }}>{report.feedback}</p>
           {report.tips.map((tip, i) => (
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
-              <span style={{ color: "#22C55E", fontSize: 12, marginTop: 2 }}>→</span>
+              <span style={{ color: "#C8FF00", fontSize: 12, marginTop: 2 }}>→</span>
               <span style={{ fontSize: 12, color: "#A0A0A0", lineHeight: 1.5 }}>{tip}</span>
             </div>
           ))}
@@ -627,6 +634,7 @@ const RunHistory = ({ state, dispatch }) => {
     <div>
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
         <div className="wm-search-bar" style={{ flex: 1, minWidth: 200 }}>
+          <span className="search-icon">🔍</span>
           <input placeholder="Search runs..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ paddingLeft: 40 }} />
         </div>
         <select value={sortField} onChange={(e) => setSortField(e.target.value)} style={{ width: "auto", minWidth: 140 }}>
@@ -641,7 +649,7 @@ const RunHistory = ({ state, dispatch }) => {
       </div>
 
       {runs.length === 0 ? (
-        <EmptyState icon="" title="No runs yet" desc="Start your first run to see it here!" />
+        <EmptyState icon="🏃" title="No runs yet" desc="Start your first run to see it here!" />
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {runs.map((run) => (
@@ -649,7 +657,7 @@ const RunHistory = ({ state, dispatch }) => {
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>{run.date}</span>
-                  {run.distance >= 5 && <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(255,255,255,0.06)", color: "#22C55E", fontWeight: 600 }}>{fmt2(run.distance, 1)} km</span>}
+                  {run.distance >= 5 && <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontWeight: 600 }}>{fmt2(run.distance, 1)} km</span>}
                 </div>
                 <div style={{ display: "flex", gap: 16, fontSize: 12, color: "#A0A0A0" }}>
                   <span className="mono">{fmtDuration(run.duration)}</span>
@@ -659,7 +667,7 @@ const RunHistory = ({ state, dispatch }) => {
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 <button className="ghost-btn" onClick={() => setViewRun(run)} style={{ padding: "6px 12px", fontSize: 12 }}>View</button>
-                <button className="ghost-btn" onClick={() => handleDelete(run.id)} style={{ padding: "6px 12px", fontSize: 12, color: "#EF4444", borderColor: "rgba(239,68,68,0.15)" }}>Delete</button>
+                <button className="ghost-btn" onClick={() => handleDelete(run.id)} style={{ padding: "6px 12px", fontSize: 12, color: "#FF4757", borderColor: "rgba(255,71,87,0.2)" }}>Delete</button>
               </div>
             </div>
           ))}
@@ -683,22 +691,22 @@ const PersonalRecords = ({ state }) => {
     const best = [];
 
     const fastest1km = sorted.filter((r) => r.avgPace > 0).sort((a, b) => a.avgPace - b.avgPace)[0];
-    if (fastest1km) best.push({ id: "fastest1km", label: "Fastest 1 km", value: fmtPace(fastest1km.avgPace), unit: "/km", date: fastest1km.date, icon: "" });
+    if (fastest1km) best.push({ id: "fastest1km", label: "Fastest 1 km", value: fmtPace(fastest1km.avgPace), unit: "/km", date: fastest1km.date, icon: "⚡" });
 
     const longest = sorted.sort((a, b) => b.distance - a.distance)[0];
-    if (longest) best.push({ id: "longestDistance", label: "Longest Distance", value: fmt2(longest.distance, 2), unit: "km", date: longest.date, icon: "" });
+    if (longest) best.push({ id: "longestDistance", label: "Longest Distance", value: fmt2(longest.distance, 2), unit: "km", date: longest.date, icon: "📏" });
 
     const fastest5k = sorted.filter((r) => r.distance >= 5).sort((a, b) => a.avgPace - b.avgPace)[0];
-    if (fastest5k) best.push({ id: "fastest5km", label: "Fastest 5 km", value: fmtPace(fastest5k.avgPace), unit: "/km", date: fastest5k.date, icon: "" });
+    if (fastest5k) best.push({ id: "fastest5km", label: "Fastest 5 km", value: fmtPace(fastest5k.avgPace), unit: "/km", date: fastest5k.date, icon: "🏅" });
 
     const longestDuration = sorted.sort((a, b) => b.duration - a.duration)[0];
-    if (longestDuration) best.push({ id: "longestDuration", label: "Longest Duration", value: fmtDurationLong(longestDuration.duration), unit: "", date: longestDuration.date, icon: "" });
+    if (longestDuration) best.push({ id: "longestDuration", label: "Longest Duration", value: fmtDurationLong(longestDuration.duration), unit: "", date: longestDuration.date, icon: "⏱️" });
 
     const highestCal = sorted.sort((a, b) => b.calories - a.calories)[0];
-    if (highestCal) best.push({ id: "highestCalories", label: "Highest Calories", value: highestCal.calories, unit: "kcal", date: highestCal.date, icon: "" });
+    if (highestCal) best.push({ id: "highestCalories", label: "Highest Calories", value: highestCal.calories, unit: "kcal", date: highestCal.date, icon: "🔥" });
 
     const totalDist = runs.reduce((s, r) => s + r.distance, 0);
-    best.push({ id: "totalDistance", label: "Total Distance", value: fmt2(totalDist, 1), unit: "km", date: "", icon: "" });
+    best.push({ id: "totalDistance", label: "Total Distance", value: fmt2(totalDist, 1), unit: "km", date: "", icon: "🌍" });
 
     return best;
   }, [runs]);
@@ -728,7 +736,7 @@ const PersonalRecords = ({ state }) => {
   }, [runs]);
 
   if (runs.length === 0) {
-    return <EmptyState icon="" title="No records yet" desc="Complete runs to set personal records!" />;
+    return <EmptyState icon="🏆" title="No records yet" desc="Complete runs to set personal records!" />;
   }
 
   return (
@@ -737,8 +745,9 @@ const PersonalRecords = ({ state }) => {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 32 }}>
         {records.map((r) => (
           <div key={r.id} className="run-pr-card achieved">
+            <div style={{ fontSize: 28, marginBottom: 8 }}>{r.icon}</div>
             <div style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 4 }}>{r.label}</div>
-            <div className="mono" style={{ fontSize: 24, fontWeight: 800, color: "#22C55E" }}>{r.value}<span style={{ fontSize: 12, fontWeight: 400, color: "#A0A0A0", marginLeft: 4 }}>{r.unit}</span></div>
+            <div className="mono" style={{ fontSize: 24, fontWeight: 800, color: "#C8FF00" }}>{r.value}<span style={{ fontSize: 12, fontWeight: 400, color: "#A0A0A0", marginLeft: 4 }}>{r.unit}</span></div>
             {r.date && <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 4 }}>{r.date}</div>}
           </div>
         ))}
@@ -749,6 +758,7 @@ const PersonalRecords = ({ state }) => {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10, marginTop: 12 }}>
         {RUNNING_BADGE_DEFS.map((b) => (
           <div key={b.id} className={`run-badge-card ${earnedBadgeIds.includes(b.id) ? "earned" : ""}`}>
+            <div className="run-badge-icon" style={{ opacity: earnedBadgeIds.includes(b.id) ? 1 : 0.3 }}>{b.icon}</div>
             <div className="run-badge-label">{b.label}</div>
             <div className="run-badge-desc">{b.desc}</div>
           </div>
@@ -837,19 +847,19 @@ const RunningAnalytics = ({ state }) => {
   const totalDuration = runs.reduce((s, r) => s + r.duration, 0);
 
   if (runs.length === 0) {
-    return <EmptyState icon="" title="No data yet" desc="Complete runs to see your analytics!" />;
+    return <EmptyState icon="📊" title="No data yet" desc="Complete runs to see your analytics!" />;
   }
 
-  const tooltipStyle = { contentStyle: { background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontSize: 12, color: "#FFFFFF" }, labelStyle: { color: "#A0A0A0" } };
+  const tooltipStyle = { contentStyle: { background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.15)", borderRadius: 10, fontSize: 12, color: "#FFFFFF" }, labelStyle: { color: "#A0A0A0" } };
 
   return (
     <div>
       {/* Summary Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
-        <RunMetricCard icon="" label="Total Distance" value={fmt2(totalDist, 1)} unit="km" color="#22C55E" />
-        <RunMetricCard icon="" label="Total Calories" value={totalCal.toLocaleString()} unit="kcal" color="#EF4444" />
-        <RunMetricCard icon="" label="Total Time" value={fmtDurationLong(totalDuration)} unit="" color="#A0A0A0" />
-        <RunMetricCard icon="" label="Total Runs" value={runs.length} unit="" color="#00C853" />
+        <RunMetricCard icon="📏" label="Total Distance" value={fmt2(totalDist, 1)} unit="km" color="#C8FF00" />
+        <RunMetricCard icon="🔥" label="Total Calories" value={totalCal.toLocaleString()} unit="kcal" color="#FF4757" />
+        <RunMetricCard icon="⏱️" label="Total Time" value={fmtDurationLong(totalDuration)} unit="" color="#A0A0A0" />
+        <RunMetricCard icon="🏃" label="Total Runs" value={runs.length} unit="" color="#00C853" />
       </div>
 
       <TabBar
@@ -862,51 +872,51 @@ const RunningAnalytics = ({ state }) => {
         {chartPeriod === "weekly" && (
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,255,0,0.05)" />
               <XAxis dataKey="label" stroke="#A0A0A0" fontSize={11} />
               <YAxis stroke="#A0A0A0" fontSize={11} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="distance" fill="#22C55E" radius={[6, 6, 0, 0]} name="Distance (km)" />
+              <Bar dataKey="distance" fill="#C8FF00" radius={[6, 6, 0, 0]} name="Distance (km)" />
             </BarChart>
           </ResponsiveContainer>
         )}
         {chartPeriod === "monthly" && (
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,255,0,0.05)" />
               <XAxis dataKey="label" stroke="#A0A0A0" fontSize={11} />
               <YAxis stroke="#A0A0A0" fontSize={11} />
               <Tooltip {...tooltipStyle} />
-              <Area type="monotone" dataKey="distance" stroke="#22C55E" fill="rgba(255,255,255,0.06)" name="Distance (km)" />
+              <Area type="monotone" dataKey="distance" stroke="#C8FF00" fill="rgba(200,255,0,0.1)" name="Distance (km)" />
             </AreaChart>
           </ResponsiveContainer>
         )}
         {chartPeriod === "calories" && (
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={chartPeriod === "monthly" ? monthlyData : weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,255,0,0.05)" />
               <XAxis dataKey="label" stroke="#A0A0A0" fontSize={11} />
               <YAxis stroke="#A0A0A0" fontSize={11} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="calories" fill="#EF4444" radius={[6, 6, 0, 0]} name="Calories" />
+              <Bar dataKey="calories" fill="#FF4757" radius={[6, 6, 0, 0]} name="Calories" />
             </BarChart>
           </ResponsiveContainer>
         )}
         {chartPeriod === "pace" && (
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={paceTrend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,255,0,0.05)" />
               <XAxis dataKey="label" stroke="#A0A0A0" fontSize={11} />
               <YAxis stroke="#A0A0A0" fontSize={11} reversed domain={["auto", "auto"]} />
               <Tooltip {...tooltipStyle} />
-              <Line type="monotone" dataKey="pace" stroke="#22C55E" strokeWidth={2} dot={{ fill: "#22C55E", r: 3 }} name="Pace (min/km)" />
+              <Line type="monotone" dataKey="pace" stroke="#C8FF00" strokeWidth={2} dot={{ fill: "#C8FF00", r: 3 }} name="Pace (min/km)" />
             </LineChart>
           </ResponsiveContainer>
         )}
         {chartPeriod === "frequency" && (
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={frequencyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,255,0,0.05)" />
               <XAxis dataKey="label" stroke="#A0A0A0" fontSize={11} />
               <YAxis stroke="#A0A0A0" fontSize={11} />
               <Tooltip {...tooltipStyle} />
@@ -925,7 +935,7 @@ const RunningAnalytics = ({ state }) => {
               const isBest = i === 0 || r.avgPace < runs.slice(0, i).reduce((min, pr) => Math.min(min, pr.avgPace), Infinity);
               return (
                 <div key={r.id} className="dash-timeline-item">
-                  <div className="dash-timeline-dot" style={{ background: isBest ? "#FFD700" : "#22C55E" }} />
+                  <div className="dash-timeline-dot" style={{ background: isBest ? "#FFD700" : "#C8FF00" }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{r.date}</div>
                     <div style={{ fontSize: 12, color: "#A0A0A0" }}>{fmt2(r.distance, 2)} km · {fmtPace(r.avgPace)} /km · {fmtDuration(r.duration)}</div>
@@ -1006,10 +1016,10 @@ const AICoach = ({ state }) => {
       {/* Quick Stats */}
       {insights.stats && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
-          <RunMetricCard icon="" label="Total Runs" value={insights.stats.totalRuns} unit="" />
-          <RunMetricCard icon="" label="Avg Distance" value={fmt2(insights.stats.avgDist, 1)} unit="km" />
-          <RunMetricCard icon="" label="Best Pace" value={fmtPace(insights.stats.bestPace)} unit="/km" color="#00C853" />
-          <RunMetricCard icon="" label="Streak" value={insights.stats.streak} unit="days" color="#FFA500" />
+          <RunMetricCard icon="🏃" label="Total Runs" value={insights.stats.totalRuns} unit="" />
+          <RunMetricCard icon="📏" label="Avg Distance" value={fmt2(insights.stats.avgDist, 1)} unit="km" />
+          <RunMetricCard icon="⚡" label="Best Pace" value={fmtPace(insights.stats.bestPace)} unit="/km" color="#00C853" />
+          <RunMetricCard icon="🔥" label="Streak" value={insights.stats.streak} unit="days" color="#FFA500" />
         </div>
       )}
 
@@ -1017,15 +1027,15 @@ const AICoach = ({ state }) => {
       <SectionTitle>AI Coaching Insights</SectionTitle>
       <div className="dash-ai-card" style={{ marginTop: 12, marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}></div>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(200,255,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🤖</div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#22C55E" }}>Running Coach</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#C8FF00" }}>Running Coach</div>
             <div style={{ fontSize: 11, color: "#A0A0A0" }}>Personalized recommendations based on your data</div>
           </div>
         </div>
         {insights.tips.map((tip, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.03)" }}>
-            <span style={{ color: "#22C55E", fontSize: 16, lineHeight: 1.3 }}>→</span>
+            <span style={{ color: "#C8FF00", fontSize: 16, lineHeight: 1.3 }}>→</span>
             <span style={{ fontSize: 13, color: "#D0D0D0", lineHeight: 1.6 }}>{tip}</span>
           </div>
         ))}
@@ -1038,7 +1048,7 @@ const AICoach = ({ state }) => {
           <div className="glass" style={{ padding: 0, overflow: "hidden", marginTop: 12 }}>
             {trainingPlan.map((day, i) => (
               <div key={i} style={{ display: "grid", gridTemplateColumns: "60px 1fr 100px", gap: 12, padding: "12px 16px", borderBottom: i < trainingPlan.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", alignItems: "center" }}>
-                <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "#22C55E" }}>{day.day}</span>
+                <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "#C8FF00" }}>{day.day}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{day.type}</div>
                   <div style={{ fontSize: 11, color: "#A0A0A0" }}>{day.note}</div>
@@ -1053,7 +1063,7 @@ const AICoach = ({ state }) => {
       {/* Hydration Reminder */}
       <div style={{ marginTop: 20, padding: 16, borderRadius: 14, background: "rgba(0,188,212,0.06)", border: "1px solid rgba(0,188,212,0.12)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 20 }}></span>
+          <span style={{ fontSize: 20 }}>💧</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#00BCD4" }}>Hydration Tip</div>
             <div style={{ fontSize: 12, color: "#A0A0A0" }}>Drink 500ml of water 2 hours before your next run. Dehydration can reduce performance by up to 15%.</div>
@@ -1087,11 +1097,11 @@ const RunningGoals = ({ state, dispatch }) => {
   const streak = getRunningStreak(runs);
 
   const goalItems = [
-    { label: "Daily Distance", current: todayDist, target: goals.dailyKm, unit: "km", icon: "", color: "#22C55E" },
-    { label: "Weekly Distance", current: weekDist, target: goals.weeklyKm, unit: "km", icon: "", color: "#00C853" },
-    { label: "Monthly Distance", current: monthDist, target: goals.monthlyKm, unit: "km", icon: "", color: "#00BCD4" },
-    { label: "Calories Goal", current: todayCal, target: goals.calories, unit: "kcal", icon: "", color: "#EF4444" },
-    { label: "Run Streak", current: streak, target: goals.streakTarget, unit: "days", icon: "", color: "#FFA500" },
+    { label: "Daily Distance", current: todayDist, target: goals.dailyKm, unit: "km", icon: "📏", color: "#C8FF00" },
+    { label: "Weekly Distance", current: weekDist, target: goals.weeklyKm, unit: "km", icon: "📅", color: "#00C853" },
+    { label: "Monthly Distance", current: monthDist, target: goals.monthlyKm, unit: "km", icon: "📆", color: "#00BCD4" },
+    { label: "Calories Goal", current: todayCal, target: goals.calories, unit: "kcal", icon: "🔥", color: "#FF4757" },
+    { label: "Run Streak", current: streak, target: goals.streakTarget, unit: "days", icon: "🔥", color: "#FFA500" },
   ];
 
   const handleSave = () => {
@@ -1123,7 +1133,7 @@ const RunningGoals = ({ state, dispatch }) => {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{g.label}</div>
                 </div>
-                {met && <span style={{ fontSize: 16 }}></span>}
+                {met && <span style={{ fontSize: 16 }}>✅</span>}
               </div>
               {editing ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -1170,7 +1180,7 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
       {/* Header */}
       <div className="dash-header" style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, position: "relative", zIndex: 1 }}>
-          <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}></div>
+          <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>🏃</div>
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, color: "#FFFFFF" }}>Running Mode</h1>
             <p style={{ fontSize: 13, color: "#A0A0A0", marginTop: 2 }}>Track your runs, crush your goals</p>
@@ -1181,7 +1191,7 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
       {/* Quick Actions */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 24 }}>
         <div className="dash-quick" onClick={onStartRun}>
-          <div className="q-icon" style={{ background: "rgba(255,255,255,0.06)" }}></div>
+          <div className="q-icon" style={{ background: "rgba(200,255,0,0.1)" }}>▶️</div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Start Run</div>
             <div style={{ fontSize: 11, color: "#A0A0A0" }}>Begin tracking</div>
@@ -1189,7 +1199,7 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
         </div>
         {lastRun && (
           <div className="dash-quick">
-            <div className="q-icon" style={{ background: "rgba(0,200,83,0.1)" }}></div>
+            <div className="q-icon" style={{ background: "rgba(0,200,83,0.1)" }}>📊</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Last Run</div>
               <div style={{ fontSize: 11, color: "#A0A0A0" }}>{fmt2(lastRun.distance, 1)} km · {fmtPace(lastRun.avgPace)} /km</div>
@@ -1197,7 +1207,7 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
           </div>
         )}
         <div className="dash-quick">
-          <div className="q-icon" style={{ background: "rgba(255,165,0,0.1)" }}></div>
+          <div className="q-icon" style={{ background: "rgba(255,165,0,0.1)" }}>🔥</div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Streak</div>
             <div style={{ fontSize: 11, color: "#A0A0A0" }}>{streak} day{streak !== 1 ? "s" : ""} running</div>
@@ -1208,17 +1218,17 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
       {/* Today's Stats */}
       <SectionTitle>Today's Activity</SectionTitle>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginTop: 12, marginBottom: 24 }}>
-        <RunMetricCard icon="" label="Distance" value={fmt2(todayDist, 2)} unit="km" color="#22C55E" />
-        <RunMetricCard icon="" label="Calories" value={todayCal} unit="kcal" color="#EF4444" />
-        <RunMetricCard icon="" label="Runs Today" value={todayRuns.length} unit="" color="#00C853" />
-        <RunMetricCard icon="" label="Total Distance" value={fmt2(totalDist, 1)} unit="km" color="#A0A0A0" />
+        <RunMetricCard icon="📏" label="Distance" value={fmt2(todayDist, 2)} unit="km" color="#C8FF00" />
+        <RunMetricCard icon="🔥" label="Calories" value={todayCal} unit="kcal" color="#FF4757" />
+        <RunMetricCard icon="🏃" label="Runs Today" value={todayRuns.length} unit="" color="#00C853" />
+        <RunMetricCard icon="🌍" label="Total Distance" value={fmt2(totalDist, 1)} unit="km" color="#A0A0A0" />
       </div>
 
       {/* Goal Progress */}
       <SectionTitle>Goal Progress</SectionTitle>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginTop: 12, marginBottom: 24 }}>
         {[
-          { label: "Daily", current: todayDist, target: goals.dailyKm, color: "#22C55E" },
+          { label: "Daily", current: todayDist, target: goals.dailyKm, color: "#C8FF00" },
           { label: "Weekly", current: (() => { const ws = new Date(); ws.setDate(ws.getDate() - ws.getDay()); return runs.filter((r) => new Date(r.date) >= ws).reduce((s, r) => s + r.distance, 0); })(), target: goals.weeklyKm, color: "#00C853" },
           { label: "Monthly", current: (() => { const ms = new Date(new Date().getFullYear(), new Date().getMonth(), 1); return runs.filter((r) => new Date(r.date) >= ms).reduce((s, r) => s + r.distance, 0); })(), target: goals.monthlyKm, color: "#00BCD4" },
         ].map((g) => {
@@ -1250,12 +1260,12 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
       <SectionTitle>Recent Runs</SectionTitle>
       <div style={{ marginTop: 12 }}>
         {recentRuns.length === 0 ? (
-          <EmptyState icon="" title="No runs yet" desc="Start your first run to begin tracking!" />
+          <EmptyState icon="🏃" title="No runs yet" desc="Start your first run to begin tracking!" />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {recentRuns.map((run) => (
               <div key={run.id} className="run-history-item" style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}></div>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(200,255,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🏃</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF" }}>{run.date}</div>
                   <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#A0A0A0", marginTop: 2 }}>
@@ -1281,7 +1291,8 @@ const RunningNotifications = ({ notifications, onClear }) => {
     <div style={{ position: "fixed", top: 80, right: 24, zIndex: 9998, display: "flex", flexDirection: "column", gap: 8, maxWidth: 340 }}>
       {notifications.map((n) => (
         <motion.div key={n.id} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}
-          style={{ background: "#151515", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+          style={{ background: "#151515", border: "1px solid rgba(200,255,0,0.15)", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+          <span style={{ fontSize: 18 }}>{n.icon}</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{n.title}</div>
             <div style={{ fontSize: 11, color: "#A0A0A0" }}>{n.message}</div>
@@ -1354,11 +1365,11 @@ export default function RunningMode({ state, dispatch }) {
     if (prevRuns.length > 0) {
       const bestPace = Math.min(...prevRuns.filter((r) => r.avgPace > 0).map((r) => r.avgPace));
       if (run.avgPace > 0 && run.avgPace < bestPace) {
-        addNotification("", "New Personal Record!", "Fastest pace ever!");
+        addNotification("⚡", "New Personal Record!", "Fastest pace ever!");
       }
       const bestDist = Math.max(...prevRuns.map((r) => r.distance));
       if (run.distance > bestDist) {
-        addNotification("", "New Personal Record!", "Longest distance!");
+        addNotification("📏", "New Personal Record!", "Longest distance!");
       }
     }
 
@@ -1368,7 +1379,7 @@ export default function RunningMode({ state, dispatch }) {
       .filter((r) => r.date === run.date)
       .reduce((s, r) => s + (r.distance || 0), 0);
     if (todayDist >= goals.dailyKm) {
-      addNotification("", "Goal Achieved!", "Daily distance goal reached!");
+      addNotification("🎯", "Goal Achieved!", "Daily distance goal reached!");
     }
   }, [runs, state.runningGoals, addNotification]);
 
@@ -1417,6 +1428,7 @@ export default function RunningMode({ state, dispatch }) {
 
   return (
     <>
+      <style>{RUNNING_STYLES}</style>
       <RunningNotifications notifications={notifications} onClear={clearNotification} />
 
       <AnimatePresence>
@@ -1429,12 +1441,12 @@ export default function RunningMode({ state, dispatch }) {
       {mode !== "active" && (
         <TabBar
           tabs={[
-            { id: "overview", icon: "", label: "Overview" },
-            { id: "history", icon: "", label: "History" },
-            { id: "records", icon: "", label: "Records" },
-            { id: "analytics", icon: "", label: "Analytics" },
-            { id: "goals", icon: "", label: "Goals" },
-            { id: "coach", icon: "", label: "Coach" },
+            { id: "overview", icon: "🏠", label: "Overview" },
+            { id: "history", icon: "📋", label: "History" },
+            { id: "records", icon: "🏆", label: "Records" },
+            { id: "analytics", icon: "📊", label: "Analytics" },
+            { id: "goals", icon: "🎯", label: "Goals" },
+            { id: "coach", icon: "🤖", label: "Coach" },
           ]}
           active={subTab}
           onChange={setSubTab}

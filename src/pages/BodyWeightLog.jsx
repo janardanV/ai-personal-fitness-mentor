@@ -42,12 +42,12 @@ const BodyWeightLog = ({ state, dispatch }) => {
           <div style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 12 }}>Weight history (60 days)</div>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={data.length ? data : [{ date: today().slice(5), weight: state.profile?.weight || 75 }]}>
-              <defs><linearGradient id="bwg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22C55E" stopOpacity={0.3} /><stop offset="95%" stopColor="#22C55E" stopOpacity={0} /></linearGradient></defs>
+              <defs><linearGradient id="bwg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C8FF00" stopOpacity={0.3} /><stop offset="95%" stopColor="#C8FF00" stopOpacity={0} /></linearGradient></defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} domain={["auto", "auto"]} />
-              <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-              <Area type="monotone" dataKey="weight" stroke="#22C55E" fill="url(#bwg)" strokeWidth={2} dot={{ fill: "#22C55E", r: 3 }} />
+              <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.3)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
+              <Area type="monotone" dataKey="weight" stroke="#C8FF00" fill="url(#bwg)" strokeWidth={2} dot={{ fill: "#C8FF00", r: 3 }} />
             </AreaChart>
           </ResponsiveContainer>
         </Card>

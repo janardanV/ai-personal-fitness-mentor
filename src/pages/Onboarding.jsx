@@ -44,10 +44,10 @@ const Onboarding = ({ onComplete }) => {
     onComplete({ ...form, bmi: fmt(bmi, 1), tdee: Math.round(tdee), protein, calories, currentProgram: parsedProgram });
   };
 
-  const stepIcons = ["", "", ""];
+  const stepIcons = ["👤", "💪", "🎯"];
   const goalIcons = {
-    muscle: "", fat_loss: "", strength: "", endurance: "",
-    powerlifting: "", bodybuilding: "", general: ""
+    muscle: "💪", fat_loss: "🔥", strength: "🏋️", endurance: "🏃",
+    powerlifting: "⚡", bodybuilding: "💎", general: "✨"
   };
 
   return (
@@ -55,35 +55,36 @@ const Onboarding = ({ onComplete }) => {
       <div className="onb-hero" style={{
         flex: "1 1 50%", maxWidth: "50%", display: "flex", flexDirection: "column",
         justifyContent: "center", padding: "60px 64px", position: "relative",
-        background: "linear-gradient(135deg, #0A0A0A 0%, #111111 40%, #151515 100%)",
+        background: "linear-gradient(135deg, #0B0B0B 0%, #111111 40%, #151515 100%)",
       }}>
         <div style={{
           position: "absolute", inset: 0, opacity: 0.5,
-          background: "radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%)",
+          background: "radial-gradient(ellipse at 20% 50%, rgba(200,255,0,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(165,230,0,0.04) 0%, transparent 50%)",
           animation: "gradientShift 12s ease infinite", backgroundSize: "200% 200%",
         }} />
         <div style={{
           position: "absolute", top: "10%", left: "8%", width: 200, height: 200,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)",
+          borderRadius: "50%", background: "radial-gradient(circle, rgba(200,255,0,0.05) 0%, transparent 70%)",
           filter: "blur(40px)", animation: "float 8s ease-in-out infinite", pointerEvents: "none",
         }} />
         <div style={{
           position: "absolute", bottom: "15%", right: "10%", width: 160, height: 160,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)",
+          borderRadius: "50%", background: "radial-gradient(circle, rgba(165,230,0,0.04) 0%, transparent 70%)",
           filter: "blur(35px)", animation: "float2 10s ease-in-out infinite", pointerEvents: "none",
         }} />
         <div style={{
           position: "absolute", top: "60%", left: "50%", width: 120, height: 120,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)",
+          borderRadius: "50%", background: "radial-gradient(circle, rgba(200,255,0,0.03) 0%, transparent 70%)",
           filter: "blur(30px)", animation: "float 12s ease-in-out infinite 2s", pointerEvents: "none",
         }} />
         <div style={{ position: "relative", zIndex: 1, animation: "fadeInLeft 0.8s ease both" }}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px",
-            borderRadius: 100, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 100, background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.12)",
             marginBottom: 32, animation: "fadeIn 1s ease 0.3s both",
           }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: "#22C55E", letterSpacing: "0.05em", textTransform: "uppercase" }}>AI-Powered Fitness</span>
+            <span style={{ fontSize: 14 }}>⚡</span>
+            <span style={{ fontSize: 12, fontWeight: 500, color: "#C8FF00", letterSpacing: "0.05em", textTransform: "uppercase" }}>AI-Powered Fitness</span>
           </div>
           <h1 style={{
             fontSize: 44, fontWeight: 900, lineHeight: 1.1, letterSpacing: "-0.03em",
@@ -91,11 +92,11 @@ const Onboarding = ({ onComplete }) => {
           }}>
             Welcome to{" "}
             <span style={{
-              background: "linear-gradient(135deg, #22C55E 0%, #22C55E 100%)",
+              background: "linear-gradient(135deg, #C8FF00 0%, #A5E600 100%)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>AI Fitness</span>{" "}
             <span style={{
-              background: "linear-gradient(135deg, #22C55E 0%, #22C55E 100%)",
+              background: "linear-gradient(135deg, #A5E600 0%, #C8FF00 100%)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>Mentor</span>
           </h1>
@@ -109,12 +110,13 @@ const Onboarding = ({ onComplete }) => {
             display: "grid", gridTemplateColumns: "1fr", gap: 12, animation: "fadeInUp 0.8s ease 0.5s both",
           }}>
             {[
-              { icon: "", title: "Smart Workout Tracking", desc: "Generate adaptive workouts and monitor strength progression.", color: "#22C55E" },
-              { icon: "", title: "AI Nutrition Coach", desc: "Track calories and macros with intelligent recommendations.", color: "#22C55E" },
-              { icon: "", title: "Progress Analytics", desc: "Visualize your fitness journey with interactive insights.", color: "#22C55E" },
+              { icon: "🏋️", title: "Smart Workout Tracking", desc: "Generate adaptive workouts and monitor strength progression.", color: "#C8FF00" },
+              { icon: "🥗", title: "AI Nutrition Coach", desc: "Track calories and macros with intelligent recommendations.", color: "#A5E600" },
+              { icon: "📈", title: "Progress Analytics", desc: "Visualize your fitness journey with interactive insights.", color: "#C8FF00" },
             ].map((f, i) => (
               <div className="onb-feature-card" key={i} style={{ animation: `fadeInUp 0.6s ease ${0.6 + i * 0.1}s both` }}>
                 <div className="feat-icon" style={{ background: `${f.color}10` }}>
+                  <span>{f.icon}</span>
                 </div>
                 <h4>{f.title}</h4>
                 <p>{f.desc}</p>
@@ -127,16 +129,17 @@ const Onboarding = ({ onComplete }) => {
       <div className="onb-card-side" style={{
         flex: "1 1 50%", maxWidth: "50%", display: "flex", alignItems: "center",
         justifyContent: "center", padding: "48px 40px", position: "relative",
-        background: "linear-gradient(180deg, #0A0A0A 0%, #111111 100%)",
+        background: "linear-gradient(180deg, #0B0B0B 0%, #111111 100%)",
       }}>
         <div style={{ width: "100%", maxWidth: 460, animation: "fadeInRight 0.8s ease 0.2s both" }}>
           <div style={{ textAlign: "center", marginBottom: 36, animation: "fadeIn 0.6s ease 0.4s both" }}>
             <div style={{
               width: 56, height: 56, borderRadius: 16, margin: "0 auto 16px",
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)", display: "flex",
+              background: "rgba(200,255,0,0.1)",
+              border: "1px solid rgba(200,255,0,0.2)", display: "flex",
               alignItems: "center", justifyContent: "center", fontSize: 24,
-            }}></div>
+              animation: "glowPulse 3s ease infinite",
+            }}>⚡</div>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>Let's set up your profile</h2>
             <p style={{ fontSize: 14, color: "rgba(160,160,160,0.6)" }}>Takes about 30 seconds</p>
           </div>
@@ -150,8 +153,8 @@ const Onboarding = ({ onComplete }) => {
                   display: "flex", alignItems: "center", justifyContent: "center",
                   width: 36, height: 36, borderRadius: 10, fontSize: 12, fontWeight: 700,
                   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                  ...(i < step ? { background: "#22C55E", color: "#0A0A0A", animation: "stepComplete 0.4s ease" }
-                  : i === step ? { background: "rgba(255,255,255,0.06)", color: "#22C55E", border: "1.5px solid rgba(255,255,255,0.2)", boxShadow: "0 0 20px rgba(255,255,255,0.06)" }
+                  ...(i < step ? { background: "#C8FF00", color: "#0B0B0B", animation: "stepComplete 0.4s ease" }
+                  : i === step ? { background: "rgba(200,255,0,0.1)", color: "#C8FF00", border: "1.5px solid rgba(200,255,0,0.35)", boxShadow: "0 0 20px rgba(200,255,0,0.1)" }
                   : { background: "rgba(255,255,255,0.03)", color: "rgba(160,160,160,0.35)", border: "1.5px solid rgba(255,255,255,0.04)" }),
                 }}>
                   {i < step ? "✓" : s.icon}
@@ -159,7 +162,7 @@ const Onboarding = ({ onComplete }) => {
                 {i < steps.length - 1 && (
                   <div style={{
                     width: 32, height: 2, borderRadius: 1,
-                    background: i < step ? "#22C55E" : "rgba(255,255,255,0.04)",
+                    background: i < step ? "#C8FF00" : "rgba(255,255,255,0.04)",
                     transition: "background 0.4s ease",
                   }} />
                 )}
@@ -167,7 +170,7 @@ const Onboarding = ({ onComplete }) => {
             ))}
           </div>
           <div style={{
-            background: "#151515", border: "1px solid rgba(255,255,255,0.06)",
+            background: "#151515", border: "1px solid rgba(200,255,0,0.08)",
             borderRadius: 20, padding: "32px 28px",
             boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
             animation: "scaleIn 0.5s ease 0.6s both",
@@ -176,7 +179,7 @@ const Onboarding = ({ onComplete }) => {
               <div style={{
                 width: 40, height: 40, borderRadius: 12, display: "flex",
                 alignItems: "center", justifyContent: "center", fontSize: 18,
-                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(200,255,0,0.08)", border: "1px solid rgba(200,255,0,0.12)",
               }}>
                 {stepIcons[step]}
               </div>
@@ -189,15 +192,18 @@ const Onboarding = ({ onComplete }) => {
             {step === 0 && (
               <div style={{ animation: "fadeInUp 0.4s ease both" }}>
                 <div className="onb-input-wrap">
+                  <span className="onb-icon">👤</span>
                   <input value={form.name} onChange={e => set("name", e.target.value)} placeholder=" " aria-label="First Name" tabIndex={0} />
                   <label className="onb-float">First Name</label>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <div className="onb-input-wrap">
+                    <span className="onb-icon">📅</span>
                     <input type="number" value={form.age} onChange={e => set("age", +e.target.value)} min={13} max={100} placeholder=" " aria-label="Age" tabIndex={0} />
                     <label className="onb-float">Age</label>
                   </div>
                   <div className="onb-input-wrap">
+                    <span className="onb-icon">⚧</span>
                     <select value={form.gender} onChange={e => set("gender", e.target.value)} aria-label="Gender" tabIndex={0}>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
@@ -212,8 +218,9 @@ const Onboarding = ({ onComplete }) => {
             {step === 1 && (
               <div style={{ animation: "fadeInUp 0.4s ease both" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                  {[["height", "Height", "cm"], ["weight", "Weight", "kg"], ["bodyFat", "Body Fat", "%"]].map(([k, label, unit]) => (
+                  {[["height", "Height", "📏", "cm"], ["weight", "Weight", "⚖️", "kg"], ["bodyFat", "Body Fat", "📊", "%"]].map(([k, label, icon, unit]) => (
                     <div className="onb-input-wrap" key={k}>
+                      <span className="onb-icon">{icon}</span>
                       <input type="number" value={form[k]} onChange={e => set(k, +e.target.value)} min={k === "height" ? 100 : k === "weight" ? 30 : 3} max={k === "height" ? 250 : k === "weight" ? 300 : 60} placeholder=" " aria-label={label} tabIndex={0} />
                       <label className="onb-float">{label} ({unit})</label>
                     </div>
@@ -225,12 +232,14 @@ const Onboarding = ({ onComplete }) => {
             {step === 2 && (
               <div style={{ animation: "fadeInUp 0.4s ease both" }}>
                 <div className="onb-input-wrap">
+                  <span className="onb-icon">🏃</span>
                   <select value={form.activity} onChange={e => set("activity", e.target.value)} aria-label="Activity Level" tabIndex={0}>
                     {[["sedentary", "Sedentary (desk job)"], ["light", "Lightly Active (1-3x/wk)"], ["moderate", "Moderately Active (3-5x/wk)"], ["active", "Very Active (6-7x/wk)"], ["very_active", "Extremely Active (2x/day)"]].map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                   <label className="onb-float">Activity Level</label>
                 </div>
                 <div className="onb-input-wrap">
+                  <span className="onb-icon">🏋️</span>
                   <select value={form.experience} onChange={e => set("experience", e.target.value)} aria-label="Training Experience" tabIndex={0}>
                     {[["beginner", "Beginner (< 1 year)"], ["intermediate", "Intermediate (1-3 years)"], ["advanced", "Advanced (3-5 years)"], ["elite", "Elite (5+ years)"]].map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
@@ -241,7 +250,7 @@ const Onboarding = ({ onComplete }) => {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     {Object.entries(GOAL_LABELS).map(([v, l]) => (
                       <button key={v} className={`onb-goal-btn ${form.goal === v ? "selected" : ""}`} onClick={() => set("goal", v)} aria-label={l} aria-pressed={form.goal === v} tabIndex={0}>
-                        <span className="goal-check">{form.goal === v && <span style={{ fontSize: 10, color: "#0A0A0A" }}>✓</span>}</span>
+                        <span className="goal-check">{form.goal === v && <span style={{ fontSize: 10, color: "#0B0B0B" }}>✓</span>}</span>
                         <span style={{ fontSize: 16 }}>{goalIcons[v]}</span>
                         <span>{l}</span>
                       </button>
@@ -261,10 +270,10 @@ const Onboarding = ({ onComplete }) => {
                 <button className="onb-grad-btn" style={{ width: "auto", padding: "14px 36px" }} onClick={handleFinish} disabled={loading} tabIndex={0} aria-label="Start your fitness journey">
                   {loading ? (
                     <span style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}>
-                      <span style={{ width: 18, height: 18, border: "2.5px solid rgba(10,10,10,0.3)", borderTopColor: "#0A0A0A", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                      <span style={{ width: 18, height: 18, border: "2.5px solid rgba(11,11,11,0.3)", borderTopColor: "#0B0B0B", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                       Generating your plan…
                     </span>
-                  ) : "Start Your Journey"}
+                  ) : "Start Your Journey ⚡"}
                 </button>
               )}
             </div>

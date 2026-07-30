@@ -2,24 +2,24 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const GOAL_TYPES = [
-  { type: "Lose Weight", icon: "", color: "#EF4444" },
-  { type: "Gain Muscle", icon: "", color: "#22C55E" },
-  { type: "Increase Strength", icon: "", color: "#FFA500" },
-  { type: "Run 5K", icon: "", color: "#3B82F6" },
-  { type: "Drink Enough Water", icon: "", color: "#4FC3F7" },
-  { type: "Custom", icon: "", color: "#22C55E" },
+  { type: "Lose Weight", icon: "⚖️", color: "#FF6B6B" },
+  { type: "Gain Muscle", icon: "💪", color: "#C8FF00" },
+  { type: "Increase Strength", icon: "🏋️", color: "#FFA500" },
+  { type: "Run 5K", icon: "🏃", color: "#00C8FF" },
+  { type: "Drink Enough Water", icon: "💧", color: "#4FC3F7" },
+  { type: "Custom", icon: "🎯", color: "#C8FF00" },
 ];
 
 const MILESTONES = [25, 50, 75, 100];
 
 function getGoalIcon(type) {
   const found = GOAL_TYPES.find(g => g.type === type);
-  return found ? found.icon : "";
+  return found ? found.icon : "🎯";
 }
 
 function getGoalColor(type) {
   const found = GOAL_TYPES.find(g => g.type === type);
-  return found ? found.color : "#22C55E";
+  return found ? found.color : "#C8FF00";
 }
 
 function getProgressPercent(currentValue, targetValue) {
@@ -104,55 +104,55 @@ export default function GoalManager({ state, dispatch }) {
     title: { fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 },
     sub: { fontSize: 13, color: "#A0A0A0" },
     statsRow: { display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" },
-    statCard: { flex: "1 1 120px", background: "#151515", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 14, padding: 16, textAlign: "center" },
-    statValue: { fontSize: 28, fontWeight: 800, color: "#22C55E" },
+    statCard: { flex: "1 1 120px", background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 16, textAlign: "center" },
+    statValue: { fontSize: 28, fontWeight: 800, color: "#C8FF00" },
     statLabel: { fontSize: 11, color: "#A0A0A0", marginTop: 4 },
     grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 12 },
-    card: { background: "#151515", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 14, padding: 18, position: "relative" },
+    card: { background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 18, position: "relative" },
     cardHeader: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 },
     iconWrap: { width: 40, height: 40, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 },
     cardTitle: { fontSize: 15, fontWeight: 700, color: "#FFFFFF", flex: 1 },
-    cardType: { fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 6, background: "rgba(255,255,255,0.04)", color: "#22C55E" },
+    cardType: { fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 6, background: "rgba(200,255,0,0.08)", color: "#C8FF00" },
     cardDesc: { fontSize: 12, color: "#A0A0A0", marginBottom: 10, lineHeight: 1.5 },
     progressSection: { marginBottom: 10 },
     progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
     progressLabel: { fontSize: 11, color: "#A0A0A0" },
-    progressValue: { fontSize: 13, fontWeight: 700, color: "#22C55E" },
+    progressValue: { fontSize: 13, fontWeight: 700, color: "#C8FF00" },
     progressBarBg: { width: "100%", height: 8, background: "#1D1D1D", borderRadius: 4, overflow: "hidden", position: "relative" },
     progressBarFill: { height: "100%", borderRadius: 4, transition: "width 0.5s ease" },
     milestones: { display: "flex", justifyContent: "space-between", marginTop: 4, position: "relative" },
-    milestoneTick: { width: 1, height: 8, background: "rgba(255,255,255,0.08)" },
-    milestoneReached: { background: "rgba(255,255,255,0.12)" },
+    milestoneTick: { width: 1, height: 8, background: "rgba(200,255,0,0.15)" },
+    milestoneReached: { background: "rgba(200,255,0,0.5)" },
     milestoneText: { fontSize: 9, color: "#A0A0A0", marginTop: 2, textAlign: "center", flex: 1 },
-    milestoneActive: { color: "#22C55E", fontWeight: 700 },
+    milestoneActive: { color: "#C8FF00", fontWeight: 700 },
     dateRow: { display: "flex", justifyContent: "space-between", marginTop: 8 },
     dateText: { fontSize: 11, color: "#A0A0A0" },
     daysLeft: { fontSize: 11, fontWeight: 600 },
     cardActions: { display: "flex", gap: 8, marginTop: 12 },
-    btnSmall: { padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", color: "#22C55E", cursor: "pointer", transition: "all 0.2s" },
-    btnDanger: { padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, border: "1px solid rgba(239,68,68,0.15)", background: "rgba(239,68,68,0.06)", color: "#EF4444", cursor: "pointer", transition: "all 0.2s" },
-    addBtn: { padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 700, background: "#22C55E", color: "#0A0A0A", border: "none", cursor: "pointer", transition: "all 0.2s" },
+    btnSmall: { padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, border: "1px solid rgba(200,255,0,0.15)", background: "rgba(200,255,0,0.06)", color: "#C8FF00", cursor: "pointer", transition: "all 0.2s" },
+    btnDanger: { padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, border: "1px solid rgba(255,71,87,0.15)", background: "rgba(255,71,87,0.06)", color: "#FF4757", cursor: "pointer", transition: "all 0.2s" },
+    addBtn: { padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 700, background: "#C8FF00", color: "#0B0B0B", border: "none", cursor: "pointer", transition: "all 0.2s" },
     overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20, overflowY: "auto" },
-    modal: { width: "100%", maxWidth: 500, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: 28, maxHeight: "90vh", overflowY: "auto" },
+    modal: { width: "100%", maxWidth: 500, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(200,255,0,0.12)", borderRadius: 20, padding: 28, maxHeight: "90vh", overflowY: "auto" },
     modalTitle: { fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 20 },
     closeBtn: { position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#A0A0A0", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 14 },
     label: { fontSize: 12, fontWeight: 600, color: "#A0A0A0", marginBottom: 6, display: "block" },
-    input: { width: "100%", padding: "10px 14px", background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 10, color: "#FFFFFF", fontSize: 14, outline: "none", boxSizing: "border-box" },
-    textarea: { width: "100%", padding: "10px 14px", background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 10, color: "#FFFFFF", fontSize: 14, outline: "none", resize: "vertical", minHeight: 60, boxSizing: "border-box", fontFamily: "inherit" },
+    input: { width: "100%", padding: "10px 14px", background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 10, color: "#FFFFFF", fontSize: 14, outline: "none", boxSizing: "border-box" },
+    textarea: { width: "100%", padding: "10px 14px", background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 10, color: "#FFFFFF", fontSize: 14, outline: "none", resize: "vertical", minHeight: 60, boxSizing: "border-box", fontFamily: "inherit" },
     typeGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 },
-    typeBtn: { padding: "10px 6px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.04)", background: "#1D1D1D", cursor: "pointer", textAlign: "center", transition: "all 0.2s", color: "#A0A0A0" },
-    typeBtnActive: { borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.04)", color: "#22C55E" },
+    typeBtn: { padding: "10px 6px", borderRadius: 10, border: "1px solid rgba(200,255,0,0.08)", background: "#1D1D1D", cursor: "pointer", textAlign: "center", transition: "all 0.2s", color: "#A0A0A0" },
+    typeBtnActive: { borderColor: "rgba(200,255,0,0.35)", background: "rgba(200,255,0,0.08)", color: "#C8FF00" },
     typeIcon: { fontSize: 22, display: "block", marginBottom: 4 },
     typeName: { fontSize: 10, fontWeight: 600 },
     row: { display: "flex", gap: 10 },
     rowField: { flex: 1 },
     celebrateOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1100 },
-    celebrateCard: { background: "#151515", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 380, width: "90%" },
+    celebrateCard: { background: "#151515", border: "1px solid rgba(200,255,0,0.2)", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 380, width: "90%" },
     celebrateIcon: { fontSize: 64, marginBottom: 16 },
-    celebrateTitle: { fontSize: 24, fontWeight: 800, color: "#22C55E", marginBottom: 8 },
+    celebrateTitle: { fontSize: 24, fontWeight: 800, color: "#C8FF00", marginBottom: 8 },
     celebrateSub: { fontSize: 14, color: "#A0A0A0", marginBottom: 24 },
     archiveToggle: { fontSize: 12, color: "#A0A0A0", cursor: "pointer", background: "none", border: "1px solid rgba(160,160,160,0.15)", padding: "6px 14px", borderRadius: 8, transition: "all 0.2s" },
-    archiveCard: { background: "#151515", border: "1px solid rgba(255,255,255,0.02)", borderRadius: 12, padding: 14, opacity: 0.7 },
+    archiveCard: { background: "#151515", border: "1px solid rgba(200,255,0,0.04)", borderRadius: 12, padding: 14, opacity: 0.7 },
     emptyState: { textAlign: "center", padding: "48px 0", color: "#A0A0A0" },
     emptyIcon: { fontSize: 48, marginBottom: 12, opacity: 0.4 },
     emptyText: { fontSize: 14, marginBottom: 4 },
@@ -208,7 +208,7 @@ export default function GoalManager({ state, dispatch }) {
 
       {activeGoals.length === 0 && archivedGoals.length === 0 && (
         <motion.div style={s.emptyState} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <div style={s.emptyIcon}></div>
+          <div style={s.emptyIcon}>🎯</div>
           <div style={s.emptyText}>No goals yet</div>
           <div style={s.emptySub}>Create your first goal to start tracking progress</div>
         </motion.div>
@@ -274,7 +274,7 @@ export default function GoalManager({ state, dispatch }) {
                   <div style={s.dateRow}>
                     <span style={s.dateText}>Started {formatDate(goal.startDate)}</span>
                     {goal.targetDate && (
-                      <span style={{ ...s.daysLeft, color: days !== null && days < 0 ? "#EF4444" : days !== null && days < 7 ? "#FFA500" : "#A0A0A0" }}>
+                      <span style={{ ...s.daysLeft, color: days !== null && days < 0 ? "#FF4757" : days !== null && days < 7 ? "#FFA500" : "#A0A0A0" }}>
                         {days !== null && days < 0 ? `${Math.abs(days)}d overdue` : days !== null ? `${days}d left` : ""}
                       </span>
                     )}
@@ -318,7 +318,7 @@ export default function GoalManager({ state, dispatch }) {
                   exit={{ opacity: 0, scale: 0.95 }}
                 >
                   <div style={s.cardHeader}>
-                    <div style={{ ...s.iconWrap, background: "rgba(255,255,255,0.06)" }}></div>
+                    <div style={{ ...s.iconWrap, background: "rgba(0,200,83,0.1)" }}>✅</div>
                     <div style={{ ...s.cardTitle, color: "#A0A0A0" }}>{goal.title}</div>
                     <span style={{ ...s.cardType, color: "#00C853", background: "rgba(0,200,83,0.1)" }}>Done</span>
                   </div>
@@ -415,7 +415,7 @@ export default function GoalManager({ state, dispatch }) {
 
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
               <button
-                style={{ ...s.btnSmall, flex: 1, padding: "10px 0", background: "rgba(255,255,255,0.04)", fontSize: 13 }}
+                style={{ ...s.btnSmall, flex: 1, padding: "10px 0", background: "rgba(200,255,0,0.08)", fontSize: 13 }}
                 onClick={() => { setShowCreate(false); resetForm(); }}
               >
                 Cancel
@@ -511,7 +511,7 @@ export default function GoalManager({ state, dispatch }) {
 
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
               <button
-                style={{ ...s.btnSmall, flex: 1, padding: "10px 0", background: "rgba(255,255,255,0.04)", fontSize: 13 }}
+                style={{ ...s.btnSmall, flex: 1, padding: "10px 0", background: "rgba(200,255,0,0.08)", fontSize: 13 }}
                 onClick={() => setEditingGoal(null)}
               >
                 Cancel
@@ -557,8 +557,8 @@ export default function GoalManager({ state, dispatch }) {
                 animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
                 transition={{ duration: 0.6 }}
               >
-                  
-                </motion.div>
+                🏆
+              </motion.div>
               <div style={s.celebrateTitle}>Goal Completed!</div>
               <div style={s.celebrateSub}>{completedGoal.title} — amazing work!</div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -568,7 +568,7 @@ export default function GoalManager({ state, dispatch }) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: m * 0.005 }}
-                    style={{ fontSize: 11, color: "#22C55E", background: "rgba(255,255,255,0.04)", padding: "4px 10px", borderRadius: 6 }}
+                    style={{ fontSize: 11, color: "#C8FF00", background: "rgba(200,255,0,0.1)", padding: "4px 10px", borderRadius: 6 }}
                   >
                     {m}%
                   </motion.span>

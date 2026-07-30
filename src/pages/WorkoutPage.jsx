@@ -20,8 +20,9 @@ const WorkoutPage = ({ state, dispatch }) => {
   if (session) {
     return (
       <Card>
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Active Workout Session</div>
+        <div style={{ textAlign: "center", padding: "20px 0" }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>🏋️</div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Active Workout Session</div>
           <p style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 16 }}>
             {session.name} · {session.exercises?.length || 0} exercises
           </p>
@@ -72,6 +73,7 @@ const WorkoutPage = ({ state, dispatch }) => {
         </Card>
       ) : (
         <div style={{ textAlign: "center", padding: "40px 0" }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>💪</div>
           <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>No workout logged today</div>
           <p style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 20, maxWidth: 400, marginInline: "auto" }}>
             Start a new workout session to track your exercises, sets, and progress in real-time.

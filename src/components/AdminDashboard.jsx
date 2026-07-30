@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-const ACCENT = '#22C55E';
-const BG = '#0A0A0A';
+const ACCENT = '#C8FF00';
+const BG = '#0B0B0B';
 const SURFACE = '#151515';
 const SURFACE_LIGHT = '#1E1E1E';
 const SECONDARY = '#A0A0A0';
@@ -307,7 +307,7 @@ export default function AdminDashboard({ state, dispatch }) {
     }),
   };
 
-  const typeColors = { Workout: ACCENT, Run: '#3B82F6', Meal: '#EF4444' };
+  const typeColors = { Workout: ACCENT, Run: '#00D4FF', Meal: '#FF6B6B' };
 
   return (
     <div style={{ background: BG, minHeight: '100vh', padding: '24px 32px', color: '#FFFFFF', fontFamily: "'Inter', -apple-system, sans-serif" }}>
@@ -362,7 +362,7 @@ export default function AdminDashboard({ state, dispatch }) {
               <YAxis tick={{ fill: SECONDARY, fontSize: 11 }} allowDecimals={false} />
               <Tooltip
                 contentStyle={{ background: SURFACE_LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, color: '#FFF' }}
-                cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                cursor={{ fill: 'rgba(200,255,0,0.05)' }}
               />
               <Bar dataKey="count" name="Workouts" fill={ACCENT} radius={[4, 4, 0, 0]} />
             </BarChart>

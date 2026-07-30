@@ -20,7 +20,7 @@ const variants = {
   danger: {
     background: "var(--red-dim)",
     color: "var(--red)",
-    border: "1px solid rgba(239,68,68,0.2)",
+    border: "1px solid rgba(255,71,87,0.2)",
   },
   accent: {
     background: "var(--accent-dim)",

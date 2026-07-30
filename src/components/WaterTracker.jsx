@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const COLORS = {
-  bg: "#0A0A0A",
+  bg: "#0B0B0B",
   surface: "#151515",
   surfaceHover: "#1C1C1C",
-  accent: "#22C55E",
-  accentDim: "rgba(255,255,255,0.06)",
+  accent: "#C8FF00",
+  accentDim: "rgba(200,255,0,0.15)",
   text: "#FFFFFF",
   secondary: "#A0A0A0",
   danger: "#FF4D4D",

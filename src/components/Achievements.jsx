@@ -2,14 +2,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 
 const COLORS = {
-  bg: '#0A0A0A',
+  bg: '#0B0B0B',
   surface: '#151515',
-  accent: '#22C55E',
+  accent: '#C8FF00',
   secondary: '#A0A0A0',
   text: '#FFFFFF',
   border: '#252525',
   locked: '#1A1A1A',
-  accentDim: 'rgba(255, 255, 255, 0.06)',
+  accentDim: 'rgba(200, 255, 0, 0.15)',
 };
 
 const CATEGORIES = ['All', 'Workout', 'Nutrition', 'Running', 'Social', 'Special'];
@@ -271,10 +271,10 @@ export default function Achievements({ state, dispatch }) {
   const xpPercent = xpToNext > 0 ? Math.max(0, Math.min((xpInLevel / xpToNext) * 100, 100)) : 0;
 
   const statCards = [
-    { label: 'Badges Earned', value: `${totalEarned} / ${achievementsWithStatus.length}`, icon: '' },
-    { label: 'Current Streak', value: `${streaks.current} days`, icon: '' },
-    { label: 'Longest Streak', value: `${streaks.longest} days`, icon: '' },
-    { label: 'Total Workouts', value: workouts.length.toString(), icon: '' },
+    { label: 'Badges Earned', value: `${totalEarned} / ${achievementsWithStatus.length}`, icon: '🏅' },
+    { label: 'Current Streak', value: `${streaks.current} days`, icon: '🔥' },
+    { label: 'Longest Streak', value: `${streaks.longest} days`, icon: '⚡' },
+    { label: 'Total Workouts', value: workouts.length.toString(), icon: '💪' },
   ];
 
   return (
@@ -311,7 +311,7 @@ export default function Achievements({ state, dispatch }) {
               fontSize: '24px',
               fontWeight: 'bold',
               color: COLORS.bg,
-              boxShadow: `0 0 20px rgba(255, 255, 255, 0.08)`,
+              boxShadow: `0 0 20px rgba(200, 255, 0, 0.3)`,
               flexShrink: 0,
             }}
           >
@@ -434,7 +434,7 @@ export default function Achievements({ state, dispatch }) {
                 color: COLORS.secondary,
               }}
             >
-              <div style={{ fontSize: '48px', marginBottom: '12px' }}></div>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🔒</div>
               <div style={{ fontSize: '16px', marginBottom: '4px' }}>No achievements here yet</div>
               <div style={{ fontSize: '13px' }}>Keep pushing to unlock badges in this category</div>
             </motion.div>
@@ -449,14 +449,14 @@ export default function Achievements({ state, dispatch }) {
               whileHover={{
                 scale: 1.02,
                 boxShadow: achievement.isEarned
-                  ? '0 0 20px rgba(255, 255, 255, 0.04)'
+                  ? '0 0 20px rgba(200, 255, 0, 0.1)'
                   : 'none',
               }}
               style={{
                 backgroundColor: achievement.isEarned ? COLORS.surface : COLORS.locked,
                 borderRadius: '12px',
                 padding: '16px',
-                border: `1px solid ${achievement.isEarned ? 'rgba(255, 255, 255, 0.12)' : COLORS.border}`,
+                border: `1px solid ${achievement.isEarned ? 'rgba(200, 255, 0, 0.25)' : COLORS.border}`,
                 opacity: achievement.isEarned ? 1 : 0.65,
                 position: 'relative',
                 overflow: 'hidden',

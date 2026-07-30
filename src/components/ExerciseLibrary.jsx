@@ -80,27 +80,27 @@ export default function ExerciseLibrary({ state, dispatch }) {
     sub: { fontSize: 13, color: "#A0A0A0" },
     searchWrap: { position: "relative", marginBottom: 16 },
     searchIcon: { position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(160,160,160,0.4)", fontSize: 14, pointerEvents: "none" },
-    searchInput: { paddingLeft: 40, height: 42, background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 12, color: "#FFFFFF", padding: "10px 14px 10px 40px", fontSize: 14, width: "100%", outline: "none" },
+    searchInput: { paddingLeft: 40, height: 42, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 12, color: "#FFFFFF", padding: "10px 14px 10px 40px", fontSize: 14, width: "100%", outline: "none" },
     filters: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 },
-    chip: { padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", color: "#A0A0A0", cursor: "pointer", transition: "all 0.2s" },
-    chipActive: { background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.12)", color: "#22C55E" },
+    chip: { padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.06)", color: "#A0A0A0", cursor: "pointer", transition: "all 0.2s" },
+    chipActive: { background: "rgba(200,255,0,0.1)", borderColor: "rgba(200,255,0,0.25)", color: "#C8FF00" },
     count: { fontSize: 12, color: "#A0A0A0", marginBottom: 12 },
     grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 },
-    card: { background: "#151515", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 14, padding: 16, cursor: "pointer", transition: "all 0.2s" },
+    card: { background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 16, cursor: "pointer", transition: "all 0.2s" },
     cardName: { fontSize: 15, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 },
     cardMeta: { fontSize: 12, color: "#A0A0A0", marginBottom: 8 },
     tag: { display: "inline-block", padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, marginRight: 4, marginBottom: 4 },
     overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20, overflowY: "auto" },
-    modal: { width: "100%", maxWidth: 600, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: 32, maxHeight: "90vh", overflowY: "auto" },
+    modal: { width: "100%", maxWidth: 600, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(200,255,0,0.12)", borderRadius: 20, padding: 32, maxHeight: "90vh", overflowY: "auto" },
     modalTitle: { fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 },
-    sectionTitle: { fontSize: 14, fontWeight: 700, color: "#22C55E", marginTop: 16, marginBottom: 8 },
+    sectionTitle: { fontSize: 14, fontWeight: 700, color: "#C8FF00", marginTop: 16, marginBottom: 8 },
     desc: { fontSize: 13, color: "#A0A0A0", lineHeight: 1.7, marginBottom: 12 },
     step: { display: "flex", gap: 10, marginBottom: 8, fontSize: 13, color: "#E8E8E8", lineHeight: 1.6 },
-    stepNum: { minWidth: 22, height: 22, borderRadius: 6, background: "rgba(255,255,255,0.04)", color: "#22C55E", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-    mistake: { fontSize: 13, color: "#EF4444", marginBottom: 4, paddingLeft: 16, position: "relative" },
+    stepNum: { minWidth: 22, height: 22, borderRadius: 6, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+    mistake: { fontSize: 13, color: "#FF4757", marginBottom: 4, paddingLeft: 16, position: "relative" },
     tip: { fontSize: 13, color: "#00C853", marginBottom: 4, paddingLeft: 16, position: "relative" },
     closeBtn: { position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#A0A0A0", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 14 },
-    imgPlaceholder: { width: "100%", height: 200, borderRadius: 12, background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginBottom: 16 },
+    imgPlaceholder: { width: "100%", height: 200, borderRadius: 12, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginBottom: 16 },
     imgText: { fontSize: 12, color: "#A0A0A0" },
   };
 
@@ -112,7 +112,7 @@ export default function ExerciseLibrary({ state, dispatch }) {
       </div>
 
       <div style={s.searchWrap}>
-        <span style={s.searchIcon}></span>
+        <span style={s.searchIcon}>🔍</span>
         <input style={s.searchInput} placeholder="Search exercises..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
@@ -145,15 +145,15 @@ export default function ExerciseLibrary({ state, dispatch }) {
           <motion.div
             key={ex.id}
             style={s.card}
-            whileHover={{ borderColor: "rgba(255,255,255,0.08)", transform: "translateY(-2px)" }}
+            whileHover={{ borderColor: "rgba(200,255,0,0.15)", transform: "translateY(-2px)" }}
             onClick={() => setSelectedExercise(ex)}
           >
             <div style={s.cardName}>{ex.name}</div>
             <div style={s.cardMeta}>{ex.equip} · {ex.cat}</div>
             <div>
-              <span style={{ ...s.tag, background: "rgba(255,255,255,0.04)", color: "#22C55E" }}>{ex.primary}</span>
+              <span style={{ ...s.tag, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>{ex.primary}</span>
               {ex.secondary && <span style={{ ...s.tag, background: "rgba(160,160,160,0.08)", color: "#A0A0A0" }}>{ex.secondary}</span>}
-              <span style={{ ...s.tag, background: ex.difficulty === "Beginner" ? "rgba(0,200,83,0.1)" : ex.difficulty === "Advanced" ? "rgba(239,68,68,0.1)" : "rgba(255,165,0,0.1)", color: ex.difficulty === "Beginner" ? "#00C853" : ex.difficulty === "Advanced" ? "#EF4444" : "#FFA500" }}>{ex.difficulty}</span>
+              <span style={{ ...s.tag, background: ex.difficulty === "Beginner" ? "rgba(0,200,83,0.1)" : ex.difficulty === "Advanced" ? "rgba(255,71,87,0.1)" : "rgba(255,165,0,0.1)", color: ex.difficulty === "Beginner" ? "#00C853" : ex.difficulty === "Advanced" ? "#FF4757" : "#FFA500" }}>{ex.difficulty}</span>
             </div>
           </motion.div>
         ))}
@@ -165,10 +165,10 @@ export default function ExerciseLibrary({ state, dispatch }) {
             <button style={s.closeBtn} onClick={() => setSelectedExercise(null)}>✕</button>
             <div style={s.modalTitle}>{selectedExercise.name}</div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12, marginTop: 8 }}>
-              <span style={{ ...s.tag, background: "rgba(255,255,255,0.04)", color: "#22C55E" }}>{selectedExercise.primary}</span>
+              <span style={{ ...s.tag, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>{selectedExercise.primary}</span>
               {selectedExercise.secondary && <span style={{ ...s.tag, background: "rgba(160,160,160,0.08)", color: "#A0A0A0" }}>{selectedExercise.secondary}</span>}
               <span style={{ ...s.tag, background: "rgba(160,160,160,0.08)", color: "#A0A0A0" }}>{selectedExercise.equip}</span>
-              <span style={{ ...s.tag, background: selectedExercise.difficulty === "Beginner" ? "rgba(0,200,83,0.1)" : selectedExercise.difficulty === "Advanced" ? "rgba(239,68,68,0.1)" : "rgba(255,165,0,0.1)", color: selectedExercise.difficulty === "Beginner" ? "#00C853" : selectedExercise.difficulty === "Advanced" ? "#EF4444" : "#FFA500" }}>{selectedExercise.difficulty}</span>
+              <span style={{ ...s.tag, background: selectedExercise.difficulty === "Beginner" ? "rgba(0,200,83,0.1)" : selectedExercise.difficulty === "Advanced" ? "rgba(255,71,87,0.1)" : "rgba(255,165,0,0.1)", color: selectedExercise.difficulty === "Beginner" ? "#00C853" : selectedExercise.difficulty === "Advanced" ? "#FF4757" : "#FFA500" }}>{selectedExercise.difficulty}</span>
             </div>
 
             <div style={s.imgPlaceholder}>
@@ -176,7 +176,7 @@ export default function ExerciseLibrary({ state, dispatch }) {
                 <img src={selectedExercise.gifUrl} alt={selectedExercise.name} style={{ width: "100%", height: 200, objectFit: "contain", borderRadius: 12 }} />
               ) : (
                 <>
-                  <span style={{ fontSize: 32 }}></span>
+                  <span style={{ fontSize: 32 }}>🏋️</span>
                   <span style={s.imgText}>Animation / GIF coming soon</span>
                 </>
               )}
@@ -192,14 +192,14 @@ export default function ExerciseLibrary({ state, dispatch }) {
               </div>
             ))}
 
-            <div style={{ ...s.sectionTitle, color: "#EF4444" }}>Common Mistakes</div>
+            <div style={{ ...s.sectionTitle, color: "#FF4757" }}>Common Mistakes</div>
             {selectedExercise.commonMistakes.map((m, i) => (
-              <div key={i} style={s.mistake}>{m}</div>
+              <div key={i} style={s.mistake}>⚠ {m}</div>
             ))}
 
             <div style={{ ...s.sectionTitle, color: "#00C853" }}>Tips</div>
             {selectedExercise.tips.map((t, i) => (
-              <div key={i} style={s.tip}>{t}</div>
+              <div key={i} style={s.tip}>✓ {t}</div>
             ))}
 
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>

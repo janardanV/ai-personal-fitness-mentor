@@ -9,7 +9,7 @@ export function Skeleton({ width = "100%", height = 16, borderRadius = 8, style 
 
 export function SkeletonCard({ height = 120, children }) {
   return (
-    <div style={{ background: "#151515", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 14, padding: 20 }}>
+    <div style={{ background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 20 }}>
       {children || <Skeleton height={height} />}
     </div>
   );

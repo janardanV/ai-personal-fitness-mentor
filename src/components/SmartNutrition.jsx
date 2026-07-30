@@ -65,10 +65,10 @@ const FOOD_DATABASE = [
 ];
 
 const colors = {
-  bg: '#0A0A0A',
+  bg: '#0B0B0B',
   surface: '#151515',
   surfaceLight: '#1E1E1E',
-  neon: '#22C55E',
+  neon: '#C8FF00',
   secondary: '#A0A0A0',
   danger: '#FF4444',
   white: '#FFFFFF',

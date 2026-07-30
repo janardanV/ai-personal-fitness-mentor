@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const styles = {
   container: {
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#0B0B0B',
     minHeight: '100vh',
     padding: '20px',
     fontFamily: "'Inter', sans-serif",
@@ -14,7 +14,7 @@ const styles = {
     fontSize: '28px',
     fontWeight: '700',
     marginBottom: '24px',
-    color: '#22C55E',
+    color: '#C8FF00',
     textAlign: 'center',
   },
   card: {
@@ -67,8 +67,8 @@ const styles = {
   button: {
     width: '100%',
     padding: '14px 24px',
-    backgroundColor: '#22C55E',
-    color: '#0A0A0A',
+    backgroundColor: '#C8FF00',
+    color: '#0B0B0B',
     border: 'none',
     borderRadius: '8px',
     fontSize: '16px',
@@ -84,7 +84,7 @@ const styles = {
   statValue: {
     fontSize: '36px',
     fontWeight: '700',
-    color: '#22C55E',
+    color: '#C8FF00',
     lineHeight: '1.2',
   },
   statLabel: {
@@ -126,12 +126,12 @@ const styles = {
     borderRadius: '8px',
     padding: '16px',
     marginBottom: '12px',
-    borderLeft: '3px solid #22C55E',
+    borderLeft: '3px solid #C8FF00',
   },
   recoTitle: {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#22C55E',
+    color: '#C8FF00',
     marginBottom: '4px',
   },
   recoText: {
@@ -142,8 +142,8 @@ const styles = {
   saveButton: {
     padding: '12px 24px',
     backgroundColor: '#252525',
-    color: '#22C55E',
-    border: '1px solid #22C55E',
+    color: '#C8FF00',
+    border: '1px solid #C8FF00',
     borderRadius: '8px',
     fontSize: '14px',
     fontWeight: '600',
@@ -170,9 +170,9 @@ const styles = {
   tabActive: {
     padding: '8px 16px',
     borderRadius: '8px',
-    border: '1px solid #22C55E',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    color: '#22C55E',
+    border: '1px solid #C8FF00',
+    backgroundColor: 'rgba(200, 255, 0, 0.1)',
+    color: '#C8FF00',
     fontSize: '14px',
     fontWeight: '500',
   },
@@ -230,13 +230,13 @@ const getBodyFatCategory = (bf, gender) => {
   if (gender === 'male') {
     if (bf < 6) return { label: 'Essential Fat', color: '#FF6D00', bg: 'rgba(255, 109, 0, 0.15)' };
     if (bf < 14) return { label: 'Athletic', color: '#00E676', bg: 'rgba(0, 230, 118, 0.15)' };
-    if (bf < 18) return { label: 'Fitness', color: '#22C55E', bg: 'rgba(255, 255, 255, 0.06)' };
+    if (bf < 18) return { label: 'Fitness', color: '#C8FF00', bg: 'rgba(200, 255, 0, 0.15)' };
     if (bf < 25) return { label: 'Average', color: '#FFB800', bg: 'rgba(255, 184, 0, 0.15)' };
     return { label: 'Above Average', color: '#FF1744', bg: 'rgba(255, 23, 68, 0.15)' };
   }
   if (bf < 14) return { label: 'Essential Fat', color: '#FF6D00', bg: 'rgba(255, 109, 0, 0.15)' };
   if (bf < 21) return { label: 'Athletic', color: '#00E676', bg: 'rgba(0, 230, 118, 0.15)' };
-  if (bf < 25) return { label: 'Fitness', color: '#22C55E', bg: 'rgba(255, 255, 255, 0.06)' };
+  if (bf < 25) return { label: 'Fitness', color: '#C8FF00', bg: 'rgba(200, 255, 0, 0.15)' };
   if (bf < 32) return { label: 'Average', color: '#FFB800', bg: 'rgba(255, 184, 0, 0.15)' };
   return { label: 'Above Average', color: '#FF1744', bg: 'rgba(255, 23, 68, 0.15)' };
 };
@@ -373,7 +373,7 @@ export default function BodyCalculator({ state, dispatch }) {
     const macros = getMacros(goalCalories, formData.goal, gender);
 
     const macrosData = [
-      { name: 'Protein', value: macros.proteinRatio * 100, fill: '#22C55E' },
+      { name: 'Protein', value: macros.proteinRatio * 100, fill: '#C8FF00' },
       { name: 'Carbs', value: macros.carbRatio * 100, fill: '#00E676' },
       { name: 'Fat', value: macros.fatRatio * 100, fill: '#FF6D00' },
     ];
@@ -684,7 +684,7 @@ export default function BodyCalculator({ state, dispatch }) {
                   >
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                       {[
-                        { label: 'Maintenance', value: results.maintenance, color: '#22C55E', desc: 'Maintain current weight' },
+                        { label: 'Maintenance', value: results.maintenance, color: '#C8FF00', desc: 'Maintain current weight' },
                         { label: 'Bulking', value: results.bulking, color: '#00E676', desc: '+500 kcal surplus' },
                         { label: 'Cutting', value: results.cutting, color: '#FF6D00', desc: '-500 kcal deficit' },
                       ].map((item) => (
@@ -721,7 +721,7 @@ export default function BodyCalculator({ state, dispatch }) {
                       </div>
                       <div style={{ ...styles.resultRow, borderBottom: 'none' }}>
                         <span style={styles.resultLabel}>Selected Goal Calories</span>
-                        <span style={{ ...styles.resultValue, color: '#22C55E' }}>
+                        <span style={{ ...styles.resultValue, color: '#C8FF00' }}>
                           {formData.goal === 'bulking' ? results.bulking : formData.goal === 'cutting' ? results.cutting : results.maintenance} kcal
                         </span>
                       </div>
@@ -761,7 +761,7 @@ export default function BodyCalculator({ state, dispatch }) {
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginTop: '16px' }}>
                       {[
-                        { label: 'Protein', value: results.macros.protein, ratio: results.macros.proteinRatio, color: '#22C55E', unit: 'g' },
+                        { label: 'Protein', value: results.macros.protein, ratio: results.macros.proteinRatio, color: '#C8FF00', unit: 'g' },
                         { label: 'Carbs', value: results.macros.carbs, ratio: results.macros.carbRatio, color: '#00E676', unit: 'g' },
                         { label: 'Fat', value: results.macros.fat, ratio: results.macros.fatRatio, color: '#FF6D00', unit: 'g' },
                       ].map((macro) => (

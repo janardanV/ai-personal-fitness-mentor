@@ -39,6 +39,7 @@ const ExerciseLibraryBase = ({ state, dispatch }) => {
       </div>
 
       <div className="wm-search-bar">
+        <span className="search-icon">🔍</span>
         <input placeholder="Search exercises by name, muscle, or equipment..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
@@ -68,13 +69,13 @@ const ExerciseLibraryBase = ({ state, dispatch }) => {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
         {filtered.map(ex => (
-          <motion.div key={ex.id} className="wm-exercise-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <motion.div key={ex.id} className="wm-exercise-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ borderColor: "rgba(200,255,0,0.2)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", marginBottom: 4 }}>{ex.name}</div>
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                   <span className="wm-muscle-tag">{ex.primary}</span>
-                  {ex.secondary && <span className="wm-muscle-tag" style={{ background: "rgba(34,197,94,0.1)", color: "#22C55E" }}>{ex.secondary.split(",")[0]}</span>}
+                  {ex.secondary && <span className="wm-muscle-tag" style={{ background: "rgba(165,230,0,0.1)", color: "#A5E600" }}>{ex.secondary.split(",")[0]}</span>}
                 </div>
               </div>
               <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "rgba(255,255,255,0.04)", color: "#A0A0A0" }}>{ex.equip}</span>
@@ -84,7 +85,7 @@ const ExerciseLibraryBase = ({ state, dispatch }) => {
               <span>{ex.type}</span>
             </div>
             {ex.id?.startsWith("custom_") && (
-              <button className="ghost-btn" style={{ marginTop: 8, fontSize: 11, color: "#EF4444", padding: "4px 8px" }}
+              <button className="ghost-btn" style={{ marginTop: 8, fontSize: 11, color: "#FF4757", padding: "4px 8px" }}
                 onClick={() => { if (confirm(`Delete ${ex.name}?`)) dispatch({ type: "DELETE_CUSTOM_EXERCISE", payload: ex.id }); }}>Delete</button>
             )}
           </motion.div>

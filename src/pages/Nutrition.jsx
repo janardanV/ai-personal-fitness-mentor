@@ -237,7 +237,7 @@ const Nutrition = ({ state, dispatch }) => {
               <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-              <Bar dataKey="calories" fill="#22C55E" radius={[4, 4, 0, 0]} name="Calories" />
+              <Bar dataKey="calories" fill="#C8FF00" radius={[4, 4, 0, 0]} name="Calories" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -249,7 +249,7 @@ const Nutrition = ({ state, dispatch }) => {
               <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-              <Bar dataKey="protein" fill="#22C55E" radius={[4, 4, 0, 0]} name="Protein (g)" />
+              <Bar dataKey="protein" fill="#A5E600" radius={[4, 4, 0, 0]} name="Protein (g)" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -330,7 +330,7 @@ const Nutrition = ({ state, dispatch }) => {
               )}
               {searchResults.map((food, i) => (
                 <div key={i} onClick={() => selectFood(food)} style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)", transition: "background 0.15s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(200,255,0,0.1)"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                   <div style={{ fontSize: 13, fontWeight: 500 }}>{food.name}</div>
                   <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 2 }}>
@@ -344,20 +344,20 @@ const Nutrition = ({ state, dispatch }) => {
         </div>
 
         {selectedFood && scaledPreview && (
-          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: 16, marginBottom: 14 }}>
+          <div style={{ background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.2)", borderRadius: 10, padding: 16, marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 600 }}>{selectedFood.name}</div>
                 {selectedFood.brand && <div style={{ fontSize: 12, color: "#A0A0A0" }}>{selectedFood.brand}</div>}
               </div>
-              <button onClick={() => { setSelectedFood(null); setSearchQuery(""); }} style={{ background: "none", color: "#EF4444", fontSize: 16, cursor: "pointer", border: "none" }}>×</button>
+              <button onClick={() => { setSelectedFood(null); setSearchQuery(""); }} style={{ background: "none", color: "#FF4757", fontSize: 16, cursor: "pointer", border: "none" }}>×</button>
             </div>
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
               <span style={{ fontSize: 12, color: "#A0A0A0" }}>Serving:</span>
               <input type="number" value={servingQty} onChange={e => setServingQty(Math.max(1, +e.target.value))} style={{ width: 70, fontSize: 12, padding: "4px 8px", textAlign: "center" }} />
               <span style={{ fontSize: 12, color: "#A0A0A0" }}>{selectedFood.servingUnit || "g"}</span>
               {servingOptions.length > 0 && servingOptions.slice(0, 4).map(opt => (
-                <button key={opt.value} onClick={() => setServingQty(opt.value)} style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, background: servingQty === opt.value ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.05)", border: `1px solid ${servingQty === opt.value ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.08)"}`, color: servingQty === opt.value ? "#22C55E" : "#A0A0A0", cursor: "pointer" }}>{opt.label}</button>
+                <button key={opt.value} onClick={() => setServingQty(opt.value)} style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, background: servingQty === opt.value ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.05)", border: `1px solid ${servingQty === opt.value ? "rgba(200,255,0,0.4)" : "rgba(255,255,255,0.08)"}`, color: servingQty === opt.value ? "#C8FF00" : "#A0A0A0", cursor: "pointer" }}>{opt.label}</button>
               ))}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 12 }}>
@@ -371,7 +371,7 @@ const Nutrition = ({ state, dispatch }) => {
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <span style={{ fontSize: 12, color: "#A0A0A0" }}>Meal:</span>
               {MEAL_TYPES.map(m => (
-                <button key={m} onClick={() => setMealType(m)} style={{ padding: "5px 12px", borderRadius: 6, fontSize: 12, background: mealType === m ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.04)", border: `1px solid ${mealType === m ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.08)"}`, color: mealType === m ? "#22C55E" : "#A0A0A0", cursor: "pointer" }}>{m}</button>
+                <button key={m} onClick={() => setMealType(m)} style={{ padding: "5px 12px", borderRadius: 6, fontSize: 12, background: mealType === m ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.04)", border: `1px solid ${mealType === m ? "rgba(200,255,0,0.4)" : "rgba(255,255,255,0.08)"}`, color: mealType === m ? "#C8FF00" : "#A0A0A0", cursor: "pointer" }}>{m}</button>
               ))}
               <div style={{ flex: 1 }} />
               <button className="neon-btn" onClick={logFood} style={{ fontSize: 13 }}>Log Food Entry</button>
@@ -420,14 +420,14 @@ const Nutrition = ({ state, dispatch }) => {
                       <div style={{ display: "flex", gap: 4 }}>
                         {editingId === n.id ? (
                           <>
-                            <button onClick={saveEdit} style={{ background: "none", color: "#22C55E", fontSize: 12, cursor: "pointer", border: "none" }}>Save</button>
+                            <button onClick={saveEdit} style={{ background: "none", color: "#C8FF00", fontSize: 12, cursor: "pointer", border: "none" }}>Save</button>
                             <button onClick={() => setEditingId(null)} style={{ background: "none", color: "#A0A0A0", fontSize: 12, cursor: "pointer", border: "none" }}>Cancel</button>
                           </>
                         ) : (
                           <>
-                            <button onClick={() => { setEditingId(n.id); setEditMealType(n.meal); setEditServing(n.servingQty || 100); }} style={{ background: "none", color: "#22C55E", fontSize: 12, cursor: "pointer", border: "none" }}>Edit</button>
-                            <button onClick={() => duplicateFood(n)} style={{ background: "none", color: "#22C55E", fontSize: 12, cursor: "pointer", border: "none" }}>Dupe</button>
-                            <button onClick={() => deleteFood(n.id)} style={{ background: "none", color: "#EF4444", fontSize: 12, cursor: "pointer", border: "none" }}>Del</button>
+                            <button onClick={() => { setEditingId(n.id); setEditMealType(n.meal); setEditServing(n.servingQty || 100); }} style={{ background: "none", color: "#C8FF00", fontSize: 12, cursor: "pointer", border: "none" }}>Edit</button>
+                            <button onClick={() => duplicateFood(n)} style={{ background: "none", color: "#A5E600", fontSize: 12, cursor: "pointer", border: "none" }}>Dupe</button>
+                            <button onClick={() => deleteFood(n.id)} style={{ background: "none", color: "#FF4757", fontSize: 12, cursor: "pointer", border: "none" }}>Del</button>
                           </>
                         )}
                       </div>
@@ -443,27 +443,27 @@ const Nutrition = ({ state, dispatch }) => {
       <Card>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#151515", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}></div>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF00, #A5E600)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🥗</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>AI Nutrition Coach</div>
               <div style={{ fontSize: 12, color: "#A0A0A0" }}>Personalized analysis of your daily intake</div>
             </div>
           </div>
-          <button className="neon-btn" onClick={getNutritionAdvice} disabled={aiLoading} style={{ fontSize: 12, padding: "8px 16px" }}>{aiLoading ? "Analyzing..." : "Get Advice"}</button>
+          <button className="neon-btn" onClick={getNutritionAdvice} disabled={aiLoading} style={{ fontSize: 12, padding: "8px 16px" }}>{aiLoading ? "Analyzing..." : "Get Advice ⚡"}</button>
         </div>
         {aiRec ? (
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ background: "rgba(200,255,0,0.06)", borderRadius: 10, padding: "14px 16px" }}>
             <p style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.7 }}>{aiRec}</p>
           </div>
         ) : (
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "14px 16px", minHeight: 50 }}>
+          <div style={{ background: "rgba(200,255,0,0.06)", borderRadius: 10, padding: "14px 16px", minHeight: 50 }}>
             <p style={{ fontSize: 13, color: "#A0A0A0" }}>Click "Get Advice" to receive AI-powered nutrition recommendations based on your logged food today.</p>
             {totals.calories > 0 && (
               <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {totals.protein < profile.protein * 0.7 && <span style={{ fontSize: 11, background: "rgba(239,68,68,0.15)", color: COLORS.red, padding: "3px 8px", borderRadius: 4 }}>Low protein: {Math.round(profile.protein - totals.protein)}g remaining</span>}
+                {totals.protein < profile.protein * 0.7 && <span style={{ fontSize: 11, background: "rgba(255,71,87,0.15)", color: COLORS.red, padding: "3px 8px", borderRadius: 4 }}>Low protein: {Math.round(profile.protein - totals.protein)}g remaining</span>}
                 {totals.sodium > 2000 && <span style={{ fontSize: 11, background: "rgba(255,184,0,0.15)", color: COLORS.amber, padding: "3px 8px", borderRadius: 4 }}>Sodium high: {totals.sodium}mg</span>}
                 {totals.fiber < 15 && totals.calories > 500 && <span style={{ fontSize: 11, background: "rgba(255,184,0,0.15)", color: COLORS.amber, padding: "3px 8px", borderRadius: 4 }}>Fiber low: {totals.fiber}g</span>}
-                {totals.calories >= profile.calories * 0.9 && totals.calories <= profile.calories && <span style={{ fontSize: 11, background: "rgba(255,255,255,0.06)", color: COLORS.primary, padding: "3px 8px", borderRadius: 4 }}>Calorie target on track</span>}
+                {totals.calories >= profile.calories * 0.9 && totals.calories <= profile.calories && <span style={{ fontSize: 11, background: "rgba(200,255,0,0.15)", color: COLORS.primary, padding: "3px 8px", borderRadius: 4 }}>Calorie target on track</span>}
                 {waterIntake < 1500 && totals.calories > 300 && <span style={{ fontSize: 11, background: "rgba(255,184,0,0.15)", color: COLORS.amber, padding: "3px 8px", borderRadius: 4 }}>Drink more water</span>}
               </div>
             )}

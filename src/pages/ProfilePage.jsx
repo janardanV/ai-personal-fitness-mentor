@@ -35,7 +35,7 @@ const ProfilePage = ({ state, dispatch }) => {
 
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 20 }}>
         <div style={{ textAlign: "center" }}>
-            <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #151515, #252525)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, fontWeight: 700, marginBottom: 12 }}>
+          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF00, #C8FF00)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, fontWeight: 700, marginBottom: 12 }}>
             {profile.name?.[0]?.toUpperCase() || "?"}
           </div>
           <div style={{ fontSize: 14, fontWeight: 600 }}>{profile.name}</div>
@@ -66,7 +66,7 @@ const ProfilePage = ({ state, dispatch }) => {
       <Card>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Reset All Data</div>
         <p style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 12 }}>This will permanently delete all your workouts, nutrition logs, and progress data.</p>
-        <button style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: COLORS.red, borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer" }} onClick={async () => { if (await showConfirm("Are you sure? This will permanently delete all your workouts, nutrition logs, and progress data. This cannot be undone.")) dispatch({ type: "RESET" }); }}>Reset All Data</button>
+        <button style={{ background: "rgba(255,71,87,0.1)", border: "1px solid rgba(255,71,87,0.3)", color: COLORS.red, borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer" }} onClick={async () => { if (await showConfirm("Are you sure? This will permanently delete all your workouts, nutrition logs, and progress data. This cannot be undone.")) dispatch({ type: "RESET" }); }}>Reset All Data</button>
       </Card>
     </div>
   );

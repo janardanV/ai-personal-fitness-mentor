@@ -239,7 +239,7 @@ const Programs = ({ state, dispatch }) => {
             {activeProg.days[dayIdx].map((ex, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", borderRadius: 8, marginBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: 6, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: COLORS.primary, fontFamily: "'JetBrains Mono',monospace" }}>{i + 1}</span>
+                  <span style={{ width: 20, height: 20, borderRadius: 6, background: "rgba(200,255,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: COLORS.primary, fontFamily: "'JetBrains Mono',monospace" }}>{i + 1}</span>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 500 }}>{ex.name}</div>
                     <div style={{ fontSize: 12, color: "#A0A0A0" }}>{ex.sets} × {ex.reps} {ex.weightMod !== "working" ? `· ${ex.weightMod}` : ""}</div>

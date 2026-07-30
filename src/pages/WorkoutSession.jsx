@@ -53,7 +53,7 @@ const RestTimer = ({ duration, onDone, onSkip }) => {
         <div style={{ marginBottom: 20 }}>
           <svg width={220} height={220}>
             <circle cx={110} cy={110} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
-            <circle cx={110} cy={110} r={r} fill="none" stroke="#22C55E" strokeWidth={8} strokeDasharray={`${dash} `} strokeLinecap="round" transform="rotate(-90 110 110)" style={{ transition: "stroke-dasharray 0.5s linear" }} />
+            <circle cx={110} cy={110} r={r} fill="none" stroke="#C8FF00" strokeWidth={8} strokeDasharray={`${dash} `} strokeLinecap="round" transform="rotate(-90 110 110)" style={{ transition: "stroke-dasharray 0.5s linear" }} />
           </svg>
           <div style={{ position: "relative", marginTop: -160, textAlign: "center" }}>
             <div className="wm-rest-timer-display">{mins}:{secs.toString().padStart(2, "0")}</div>
@@ -94,16 +94,17 @@ const FinishWorkoutSummary = ({ session, duration, onClose, onDiscard }) => {
   return (
     <motion.div className="wm-summary-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <motion.div className="wm-summary-card" initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
         <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Workout Complete!</h2>
         <p style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 24 }}>{session.name} · {duration} min</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginBottom: 20 }}>
-            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 14 }}>
-              <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Volume</div>
-              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#22C55E" }}>{fmt(totalVolume)}<span style={{ fontSize: 12, color: "#A0A0A0" }}> kg</span></div>
+          <div style={{ background: "rgba(200,255,0,0.08)", borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Volume</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#C8FF00" }}>{fmt(totalVolume)}<span style={{ fontSize: 12, color: "#A0A0A0" }}> kg</span></div>
           </div>
-            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 14 }}>
-              <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Calories</div>
-              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#22C55E" }}>{calories}<span style={{ fontSize: 12, color: "#A0A0A0" }}> kcal</span></div>
+          <div style={{ background: "rgba(165,230,0,0.08)", borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Calories</div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "#A5E600" }}>{calories}<span style={{ fontSize: 12, color: "#A0A0A0" }}> kcal</span></div>
           </div>
           <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: 14 }}>
             <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sets</div>
@@ -124,7 +125,7 @@ const FinishWorkoutSummary = ({ session, duration, onClose, onDiscard }) => {
           ))}
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button className="ghost-btn" onClick={onDiscard} style={{ flex: 1, padding: 12, color: "#EF4444", borderColor: "rgba(239,68,68,0.3)" }}>Discard</button>
+          <button className="ghost-btn" onClick={onDiscard} style={{ flex: 1, padding: 12, color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}>Discard</button>
           <button className="neon-btn" onClick={() => onClose(calories)} style={{ flex: 2, padding: 12 }}>Save +50 XP</button>
         </div>
       </motion.div>
@@ -164,6 +165,7 @@ const WorkoutSession = ({ state, dispatch }) => {
   if (!session) {
     return (
       <div className="wm-empty">
+        <div className="wm-empty-icon">🏋️</div>
         <div className="wm-empty-title">No Active Workout</div>
         <div className="wm-empty-desc">Start a workout from the Dashboard or Templates tab.</div>
         <button className="neon-btn" onClick={() => NAV("dashboard")}>Go to Dashboard</button>
@@ -211,7 +213,7 @@ const WorkoutSession = ({ state, dispatch }) => {
           <div className="wm-session-stat">Reps: <span>{totalReps}</span></div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="ghost-btn" onClick={() => { if (confirm("Discard this workout?")) dispatch({ type: "DISCARD_SESSION" }); }} style={{ fontSize: 12, color: "#EF4444" }}>Discard</button>
+          <button className="ghost-btn" onClick={() => { if (confirm("Discard this workout?")) dispatch({ type: "DISCARD_SESSION" }); }} style={{ fontSize: 12, color: "#FF4757" }}>Discard</button>
           <button className="neon-btn" onClick={finishWorkout} style={{ fontSize: 13, padding: "8px 16px" }}>Finish ✓</button>
         </div>
       </div>
@@ -228,13 +230,13 @@ const WorkoutSession = ({ state, dispatch }) => {
                   <div className="wm-exercise-name">{ex.exerciseName}</div>
                   <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
                     {exDef.primary && <span className="wm-muscle-tag">{exDef.primary}</span>}
-                    {exDef.secondary && <span className="wm-muscle-tag" style={{ background: "rgba(255,255,255,0.04)", color: "#22C55E" }}>{exDef.secondary.split(",")[0]}</span>}
+                    {exDef.secondary && <span className="wm-muscle-tag" style={{ background: "rgba(165,230,0,0.1)", color: "#A5E600" }}>{exDef.secondary.split(",")[0]}</span>}
                     {exDef.equip && <span className="wm-muscle-tag" style={{ background: "rgba(255,255,255,0.04)", color: "#A0A0A0" }}>{exDef.equip}</span>}
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button className="ghost-btn" style={{ padding: "4px 8px", fontSize: 11 }} onClick={() => dispatch({ type: "ADD_SET_TO_EXERCISE", payload: { exerciseIndex: ei } })}>+ Set</button>
-                  <button className="ghost-btn" style={{ padding: "4px 8px", fontSize: 11, color: "#EF4444", borderColor: "rgba(239,68,68,0.3)" }}
+                  <button className="ghost-btn" style={{ padding: "4px 8px", fontSize: 11, color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}
                     onClick={() => { if (confirm("Remove exercise?")) dispatch({ type: "REMOVE_EXERCISE_FROM_SESSION", payload: ei }); }}>✕</button>
                 </div>
               </div>
@@ -248,7 +250,7 @@ const WorkoutSession = ({ state, dispatch }) => {
               </div>
               {ex.sets.map((set, si) => (
                 <div key={si} className="wm-set-row" style={{ opacity: set.done ? 0.6 : 1 }}>
-                  <div className="wm-set-num" style={{ color: set.done ? "#22C55E" : "#A0A0A0" }}>
+                  <div className="wm-set-num" style={{ color: set.done ? "#C8FF00" : "#A0A0A0" }}>
                     {set.isWarmup ? "W" : si + 1}
                   </div>
                   <input className="wm-set-input" type="number" value={set.weight} placeholder="kg"
@@ -257,7 +259,7 @@ const WorkoutSession = ({ state, dispatch }) => {
                     onChange={e => dispatch({ type: "UPDATE_SET", payload: { exerciseIndex: ei, setIndex: si, field: "reps", value: +e.target.value } })} />
                   <input className="wm-set-input rpe" type="number" value={set.rpe || ""} placeholder="RPE" min={1} max={10}
                     onChange={e => dispatch({ type: "UPDATE_SET", payload: { exerciseIndex: ei, setIndex: si, field: "rpe", value: +e.target.value } })} />
-                  <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: set.weight > 0 ? "#22C55E" : "rgba(160,160,160,0.3)", textAlign: "center" }}>
+                  <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: set.weight > 0 ? "#C8FF00" : "rgba(160,160,160,0.3)", textAlign: "center" }}>
                     {set.weight > 0 ? fmt(calcE1RM(set.weight, set.reps), 1) : "—"}
                   </div>
                   <button className={wm-set-done }
@@ -296,8 +298,9 @@ const WorkoutSession = ({ state, dispatch }) => {
               <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>Add Exercise</h3>
               <button className="ghost-btn" onClick={() => setAddExOpen(false)} style={{ padding: "4px 8px" }}>✕</button>
             </div>
-              <div className="wm-search-bar">
-                <input placeholder="Search exercises..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} autoFocus />
+            <div className="wm-search-bar">
+              <span className="search-icon">🔍</span>
+              <input placeholder="Search exercises..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} autoFocus />
             </div>
             <div style={{ overflowY: "auto", flex: 1 }}>
               {filteredExercises.map(ex => (
@@ -311,7 +314,7 @@ const WorkoutSession = ({ state, dispatch }) => {
                         <span className="wm-muscle-tag" style={{ background: "rgba(255,255,255,0.04)", color: "#A0A0A0" }}>{ex.equip}</span>
                       </div>
                     </div>
-                    <span style={{ fontSize: 20, color: "#22C55E" }}>+</span>
+                    <span style={{ fontSize: 20, color: "#C8FF00" }}>+</span>
                   </div>
                 </div>
               ))}
