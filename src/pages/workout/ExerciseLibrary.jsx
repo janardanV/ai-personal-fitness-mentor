@@ -1,7 +1,16 @@
 import { useState } from "react";
-import React from "react";
-import { motion } from "framer-motion";
 import { EXERCISE_DB, MUSCLE_GROUPS, EQUIPMENT_TYPES, EXERCISE_CATEGORIES, showToast } from "../../utils/helpers";
+import { Search, Plus, X, Trash2, ChevronDown, Dumbbell, Target, Zap, HeartPulse, PersonStanding, Repeat, Activity } from "lucide-react";
+
+const CAT_ICONS = {
+  compound: Dumbbell,
+  isolation: Target,
+  plyometric: Zap,
+  cardio: HeartPulse,
+  bodyweight: PersonStanding,
+};
+
+const catTitle = c => c.charAt(0).toUpperCase() + c.slice(1);
 
 const ExerciseLibraryBase = ({ state, dispatch }) => {
   const [search, setSearch] = useState("");
@@ -23,6 +32,15 @@ const ExerciseLibraryBase = ({ state, dispatch }) => {
     return true;
   });
 
+  const hasFilters = catFilter !== "all" || muscleFilter !== "all" || equipFilter !== "all" || search;
+
+  const clearFilters = () => {
+    setSearch("");
+    setCatFilter("all");
+    setMuscleFilter("all");
+    setEquipFilter("all");
+  };
+
   const addCustomExercise = () => {
     if (!newEx.name.trim()) return;
     dispatch({ type: "ADD_CUSTOM_EXERCISE", payload: { ...newEx, id: `custom_${Date.now()}`, name: newEx.name.trim() } });
@@ -31,90 +49,124 @@ const ExerciseLibraryBase = ({ state, dispatch }) => {
     showToast("Exercise added to library");
   };
 
+  const chip = (key, active, onClick, children) => (
+    <button key={key} className={`rd-chip ${active ? "active" : ""}`} onClick={onClick}>{children}</button>
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div className="wm-page-header">
-        <h2>Exercise Library</h2>
-        <button className="neon-btn" onClick={() => setShowAdd(true)} style={{ fontSize: 13 }}>+ Custom Exercise</button>
+      <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
+        <div className="rd-search" style={{ flex: 1 }}>
+          <Search size={16} />
+          <input placeholder="Search exercises by name, muscle, or equipment..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <button className="rd-btn-secondary" onClick={() => setShowAdd(true)} style={{ padding: "0 18px", flexShrink: 0 }}>
+          <Plus size={15} /> Custom Exercise
+        </button>
       </div>
 
-      <div className="wm-search-bar">
-        <span className="search-icon">🔍</span>
-        <input placeholder="Search exercises by name, muscle, or equipment..." value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="rd-card rd-filter-card" style={{ padding: "16px 18px" }}>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Muscle</span>
+          {chip("m-all", muscleFilter === "all", () => setMuscleFilter("all"), "All")}
+          {MUSCLE_GROUPS.map(m => chip(`m-${m}`, muscleFilter === m, () => setMuscleFilter(muscleFilter === m ? "all" : m), m))}
+        </div>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Category</span>
+          {chip("c-all", catFilter === "all", () => setCatFilter("all"), "All")}
+          {EXERCISE_CATEGORIES.map(c => chip(`c-${c}`, catFilter === c, () => setCatFilter(catFilter === c ? "all" : c), catTitle(c)))}
+        </div>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Equipment</span>
+          {chip("e-all", equipFilter === "all", () => setEquipFilter("all"), "All")}
+          {EQUIPMENT_TYPES.map(e => chip(`e-${e}`, equipFilter === e, () => setEquipFilter(equipFilter === e ? "all" : e), e))}
+        </div>
       </div>
 
-      <div className="wm-filter-chips">
-        <span style={{ fontSize: 11, color: "rgba(160,160,160,0.5)", alignSelf: "center", marginRight: 4 }}>Muscle:</span>
-        <button className={`wm-chip ${muscleFilter === "all" ? "active" : ""}`} onClick={() => setMuscleFilter("all")}>All</button>
-        {MUSCLE_GROUPS.map(m => (
-          <button key={m} className={`wm-chip ${muscleFilter === m ? "active" : ""}`} onClick={() => setMuscleFilter(m)}>{m}</button>
-        ))}
-      </div>
-      <div className="wm-filter-chips">
-        <span style={{ fontSize: 11, color: "rgba(160,160,160,0.5)", alignSelf: "center", marginRight: 4 }}>Category:</span>
-        <button className={`wm-chip ${catFilter === "all" ? "active" : ""}`} onClick={() => setCatFilter("all")}>All</button>
-        {EXERCISE_CATEGORIES.map(c => (
-          <button key={c} className={`wm-chip ${catFilter === c ? "active" : ""}`} onClick={() => setCatFilter(c)}>{c.charAt(0).toUpperCase() + c.slice(1)}</button>
-        ))}
-      </div>
-      <div className="wm-filter-chips">
-        <span style={{ fontSize: 11, color: "rgba(160,160,160,0.5)", alignSelf: "center", marginRight: 4 }}>Equipment:</span>
-        <button className={`wm-chip ${equipFilter === "all" ? "active" : ""}`} onClick={() => setEquipFilter("all")}>All</button>
-        {EQUIPMENT_TYPES.map(e => (
-          <button key={e} className={`wm-chip ${equipFilter === e ? "active" : ""}`} onClick={() => setEquipFilter(e)}>{e}</button>
-        ))}
-      </div>
+      <div className="rd-count"><b>{filtered.length}</b> exercise{filtered.length !== 1 ? "s" : ""}</div>
 
-      <div style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 4 }}>{filtered.length} exercise{filtered.length !== 1 ? "s" : ""}</div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
-        {filtered.map(ex => (
-          <motion.div key={ex.id} className="wm-exercise-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ borderColor: "rgba(200,255,0,0.2)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", marginBottom: 4 }}>{ex.name}</div>
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                  <span className="wm-muscle-tag">{ex.primary}</span>
-                  {ex.secondary && <span className="wm-muscle-tag" style={{ background: "rgba(165,230,0,0.1)", color: "#A5E600" }}>{ex.secondary.split(",")[0]}</span>}
+      {filtered.length === 0 ? (
+        <div className="rd-card rd-empty" style={{ padding: "48px 16px" }}>
+          <div className="rd-empty-title">No exercises found</div>
+          <div className="rd-empty-sub">Try adjusting your search or clearing the active filters.</div>
+          {hasFilters && <button className="rd-btn-secondary" onClick={clearFilters} style={{ marginTop: 8, padding: "10px 18px" }}>Clear Filters</button>}
+        </div>
+      ) : (
+        <div className="rd-ex-grid">
+          {filtered.map(ex => {
+            const Icon = CAT_ICONS[ex.cat] || Dumbbell;
+            return (
+              <div key={ex.id} className="rd-ex-card">
+                <div className="rd-ex-top">
+                  <div className="rd-ex-tile"><Icon size={20} /></div>
+                  <div className="rd-ex-body">
+                    <div className="rd-ex-name">{ex.name}</div>
+                    <div className="rd-ex-sub">{ex.primary}{ex.secondary ? ` · ${ex.secondary.split(",")[0]}` : ""}</div>
+                  </div>
+                </div>
+                <div className="rd-ex-tags">
+                  <span className="rd-ex-tag">{ex.primary}</span>
+                  {ex.secondary && <span className="rd-ex-tag muted">{ex.secondary.split(",")[0]}</span>}
+                  <span className="rd-ex-tag blue">{catTitle(ex.cat)}</span>
+                </div>
+                <div className="rd-ex-meta">
+                  <span className="rd-ex-meta-item"><Repeat size={14} /> <b>{ex.defaultSets} × {ex.defaultReps}</b></span>
+                  <span className="rd-ex-meta-item"><Activity size={14} /> {ex.type}</span>
+                  {ex.id?.startsWith("custom_") && (
+                    <button className="rd-ex-del" onClick={() => { if (confirm(`Delete ${ex.name}?`)) dispatch({ type: "DELETE_CUSTOM_EXERCISE", payload: ex.id }); }}>
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  )}
                 </div>
               </div>
-              <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "rgba(255,255,255,0.04)", color: "#A0A0A0" }}>{ex.equip}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 11, color: "rgba(160,160,160,0.5)" }}>
-              <span>{ex.defaultSets} sets × {ex.defaultReps} reps</span>
-              <span>{ex.type}</span>
-            </div>
-            {ex.id?.startsWith("custom_") && (
-              <button className="ghost-btn" style={{ marginTop: 8, fontSize: 11, color: "#FF4757", padding: "4px 8px" }}
-                onClick={() => { if (confirm(`Delete ${ex.name}?`)) dispatch({ type: "DELETE_CUSTOM_EXERCISE", payload: ex.id }); }}>Delete</button>
-            )}
-          </motion.div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {showAdd && (
-        <motion.div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 900, padding: 20 }}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setShowAdd(false)}>
-          <motion.div style={{ width: "100%", maxWidth: 420, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 24 }}
-            initial={{ scale: 0.95 }} animate={{ scale: 1 }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF", marginBottom: 16 }}>Add Custom Exercise</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <input placeholder="Exercise name" value={newEx.name} onChange={e => setNewEx(p => ({ ...p, name: e.target.value }))} autoFocus />
-              <input placeholder="Primary muscle (e.g., Chest)" value={newEx.primary} onChange={e => setNewEx(p => ({ ...p, primary: e.target.value }))} />
-              <input placeholder="Secondary muscles (optional)" value={newEx.secondary} onChange={e => setNewEx(p => ({ ...p, secondary: e.target.value }))} />
-              <select value={newEx.equip} onChange={e => setNewEx(p => ({ ...p, equip: e.target.value }))}>
-                {EQUIPMENT_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
-              </select>
-              <select value={newEx.cat} onChange={e => setNewEx(p => ({ ...p, cat: e.target.value }))}>
-                {EXERCISE_CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-              </select>
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button className="ghost-btn" onClick={() => setShowAdd(false)} style={{ flex: 1, padding: 12 }}>Cancel</button>
-                <button className="neon-btn" onClick={addCustomExercise} style={{ flex: 1, padding: 12 }}>Add Exercise</button>
+        <div className="rd-modal-overlay" onClick={() => setShowAdd(false)}>
+          <div className="rd-modal" onClick={e => e.stopPropagation()}>
+            <button className="rd-modal-close" onClick={() => setShowAdd(false)}><X size={15} /></button>
+            <div className="rd-modal-title" style={{ marginBottom: 18 }}>Add Custom Exercise</div>
+            <div className="rd-form">
+              <div className="rd-field">
+                <label>Exercise Name</label>
+                <input className="rd-input" placeholder="e.g., Landmine Press" value={newEx.name} onChange={e => setNewEx(p => ({ ...p, name: e.target.value }))} autoFocus />
+              </div>
+              <div className="rd-field">
+                <label>Primary Muscle</label>
+                <input className="rd-input" placeholder="e.g., Chest" value={newEx.primary} onChange={e => setNewEx(p => ({ ...p, primary: e.target.value }))} />
+              </div>
+              <div className="rd-field">
+                <label>Secondary Muscles</label>
+                <input className="rd-input" placeholder="Optional" value={newEx.secondary} onChange={e => setNewEx(p => ({ ...p, secondary: e.target.value }))} />
+              </div>
+              <div className="rd-field">
+                <label>Equipment</label>
+                <div className="rd-select-wrap">
+                  <select className="rd-select" value={newEx.equip} onChange={e => setNewEx(p => ({ ...p, equip: e.target.value }))}>
+                    {EQUIPMENT_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                  <ChevronDown size={15} />
+                </div>
+              </div>
+              <div className="rd-field">
+                <label>Category</label>
+                <div className="rd-select-wrap">
+                  <select className="rd-select" value={newEx.cat} onChange={e => setNewEx(p => ({ ...p, cat: e.target.value }))}>
+                    {EXERCISE_CATEGORIES.map(c => <option key={c} value={c}>{catTitle(c)}</option>)}
+                  </select>
+                  <ChevronDown size={15} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+                <button className="rd-btn-secondary" onClick={() => setShowAdd(false)} style={{ flex: 1 }}>Cancel</button>
+                <button className="rd-btn-primary" onClick={addCustomExercise} style={{ flex: 1 }}>Add Exercise</button>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
     </div>
   );

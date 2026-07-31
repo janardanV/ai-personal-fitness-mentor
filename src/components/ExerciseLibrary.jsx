@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Search, X, Dumbbell, Target, Zap, HeartPulse, PersonStanding, Repeat, Activity, BookOpen } from "lucide-react";
 
 const ENHANCED_EXERCISES = [
   { id: "barbell_squat", name: "Barbell Squat", cat: "compound", primary: "Quadriceps", secondary: "Glutes, Hamstrings, Core", equip: "Barbell", type: "strength", difficulty: "Intermediate", description: "The barbell squat is a compound lower body exercise that primarily targets the quadriceps, glutes, and hamstrings. It is considered one of the most effective exercises for building overall leg strength and muscle mass.", steps: ["Place a barbell across your upper back, resting it on your trapezius muscles", "Stand with feet shoulder-width apart, toes slightly turned out", "Brace your core and take a deep breath", "Descend by pushing your hips back and bending your knees simultaneously", "Lower until your thighs are at least parallel to the floor", "Drive through your whole foot to stand back up", "Exhale at the top and squeeze your glutes"], commonMistakes: ["Knees caving inward (valgus collapse)", "Rising onto toes during the ascent", "Rounding the lower back (butt wink)", "Not hitting adequate depth", "Leaning too far forward"], tips: ["Keep your chest up throughout the movement", "Push your knees out in the direction of your toes", "Look straight ahead or slightly upward", "Wear flat-soled shoes or go barefoot for better stability", "Start with bodyweight to master form before adding load"], gifUrl: "", defaultSets: 4, defaultReps: 8 },
@@ -56,6 +57,22 @@ const MUSCLE_GROUPS = [...new Set(ENHANCED_EXERCISES.map(e => e.primary))].sort(
 const EQUIPMENT_TYPES = [...new Set(ENHANCED_EXERCISES.map(e => e.equip))].sort();
 const DIFFICULTY_LEVELS = ["Beginner", "Intermediate", "Advanced"];
 
+const CAT_ICONS = {
+  compound: Dumbbell,
+  isolation: Target,
+  plyometric: Zap,
+  cardio: HeartPulse,
+  bodyweight: PersonStanding,
+};
+
+const catTitle = c => c.charAt(0).toUpperCase() + c.slice(1);
+const diffClass = d => d === "Beginner" ? "green" : d === "Advanced" ? "red" : "orange";
+
+const CatIcon = ({ cat, size = 20 }) => {
+  const Icon = CAT_ICONS[cat] || Dumbbell;
+  return <Icon size={size} />;
+};
+
 export default function ExerciseLibrary({ state, dispatch }) {
   const [search, setSearch] = useState("");
   const [muscleFilter, setMuscleFilter] = useState("");
@@ -73,153 +90,166 @@ export default function ExerciseLibrary({ state, dispatch }) {
     });
   }, [search, muscleFilter, equipFilter, diffFilter]);
 
-  const s = {
-    page: { padding: "0 0 24px" },
-    header: { marginBottom: 24 },
-    title: { fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 },
-    sub: { fontSize: 13, color: "#A0A0A0" },
-    searchWrap: { position: "relative", marginBottom: 16 },
-    searchIcon: { position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(160,160,160,0.4)", fontSize: 14, pointerEvents: "none" },
-    searchInput: { paddingLeft: 40, height: 42, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 12, color: "#FFFFFF", padding: "10px 14px 10px 40px", fontSize: 14, width: "100%", outline: "none" },
-    filters: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 },
-    chip: { padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.06)", color: "#A0A0A0", cursor: "pointer", transition: "all 0.2s" },
-    chipActive: { background: "rgba(200,255,0,0.1)", borderColor: "rgba(200,255,0,0.25)", color: "#C8FF00" },
-    count: { fontSize: 12, color: "#A0A0A0", marginBottom: 12 },
-    grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 },
-    card: { background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 16, cursor: "pointer", transition: "all 0.2s" },
-    cardName: { fontSize: 15, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 },
-    cardMeta: { fontSize: 12, color: "#A0A0A0", marginBottom: 8 },
-    tag: { display: "inline-block", padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, marginRight: 4, marginBottom: 4 },
-    overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20, overflowY: "auto" },
-    modal: { width: "100%", maxWidth: 600, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(200,255,0,0.12)", borderRadius: 20, padding: 32, maxHeight: "90vh", overflowY: "auto" },
-    modalTitle: { fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 },
-    sectionTitle: { fontSize: 14, fontWeight: 700, color: "#C8FF00", marginTop: 16, marginBottom: 8 },
-    desc: { fontSize: 13, color: "#A0A0A0", lineHeight: 1.7, marginBottom: 12 },
-    step: { display: "flex", gap: 10, marginBottom: 8, fontSize: 13, color: "#E8E8E8", lineHeight: 1.6 },
-    stepNum: { minWidth: 22, height: 22, borderRadius: 6, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-    mistake: { fontSize: 13, color: "#FF4757", marginBottom: 4, paddingLeft: 16, position: "relative" },
-    tip: { fontSize: 13, color: "#00C853", marginBottom: 4, paddingLeft: 16, position: "relative" },
-    closeBtn: { position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#A0A0A0", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 14 },
-    imgPlaceholder: { width: "100%", height: 200, borderRadius: 12, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginBottom: 16 },
-    imgText: { fontSize: 12, color: "#A0A0A0" },
+  const hasFilters = search || muscleFilter || equipFilter || diffFilter;
+
+  const clearFilters = () => {
+    setSearch("");
+    setMuscleFilter("");
+    setEquipFilter("");
+    setDiffFilter("");
   };
 
+  const chip = (key, active, onClick, children) => (
+    <button key={key} className={`rd-chip ${active ? "active" : ""}`} onClick={onClick}>{children}</button>
+  );
+
+  const sectionTitle = (text, color) => (
+    <div style={{ fontSize: 13, fontWeight: 800, color: color || "#C8FF00", margin: "18px 0 10px" }}>{text}</div>
+  );
+
   return (
-    <div style={s.page}>
-      <div style={s.header}>
-        <h2 style={s.title}>Exercise Library</h2>
-        <p style={s.sub}>Browse exercises with detailed instructions, tips, and muscle targeting</p>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><BookOpen size={13} /> Library</span>
+          <h1 className="rd-title">Exercise Library</h1>
+          <p className="rd-sub">Browse exercises with detailed instructions, tips, and muscle targeting.</p>
+        </div>
       </div>
 
-      <div style={s.searchWrap}>
-        <span style={s.searchIcon}>🔍</span>
-        <input style={s.searchInput} placeholder="Search exercises..." value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="rd-search">
+        <Search size={16} />
+        <input placeholder="Search exercises..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div style={s.filters}>
-        <button style={{ ...s.chip, ...(muscleFilter ? s.chipActive : {}) }} onClick={() => setMuscleFilter(muscleFilter ? "" : muscleFilter)}>
-          {muscleFilter || "All Muscles"}
-        </button>
-        {MUSCLE_GROUPS.map(m => (
-          <button key={m} style={{ ...s.chip, ...(muscleFilter === m ? s.chipActive : {}) }} onClick={() => setMuscleFilter(muscleFilter === m ? "" : m)}>{m}</button>
-        ))}
-      </div>
-      <div style={s.filters}>
-        <button style={{ ...s.chip, ...(equipFilter ? s.chipActive : {}) }} onClick={() => setEquipFilter("")}>
-          {equipFilter || "All Equipment"}
-        </button>
-        {EQUIPMENT_TYPES.map(e => (
-          <button key={e} style={{ ...s.chip, ...(equipFilter === e ? s.chipActive : {}) }} onClick={() => setEquipFilter(equipFilter === e ? "" : e)}>{e}</button>
-        ))}
-      </div>
-      <div style={s.filters}>
-        {DIFFICULTY_LEVELS.map(d => (
-          <button key={d} style={{ ...s.chip, ...(diffFilter === d ? s.chipActive : {}) }} onClick={() => setDiffFilter(diffFilter === d ? "" : d)}>{d}</button>
-        ))}
+      <div className="rd-card rd-filter-card" style={{ padding: "16px 18px" }}>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Muscle</span>
+          {chip("m-all", !muscleFilter, () => setMuscleFilter(""), "All Muscles")}
+          {MUSCLE_GROUPS.map(m => chip(`m-${m}`, muscleFilter === m, () => setMuscleFilter(muscleFilter === m ? "" : m), m))}
+        </div>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Equipment</span>
+          {chip("e-all", !equipFilter, () => setEquipFilter(""), "All Equipment")}
+          {EQUIPMENT_TYPES.map(e => chip(`e-${e}`, equipFilter === e, () => setEquipFilter(equipFilter === e ? "" : e), e))}
+        </div>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Difficulty</span>
+          {chip("d-all", !diffFilter, () => setDiffFilter(""), "All Levels")}
+          {DIFFICULTY_LEVELS.map(d => chip(`d-${d}`, diffFilter === d, () => setDiffFilter(diffFilter === d ? "" : d), d))}
+        </div>
       </div>
 
-      <div style={s.count}>{filtered.length} exercise{filtered.length !== 1 ? "s" : ""} found</div>
+      <div className="rd-count"><b>{filtered.length}</b> exercise{filtered.length !== 1 ? "s" : ""} found</div>
 
-      <div style={s.grid}>
-        {filtered.map(ex => (
-          <motion.div
-            key={ex.id}
-            style={s.card}
-            whileHover={{ borderColor: "rgba(200,255,0,0.15)", transform: "translateY(-2px)" }}
-            onClick={() => setSelectedExercise(ex)}
-          >
-            <div style={s.cardName}>{ex.name}</div>
-            <div style={s.cardMeta}>{ex.equip} · {ex.cat}</div>
-            <div>
-              <span style={{ ...s.tag, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>{ex.primary}</span>
-              {ex.secondary && <span style={{ ...s.tag, background: "rgba(160,160,160,0.08)", color: "#A0A0A0" }}>{ex.secondary}</span>}
-              <span style={{ ...s.tag, background: ex.difficulty === "Beginner" ? "rgba(0,200,83,0.1)" : ex.difficulty === "Advanced" ? "rgba(255,71,87,0.1)" : "rgba(255,165,0,0.1)", color: ex.difficulty === "Beginner" ? "#00C853" : ex.difficulty === "Advanced" ? "#FF4757" : "#FFA500" }}>{ex.difficulty}</span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {filtered.length === 0 ? (
+        <div className="rd-card rd-empty" style={{ padding: "48px 16px" }}>
+          <div className="rd-empty-title">No exercises found</div>
+          <div className="rd-empty-sub">Try adjusting your search or clearing the active filters.</div>
+          {hasFilters && <button className="rd-btn-secondary" onClick={clearFilters} style={{ marginTop: 8, padding: "10px 18px" }}>Clear Filters</button>}
+        </div>
+      ) : (
+        <div className="rd-ex-grid">
+          {filtered.map(ex => {
+            return (
+              <motion.div key={ex.id} className="rd-ex-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setSelectedExercise(ex)}>
+                <div className="rd-ex-top">
+                  <div className="rd-ex-tile"><CatIcon cat={ex.cat} /></div>
+                  <div className="rd-ex-body">
+                    <div className="rd-ex-name">{ex.name}</div>
+                    <div className="rd-ex-sub">{ex.primary}{ex.secondary ? ` · ${ex.secondary.split(",")[0]}` : ""}</div>
+                  </div>
+                </div>
+                <div className="rd-ex-tags">
+                  <span className="rd-ex-tag">{ex.primary}</span>
+                  <span className={`rd-ex-tag ${diffClass(ex.difficulty)}`}>{ex.difficulty}</span>
+                  <span className="rd-ex-tag muted">{ex.equip}</span>
+                </div>
+                <div className="rd-ex-meta">
+                  <span className="rd-ex-meta-item"><Repeat size={14} /> <b>{ex.defaultSets} × {ex.defaultReps}</b></span>
+                  <span className="rd-ex-meta-item"><Activity size={14} /> {ex.type}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+      
+      <AnimatePresence>
+        {selectedExercise && (
+          <motion.div className="rd-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedExercise(null)}>
+            <motion.div className="rd-modal rd-modal-lg" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} onClick={e => e.stopPropagation()}>
+              <button className="rd-modal-close" onClick={() => setSelectedExercise(null)}><X size={15} /></button>
 
-      {selectedExercise && (
-        <div style={s.overlay} onClick={() => setSelectedExercise(null)}>
-          <motion.div style={s.modal} onClick={e => e.stopPropagation()} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}>
-            <button style={s.closeBtn} onClick={() => setSelectedExercise(null)}>✕</button>
-            <div style={s.modalTitle}>{selectedExercise.name}</div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12, marginTop: 8 }}>
-              <span style={{ ...s.tag, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>{selectedExercise.primary}</span>
-              {selectedExercise.secondary && <span style={{ ...s.tag, background: "rgba(160,160,160,0.08)", color: "#A0A0A0" }}>{selectedExercise.secondary}</span>}
-              <span style={{ ...s.tag, background: "rgba(160,160,160,0.08)", color: "#A0A0A0" }}>{selectedExercise.equip}</span>
-              <span style={{ ...s.tag, background: selectedExercise.difficulty === "Beginner" ? "rgba(0,200,83,0.1)" : selectedExercise.difficulty === "Advanced" ? "rgba(255,71,87,0.1)" : "rgba(255,165,0,0.1)", color: selectedExercise.difficulty === "Beginner" ? "#00C853" : selectedExercise.difficulty === "Advanced" ? "#FF4757" : "#FFA500" }}>{selectedExercise.difficulty}</span>
-            </div>
-
-            <div style={s.imgPlaceholder}>
-              {selectedExercise.gifUrl ? (
-                <img src={selectedExercise.gifUrl} alt={selectedExercise.name} style={{ width: "100%", height: 200, objectFit: "contain", borderRadius: 12 }} />
-              ) : (
-                <>
-                  <span style={{ fontSize: 32 }}>🏋️</span>
-                  <span style={s.imgText}>Animation / GIF coming soon</span>
-                </>
-              )}
-            </div>
-
-            <p style={s.desc}>{selectedExercise.description}</p>
-
-            <div style={s.sectionTitle}>Steps</div>
-            {selectedExercise.steps.map((step, i) => (
-              <div key={i} style={s.step}>
-                <span style={s.stepNum}>{i + 1}</span>
-                <span>{step}</span>
+              <div className="rd-ex-top" style={{ marginBottom: 14 }}>
+                <div className="rd-ex-tile" style={{ width: 52, height: 52, borderRadius: 15 }}>
+                  <CatIcon cat={selectedExercise.cat} size={24} />
+                </div>
+                <div className="rd-ex-body">
+                  <div className="rd-modal-title">{selectedExercise.name}</div>
+                  <div className="rd-ex-sub">{selectedExercise.primary}{selectedExercise.secondary ? ` · ${selectedExercise.secondary}` : ""}</div>
+                </div>
               </div>
-            ))}
 
-            <div style={{ ...s.sectionTitle, color: "#FF4757" }}>Common Mistakes</div>
-            {selectedExercise.commonMistakes.map((m, i) => (
-              <div key={i} style={s.mistake}>⚠ {m}</div>
-            ))}
+              <div className="rd-ex-tags">
+                <span className="rd-ex-tag">{selectedExercise.primary}</span>
+                {selectedExercise.secondary && <span className="rd-ex-tag muted">{selectedExercise.secondary}</span>}
+                <span className="rd-ex-tag blue">{catTitle(selectedExercise.cat)}</span>
+                <span className={`rd-ex-tag ${diffClass(selectedExercise.difficulty)}`}>{selectedExercise.difficulty}</span>
+                <span className="rd-ex-tag muted">{selectedExercise.equip}</span>
+              </div>
 
-            <div style={{ ...s.sectionTitle, color: "#00C853" }}>Tips</div>
-            {selectedExercise.tips.map((t, i) => (
-              <div key={i} style={s.tip}>✓ {t}</div>
-            ))}
+              <div style={{ height: 160, borderRadius: 14, background: "#171717", border: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 16, overflow: "hidden" }}>
+                {selectedExercise.gifUrl ? (
+                  <img src={selectedExercise.gifUrl} alt={selectedExercise.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                ) : (
+                  <>
+                    <Zap size={28} style={{ color: "rgba(200,255,0,0.4)" }} />
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>Animation / GIF coming soon</span>
+                  </>
+                )}
+              </div>
 
-            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+              <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.75)", marginTop: 16 }}>{selectedExercise.description}</p>
+
+              {sectionTitle("Steps")}
+              {selectedExercise.steps.map((step, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 13, lineHeight: 1.6, color: "#E8E8E8" }}>
+                  <span style={{ minWidth: 22, height: 22, borderRadius: 6, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
+                  <span>{step}</span>
+                </div>
+              ))}
+
+              {sectionTitle("Common Mistakes", "#FF4757")}
+              {selectedExercise.commonMistakes.map((m, i) => (
+                <div key={i} style={{ fontSize: 13, color: "#FF4757", marginBottom: 4, paddingLeft: 16, position: "relative" }}>
+                  <span style={{ position: "absolute", left: 0 }}>•</span>{m}
+                </div>
+              ))}
+
+              {sectionTitle("Tips", "#00C853")}
+              {selectedExercise.tips.map((t, i) => (
+                <div key={i} style={{ fontSize: 13, color: "#00C853", marginBottom: 4, paddingLeft: 16, position: "relative" }}>
+                  <span style={{ position: "absolute", left: 0 }}>•</span>{t}
+                </div>
+              ))}
+
               <button
-                className="neon-btn"
-                style={{ flex: 1 }}
+                className="rd-btn-primary"
+                style={{ width: "100%", marginTop: 22 }}
                 onClick={() => {
                   dispatch({ type: "ADD_EXERCISE_TO_SESSION", payload: { id: selectedExercise.id, name: selectedExercise.name, cat: selectedExercise.cat, primary: selectedExercise.primary, secondary: selectedExercise.secondary, equip: selectedExercise.equip, type: selectedExercise.type, sets: Array.from({ length: selectedExercise.defaultSets }, (_, i) => ({ set: i + 1, weight: 0, reps: selectedExercise.defaultReps, rpe: "", done: false })), notes: "" } });
                   setSelectedExercise(null);
                   window.__setPage && window.__setPage("workout");
                 }}
               >
-                Add to Workout
+                <Dumbbell size={16} /> Add to Workout
               </button>
-            </div>
+            </motion.div>
           </motion.div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
 export { ENHANCED_EXERCISES };

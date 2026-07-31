@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import React from "react";
 import { showToast } from "../utils/helpers";
+import { BookOpen, ClipboardList, Dumbbell, History, Trophy, Zap } from "lucide-react";
 import WorkoutSession from "./WorkoutSession";
 import WorkoutTemplates from "./WorkoutTemplates";
 import ExerciseLibraryBase from "./workout/ExerciseLibrary";
@@ -9,15 +9,16 @@ import PersonalRecords from "./workout/PersonalRecords";
 
 const WORKOUT_TAB_MAP = { workout: "library", session: "session", library: "library", templates: "templates", history: "history", prs: "prs" };
 
+const TABS = [
+  { id: "library", label: "Exercise Library", icon: BookOpen },
+  { id: "templates", label: "Templates", icon: ClipboardList },
+  { id: "session", label: "Active Workout", icon: Dumbbell },
+  { id: "history", label: "History", icon: History },
+  { id: "prs", label: "Personal Records", icon: Trophy },
+];
+
 const WorkoutHub = ({ state, dispatch, page }) => {
   const [tab, setTab] = useState(WORKOUT_TAB_MAP[page] || (state.activeSession ? "session" : "library"));
-  const tabs = [
-    { id: "library", label: "Exercise Library", icon: "📚" },
-    { id: "templates", label: "Templates", icon: "📋" },
-    { id: "session", label: "Active Workout", icon: "🏋️" },
-    { id: "history", label: "History", icon: "📅" },
-    { id: "prs", label: "Personal Records", icon: "🏆" },
-  ];
 
   useEffect(() => {
     if (state.activeSession && tab !== "session") setTab("session");
@@ -43,23 +44,30 @@ const WorkoutHub = ({ state, dispatch, page }) => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-      <div className="wm-tab-bar">
-        {tabs.map(t => (
-          <button key={t.id} className={`wm-tab ${tab === t.id ? "active" : ""}`} onClick={() => setTab(t.id)}>
-            {t.icon} {t.label}
-          </button>
-        ))}
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><Dumbbell size={13} /> Workouts</span>
+          <h1 className="rd-title">Train Smarter</h1>
+          <p className="rd-sub">Pick a program, browse the library, or jump straight into a session.</p>
+        </div>
+        <button className="rd-btn-primary" onClick={startQuickWorkout} style={{ alignSelf: "center" }}>
+          <Zap size={16} /> Start Quick Workout
+        </button>
       </div>
 
-      {tab === "library" && (
-        <div>
-          <div style={{ marginBottom: 16 }}>
-            <button className="neon-btn" onClick={startQuickWorkout} style={{ fontSize: 13, padding: "10px 20px" }}>🚀 Start Quick Workout</button>
-          </div>
-           <ExerciseLibraryBase state={state} dispatch={dispatch} />
-        </div>
-      )}
+      <div className="rd-tabbar">
+        {TABS.map(t => {
+          const Icon = t.icon;
+          return (
+            <button key={t.id} className={`rd-tab ${tab === t.id ? "active" : ""}`} onClick={() => setTab(t.id)}>
+              <Icon size={15} /> {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === "library" && <ExerciseLibraryBase state={state} dispatch={dispatch} />}
       {tab === "templates" && <WorkoutTemplates state={state} dispatch={dispatch} />}
       {tab === "session" && <WorkoutSession state={state} dispatch={dispatch} />}
       {tab === "history" && <WorkoutHistory state={state} dispatch={dispatch} />}
