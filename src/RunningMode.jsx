@@ -3,8 +3,8 @@ import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, Cartesia
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { pick, fmtPace, fmtDuration, fmtDurationLong, calcCalories, haversine, today, fmt as fmt2 } from "./utils/helpers";
+import { Footprints, Home, History, Trophy, BarChart3, Target, Bot, Play, Pause, Square, RotateCcw, X, Check, Search, ChevronDown, ArrowDownUp, ArrowLeft, Clock, Flame, Gauge, Trash2, Pencil, Award, Zap, CalendarDays, Calendar, Activity, TrendingUp, MapPin } from "lucide-react";
 
-// ── Constants ───────────────────────────────────────────────────────────────
 const RUNNING_BADGE_DEFS = [
   { id: "first_run", icon: "🏃", label: "First Run", desc: "Complete your first run" },
   { id: "run_5k", icon: "🏅", label: "5K Runner", desc: "Run 5 km in a single session" },
@@ -48,7 +48,6 @@ const MOCK_RUN_COACHING = {
   ],
 };
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
 const calcTotalDistance = (coords) => {
   let total = 0;
   for (let i = 1; i < coords.length; i++) {
@@ -108,52 +107,58 @@ const generateAIReport = (run, prevRun) => {
   return { feedback, tips: tips.slice(0, 3) };
 };
 
-// ── RunningMode CSS (injected) ──────────────────────────────────────────────
-const RUNNING_STYLES = `
-  @keyframes runPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.3); } 50% { box-shadow: 0 0 0 12px rgba(200,255,0,0); } }
-  @keyframes runGlow { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
-  .run-live-pulse { animation: runPulse 2s ease-in-out infinite; }
-  .run-glow { animation: runGlow 2s ease-in-out infinite; }
-`;
+const RD_COLOR_CLS = {
+  "#C8FF00": "lime", "#A5E600": "lime", "#D9FF4D": "lime",
+  "#FF4757": "red", "#00C853": "green",
+  "#FFA500": "orange", "#FF9F43": "orange",
+  "#00BCD4": "blue", "#4D9FFF": "blue", "#A78BFA": "purple",
+};
 
-// ── Reusable Running Components ─────────────────────────────────────────────
 const RunMetricCard = ({ icon, label, value, unit, color = "#C8FF00", sub }) => (
-  <div className="run-metric-card" style={{ "--accent": color }}>
-    <div className="run-metric-icon" style={{ background: `${color}15` }}>{icon}</div>
-    <div className="run-metric-value" style={{ color }}>{value}<span style={{ fontSize: 12, fontWeight: 400, color: "#A0A0A0", marginLeft: 4 }}>{unit}</span></div>
-    <div className="run-metric-label">{label}</div>
-    {sub && <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 4 }}>{sub}</div>}
+  <div className={`rd-nut-stat ${RD_COLOR_CLS[color] || ""}`}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span className="l">{label}</span>
+      <span style={{ fontSize: 15, lineHeight: 1 }}>{icon}</span>
+    </div>
+    <div className="v">{value}<span>{unit}</span></div>
+    {sub && <div className="s">{sub}</div>}
   </div>
 );
 
-const RunControlBtn = ({ onClick, className, children, disabled, style }) => (
-  <button className={`run-control-btn ${className}`} onClick={onClick} disabled={disabled} style={{ ...style, opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer" }}>{children}</button>
-);
+const RunControlBtn = ({ onClick, className, children, disabled, style }) => {
+  const primary = className.includes("start");
+  const danger = className.includes("finish");
+  const tone = danger ? { background: "rgba(255,71,87,0.12)", border: "1px solid rgba(255,71,87,0.32)", color: "#FF4757" } : null;
+  return (
+    <button className={primary ? "rd-btn-primary" : "rd-btn-secondary"} onClick={onClick} disabled={disabled} style={{ ...tone, ...style, opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer" }}>
+      {children}
+    </button>
+  );
+};
 
-const SectionTitle = ({ children }) => (
-  <div className="dash-section-title" style={{ marginTop: 24 }}><span className="st-dot" />{children}</div>
+const SectionTitle = ({ children, style }) => (
+  <div className="rd-pr-section-label" style={style}>{children}</div>
 );
 
 const TabBar = ({ tabs, active, onChange }) => (
-  <div className="wm-tab-bar" style={{ marginBottom: 20 }}>
+  <div className="rd-tabbar">
     {tabs.map((t) => (
-      <button key={t.id} className={`wm-tab ${active === t.id ? "active" : ""}`} onClick={() => onChange(t.id)}>
-        {t.icon && <span style={{ marginRight: 6 }}>{t.icon}</span>}{t.label}
+      <button key={t.id} className={`rd-tab ${active === t.id ? "active" : ""}`} onClick={() => onChange(t.id)}>
+        {t.icon ? <t.icon size={14} /> : null}{t.label}
       </button>
     ))}
   </div>
 );
 
-const EmptyState = ({ icon, title, desc, action }) => (
-  <div className="wm-empty">
-    <div className="wm-empty-icon">{icon}</div>
-    <div className="wm-empty-title">{title}</div>
-    <div className="wm-empty-desc">{desc}</div>
+const EmptyState = ({ icon: Icon, title, desc, action }) => (
+  <div className="rd-empty" style={{ padding: "36px 16px" }}>
+    {Icon && <Icon size={28} style={{ color: "rgba(255,255,255,0.22)", marginBottom: 4 }} />}
+    <div className="rd-empty-title">{title}</div>
+    <div className="rd-empty-sub">{desc}</div>
     {action}
   </div>
 );
 
-// ── Leaflet Map Component ───────────────────────────────────────────────────
 const RunMap = ({ route, height = 300, showMarker = true, fitBounds = true }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
@@ -242,7 +247,6 @@ const RunMap = ({ route, height = 300, showMarker = true, fitBounds = true }) =>
   );
 };
 
-// ── Live Stopwatch Hook ─────────────────────────────────────────────────────
 const useStopwatch = () => {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
@@ -283,7 +287,6 @@ const useStopwatch = () => {
   return { elapsed, running, start, pause, reset, stop };
 };
 
-// ── Active Run View ─────────────────────────────────────────────────────────
 const ActiveRun = ({ state, dispatch, onSummary, onCancel }) => {
   const { elapsed, running, start, pause, reset, stop } = useStopwatch();
   const [paused, setPaused] = useState(false);
@@ -424,31 +427,27 @@ const ActiveRun = ({ state, dispatch, onSummary, onCancel }) => {
   const gpsLabel = { initializing: "Initializing GPS...", searching: "Searching for signal", active: "GPS Active", denied: "GPS Permission Denied", unavailable: "GPS Unavailable", timeout: "GPS Timeout" }[gpsStatus] || "Unknown";
 
   return (
-    <div>
-      {/* Map */}
-      <div style={{ position: "relative", marginBottom: 20, borderRadius: 16, overflow: "hidden" }}>
+    <div className="rd-stack">
+      <div className="rd-card" style={{ padding: 0, overflow: "hidden" }}>
         <RunMap route={route} height={320} showMarker={false} fitBounds={false} />
-        {/* GPS Badge */}
         <div style={{ position: "absolute", top: 12, left: 12, zIndex: 500, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, border: `1px solid ${gpsColor}30` }}>
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: gpsColor, boxShadow: `0 0 8px ${gpsColor}60` }} className={gpsStatus === "active" ? "run-glow" : ""} />
           <span style={{ fontSize: 11, fontWeight: 600, color: gpsColor }}>{gpsLabel}</span>
         </div>
-        {/* Live pace overlay */}
-        <div style={{ position: "absolute", bottom: 12, right: 12, zIndex: 500, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px", border: "1px solid rgba(200,255,0,0.1)" }}>
-          <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pace</div>
+        <div style={{ position: "absolute", bottom: 12, right: 12, zIndex: 500, background: "rgba(15,15,15,0.9)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px", border: "1px solid rgba(200,255,0,0.1)", textAlign: "right" }}>
+          <div className="rd-metric-label" style={{ marginTop: 0 }}>Pace</div>
           <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: "#C8FF00" }}>{fmtPace(avgPace)}</div>
         </div>
       </div>
 
-      {/* Live Display */}
-      <div className="run-live-display" style={{ background: "#151515", borderRadius: 16, border: "1px solid rgba(200,255,0,0.08)", padding: "28px 20px", marginBottom: 20 }}>
-        <div className="run-live-label">Current Pace</div>
-        <div className="run-live-pace mono">{fmtPace(avgPace)}</div>
-        <div className="mono" style={{ fontSize: 14, color: "#A0A0A0", marginTop: 8 }}>{fmtDuration(elapsed)}</div>
+      <div className="rd-card" style={{ textAlign: "center" }}>
+        <div className="rd-metric-label">Current Pace</div>
+        <div className="rd-timer-display" style={{ fontSize: 64, marginTop: 10 }}>{fmtPace(avgPace)}</div>
+        <div className="mono" style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginTop: 10 }}>{fmtDuration(elapsed)}</div>
+        <div className="rd-metric-label" style={{ marginTop: 8 }}>Elapsed</div>
       </div>
 
-      {/* Metrics Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
+      <div className="rd-nut-stats">
         <RunMetricCard icon="📏" label="Distance" value={fmt2(distance, 2)} unit="km" color="#C8FF00" />
         <RunMetricCard icon="⏱️" label="Duration" value={fmtDuration(elapsed)} unit="" color="#A0A0A0" />
         <RunMetricCard icon="📊" label="Avg Pace" value={fmtPace(avgPace)} unit="/km" color="#C8FF00" />
@@ -461,28 +460,26 @@ const ActiveRun = ({ state, dispatch, onSummary, onCancel }) => {
         <RunMetricCard icon="⛰️" label="Elevation" value={fmt2(elevationGain, 0)} unit="m" color="#00BCD4" />
       </div>
 
-      {/* Controls */}
       <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         {!running && elapsed === 0 ? (
-          <RunControlBtn className="start" onClick={handleStart}>▶ Start Run</RunControlBtn>
+          <RunControlBtn className="start" onClick={handleStart}><Play size={15} /> Start Run</RunControlBtn>
         ) : (
           <>
             {!paused ? (
-              <RunControlBtn className="pause" onClick={handlePause}>⏸ Pause</RunControlBtn>
+              <RunControlBtn className="pause" onClick={handlePause}><Pause size={15} /> Pause</RunControlBtn>
             ) : (
-              <RunControlBtn className="resume" onClick={handleResume}>▶ Resume</RunControlBtn>
+              <RunControlBtn className="resume" onClick={handleResume}><Play size={15} /> Resume</RunControlBtn>
             )}
-            <RunControlBtn className="finish" onClick={handleFinish}>⏹ Finish</RunControlBtn>
-            <RunControlBtn className="reset" onClick={handleReset} disabled={running}>↻ Reset</RunControlBtn>
+            <RunControlBtn className="finish" onClick={handleFinish}><Square size={15} /> Finish</RunControlBtn>
+            <RunControlBtn className="reset" onClick={handleReset} disabled={running}><RotateCcw size={15} /> Reset</RunControlBtn>
           </>
         )}
-        <RunControlBtn className="ghost" onClick={onCancel}>✕ Cancel</RunControlBtn>
+        <RunControlBtn className="ghost" onClick={onCancel}><X size={15} /> Cancel</RunControlBtn>
       </div>
     </div>
   );
 };
 
-// ── Run Summary Overlay ─────────────────────────────────────────────────────
 const RunSummary = ({ run, state, dispatch, onClose }) => {
   const prevRuns = (state.runs || []);
   const prevRun = prevRuns.length > 0 ? prevRuns[prevRuns.length - 1] : null;
@@ -505,72 +502,54 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
   };
 
   return (
-    <div className="run-summary-overlay">
-      <motion.div className="run-summary-card" initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>{isPR ? "🏆" : "🎉"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 }}>Run Complete!</h2>
-          {isPR && <div style={{ fontSize: 13, color: "#FFD700", fontWeight: 600 }}>New Personal Record!</div>}
+    <div className="rd-modal-overlay">
+      <motion.div className="rd-modal rd-modal-lg" initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ duration: 0.3 }} style={{ maxWidth: 640 }}>
+        <button className="rd-modal-close" onClick={onClose} aria-label="Close"><X size={16} /></button>
+        <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <div style={{ fontSize: 44, marginBottom: 8 }}>{isPR ? "🏆" : "🎉"}</div>
+          <div className="rd-modal-title">Run Complete!</div>
+          {isPR && <div style={{ fontSize: 13, color: "#FFD700", fontWeight: 600, marginTop: 6 }}>New Personal Record!</div>}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
-          <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Distance</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#C8FF00" }}>{fmt2(run.distance, 2)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>km</span></div>
-          </div>
-          <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Time</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#FFFFFF" }}>{fmtDuration(run.duration)}</div>
-          </div>
-          <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Avg Pace</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#C8FF00" }}>{fmtPace(run.avgPace)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>/km</span></div>
-          </div>
-          <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Fastest Pace</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#00C853" }}>{fmtPace(run.fastestPace)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>/km</span></div>
-          </div>
-          <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Calories</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#FF4757" }}>{run.calories} <span style={{ fontSize: 12, color: "#A0A0A0" }}>kcal</span></div>
-          </div>
-          <div className="glass-sm" style={{ padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Avg Speed</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#00C853" }}>{fmt2(run.avgSpeed, 1)} <span style={{ fontSize: 12, color: "#A0A0A0" }}>km/h</span></div>
-          </div>
+        <div className="rd-stats-grid">
+          <div className="rd-stat-box lime"><div className="l">Distance</div><div className="v">{fmt2(run.distance, 2)}<span> km</span></div></div>
+          <div className="rd-stat-box"><div className="l">Time</div><div className="v">{fmtDuration(run.duration)}</div></div>
+          <div className="rd-stat-box lime"><div className="l">Avg Pace</div><div className="v">{fmtPace(run.avgPace)}<span> /km</span></div></div>
+          <div className="rd-stat-box"><div className="l">Fastest Pace</div><div className="v" style={{ color: "#00C853" }}>{fmtPace(run.fastestPace)}<span> /km</span></div></div>
+          <div className="rd-stat-box"><div className="l">Calories</div><div className="v" style={{ color: "#FF4757" }}>{run.calories}<span> kcal</span></div></div>
+          <div className="rd-stat-box"><div className="l">Avg Speed</div><div className="v" style={{ color: "#00C853" }}>{fmt2(run.avgSpeed, 1)}<span> km/h</span></div></div>
         </div>
 
-        {/* Splits */}
         {run.splits && run.splits.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <div className="dash-section-title" style={{ fontSize: 13, marginBottom: 10 }}><span className="st-dot" />Splits</div>
-            <div className="glass-sm" style={{ padding: 0, overflow: "hidden" }}>
-              <div className="run-split-row run-split-header">
-                <span>Km</span><span>Pace</span><span>Time</span>
-              </div>
-              {run.splits.map((s) => (
-                <div key={s.km} className="run-split-row">
-                  <span className="mono" style={{ fontWeight: 600, color: "#FFFFFF" }}>KM {s.km}</span>
-                  <span className={`mono ${s.pace < run.avgPace ? "run-split-fast" : "run-split-slow"}`}>{fmtPace(s.pace)} /km</span>
-                  <span className="mono" style={{ color: "#A0A0A0" }}>{fmtDuration(Math.round(s.duration))}</span>
-                </div>
-              ))}
-            </div>
+            <SectionTitle style={{ marginBottom: 10 }}>Splits</SectionTitle>
+            <table className="rd-table">
+              <thead>
+                <tr><th>Km</th><th>Pace</th><th>Time</th></tr>
+              </thead>
+              <tbody>
+                {run.splits.map((s) => (
+                  <tr key={s.km}>
+                    <td className="food-name" style={{ fontFamily: "'JetBrains Mono', monospace" }}>KM {s.km}</td>
+                    <td className="num" style={{ color: s.pace < run.avgPace ? "#C8FF00" : "rgba(255,255,255,0.75)" }}>{fmtPace(s.pace)} /km</td>
+                    <td className="num" style={{ color: "rgba(255,255,255,0.45)" }}>{fmtDuration(Math.round(s.duration))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
-        {/* Route Preview */}
         {run.route && run.route.length > 1 && (
           <div style={{ marginBottom: 20 }}>
-            <div className="dash-section-title" style={{ fontSize: 13, marginBottom: 10 }}><span className="st-dot" />Route Preview</div>
+            <SectionTitle style={{ marginBottom: 10 }}>Route Preview</SectionTitle>
             <RunMap route={run.route} height={200} showMarker={true} />
           </div>
         )}
 
-        {/* AI Coach Feedback */}
-        <div className="dash-ai-card" style={{ marginBottom: 20, padding: 20 }}>
+        <div className="rd-card rd-ai-card" style={{ padding: 20, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,255,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🤖</div>
+            <div className="rd-card-title-ico lime"><Bot size={16} /></div>
             <span style={{ fontSize: 14, fontWeight: 700, color: "#C8FF00" }}>AI Running Coach</span>
           </div>
           <p style={{ fontSize: 13, color: "#D0D0D0", lineHeight: 1.6, marginBottom: 12 }}>{report.feedback}</p>
@@ -583,15 +562,14 @@ const RunSummary = ({ run, state, dispatch, onClose }) => {
         </div>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-          <button className="neon-btn" onClick={handleSave} style={{ padding: "12px 32px" }}>Save Run</button>
-          <button className="ghost-btn" onClick={onClose} style={{ padding: "12px 24px" }}>Discard</button>
+          <button className="rd-btn-primary" onClick={handleSave} style={{ padding: "12px 32px" }}><Check size={16} /> Save Run</button>
+          <button className="rd-btn-secondary" onClick={onClose} style={{ padding: "12px 24px" }}><X size={16} /> Discard</button>
         </div>
       </motion.div>
     </div>
   );
 };
 
-// ── Run History ─────────────────────────────────────────────────────────────
 const RunHistory = ({ state, dispatch }) => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("date");
@@ -623,64 +601,75 @@ const RunHistory = ({ state, dispatch }) => {
 
   if (viewRun) {
     return (
-      <div>
-        <button className="ghost-btn" onClick={() => setViewRun(null)} style={{ marginBottom: 16 }}>← Back to History</button>
+      <div className="rd-stack">
+        <button className="rd-btn-sm ghost" onClick={() => setViewRun(null)} style={{ alignSelf: "flex-start" }}>
+          <ArrowLeft size={14} /> Back to History
+        </button>
         <RunSummary run={viewRun} state={state} dispatch={dispatch} onClose={() => setViewRun(null)} />
       </div>
     );
   }
 
   return (
-    <div>
-      <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-        <div className="wm-search-bar" style={{ flex: 1, minWidth: 200 }}>
-          <span className="search-icon">🔍</span>
-          <input placeholder="Search runs..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ paddingLeft: 40 }} />
+    <div className="rd-stack">
+      <div className="rd-filter-row">
+        <div className="rd-search" style={{ flex: 1, minWidth: 200 }}>
+          <Search size={15} />
+          <input placeholder="Search runs..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <select value={sortField} onChange={(e) => setSortField(e.target.value)} style={{ width: "auto", minWidth: 140 }}>
-          <option value="date">Date</option>
-          <option value="distance">Distance</option>
-          <option value="duration">Duration</option>
-          <option value="pace">Pace</option>
-        </select>
-        <button className="ghost-btn" onClick={() => setSortDir((d) => d === "desc" ? "asc" : "desc")} style={{ padding: "10px 14px" }}>
-          {sortDir === "desc" ? "↓ Desc" : "↑ Asc"}
+        <div className="rd-select-wrap">
+          <ChevronDown size={14} />
+          <select className="rd-select" value={sortField} onChange={(e) => setSortField(e.target.value)} style={{ width: "auto", minWidth: 150 }}>
+            <option value="date">Sort by Date</option>
+            <option value="distance">Sort by Distance</option>
+            <option value="duration">Sort by Duration</option>
+            <option value="pace">Sort by Pace</option>
+          </select>
+        </div>
+        <button className="rd-mini-btn" onClick={() => setSortDir((d) => d === "desc" ? "asc" : "desc")}>
+          <ArrowDownUp size={13} /> {sortDir === "desc" ? "Desc" : "Asc"}
         </button>
       </div>
 
       {runs.length === 0 ? (
-        <EmptyState icon="🏃" title="No runs yet" desc="Start your first run to see it here!" />
+        <EmptyState icon={Footprints} title="No runs yet" desc="Start your first run to see it here!" />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div className="rd-history-list">
           {runs.map((run) => (
-            <div key={run.id} className="run-history-item" style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>{run.date}</span>
-                  {run.distance >= 5 && <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontWeight: 600 }}>{fmt2(run.distance, 1)} km</span>}
+            <div key={run.id} className="rd-history-card" style={{ cursor: "default" }}>
+              <div className="rd-history-top">
+                <div style={{ minWidth: 0 }}>
+                  <div className="rd-history-name">{run.date}</div>
+                  <div className="rd-history-sub">
+                    <span><Clock size={11} /> {fmtDuration(run.duration)}</span>
+                    <span><Gauge size={11} /> {fmtPace(run.avgPace)} /km</span>
+                    <span><Flame size={11} /> {run.calories} kcal</span>
+                  </div>
                 </div>
-                <div style={{ display: "flex", gap: 16, fontSize: 12, color: "#A0A0A0" }}>
-                  <span className="mono">{fmtDuration(run.duration)}</span>
-                  <span className="mono">{fmtPace(run.avgPace)} /km</span>
-                  <span className="mono">{run.calories} kcal</span>
+                <div className="rd-history-vol">
+                  <div className="v">{fmt2(run.distance, 2)}<span> km</span></div>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button className="ghost-btn" onClick={() => setViewRun(run)} style={{ padding: "6px 12px", fontSize: 12 }}>View</button>
-                <button className="ghost-btn" onClick={() => handleDelete(run.id)} style={{ padding: "6px 12px", fontSize: 12, color: "#FF4757", borderColor: "rgba(255,71,87,0.2)" }}>Delete</button>
+              {run.distance >= 5 && (
+                <div className="rd-history-chips">
+                  <span className="rd-ex-tag">{fmt2(run.distance, 1)} km</span>
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                <button className="rd-mini-btn" onClick={() => setViewRun(run)}>View</button>
+                <button className="rd-mini-btn danger" onClick={() => handleDelete(run.id)}><Trash2 size={12} /> Delete</button>
               </div>
             </div>
           ))}
         </div>
       )}
-      <div style={{ marginTop: 16, fontSize: 12, color: "#A0A0A0", textAlign: "center" }}>
-        Showing {runs.length} of {(state.runs || []).length} runs
+      <div className="rd-count" style={{ textAlign: "center" }}>
+        Showing <b>{runs.length}</b> of <b>{(state.runs || []).length}</b> runs
       </div>
     </div>
   );
 };
 
-// ── Personal Records ────────────────────────────────────────────────────────
 const PersonalRecords = ({ state }) => {
   const runs = state.runs || [];
   const prs = state.runningPRs || {};
@@ -736,39 +725,42 @@ const PersonalRecords = ({ state }) => {
   }, [runs]);
 
   if (runs.length === 0) {
-    return <EmptyState icon="🏆" title="No records yet" desc="Complete runs to set personal records!" />;
+    return <EmptyState icon={Trophy} title="No records yet" desc="Complete runs to set personal records!" />;
   }
 
   return (
-    <div>
-      {/* Personal Records */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 32 }}>
+    <div className="rd-stack">
+      <SectionTitle><Trophy size={12} /> Personal Records</SectionTitle>
+      <div className="rd-pr-grid">
         {records.map((r) => (
-          <div key={r.id} className="run-pr-card achieved">
-            <div style={{ fontSize: 28, marginBottom: 8 }}>{r.icon}</div>
-            <div style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 4 }}>{r.label}</div>
-            <div className="mono" style={{ fontSize: 24, fontWeight: 800, color: "#C8FF00" }}>{r.value}<span style={{ fontSize: 12, fontWeight: 400, color: "#A0A0A0", marginLeft: 4 }}>{r.unit}</span></div>
-            {r.date && <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 4 }}>{r.date}</div>}
+          <div key={r.id} className="rd-pr-card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <span style={{ fontSize: 22 }}>{r.icon}</span>
+              {r.date && <span className="rd-pr-date">{r.date}</span>}
+            </div>
+            <div className="rd-pr-name" style={{ marginBottom: 4 }}>{r.label}</div>
+            <div className="rd-pr-val" style={{ color: "#C8FF00" }}>{r.value}<span>{r.unit}</span></div>
           </div>
         ))}
       </div>
 
-      {/* Badges */}
-      <SectionTitle>Achievement Badges</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10, marginTop: 12 }}>
-        {RUNNING_BADGE_DEFS.map((b) => (
-          <div key={b.id} className={`run-badge-card ${earnedBadgeIds.includes(b.id) ? "earned" : ""}`}>
-            <div className="run-badge-icon" style={{ opacity: earnedBadgeIds.includes(b.id) ? 1 : 0.3 }}>{b.icon}</div>
-            <div className="run-badge-label">{b.label}</div>
-            <div className="run-badge-desc">{b.desc}</div>
-          </div>
-        ))}
+      <SectionTitle><Award size={12} /> Achievement Badges</SectionTitle>
+      <div className="rd-tmpl-grid">
+        {RUNNING_BADGE_DEFS.map((b) => {
+          const earned = earnedBadgeIds.includes(b.id);
+          return (
+            <div key={b.id} className="rd-tmpl-card" style={{ opacity: earned ? 1 : 0.45, borderColor: earned ? "rgba(200,255,0,0.18)" : undefined }}>
+              <div style={{ fontSize: 26 }}>{b.icon}</div>
+              <div className="rd-tmpl-name">{b.label}</div>
+              <div className="rd-tmpl-desc">{b.desc}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-// ── Running Analytics ───────────────────────────────────────────────────────
 const RunningAnalytics = ({ state }) => {
   const runs = state.runs || [];
   const [chartPeriod, setChartPeriod] = useState("monthly");
@@ -847,15 +839,14 @@ const RunningAnalytics = ({ state }) => {
   const totalDuration = runs.reduce((s, r) => s + r.duration, 0);
 
   if (runs.length === 0) {
-    return <EmptyState icon="📊" title="No data yet" desc="Complete runs to see your analytics!" />;
+    return <EmptyState icon={BarChart3} title="No data yet" desc="Complete runs to see your analytics!" />;
   }
 
-  const tooltipStyle = { contentStyle: { background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.15)", borderRadius: 10, fontSize: 12, color: "#FFFFFF" }, labelStyle: { color: "#A0A0A0" } };
+  const tooltipStyle = { contentStyle: { background: "#161616", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, fontSize: 12, color: "#FFFFFF" }, labelStyle: { color: "#A0A0A0" } };
 
   return (
-    <div>
-      {/* Summary Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
+    <div className="rd-stack">
+      <div className="rd-nut-stats">
         <RunMetricCard icon="📏" label="Total Distance" value={fmt2(totalDist, 1)} unit="km" color="#C8FF00" />
         <RunMetricCard icon="🔥" label="Total Calories" value={totalCal.toLocaleString()} unit="kcal" color="#FF4757" />
         <RunMetricCard icon="⏱️" label="Total Time" value={fmtDurationLong(totalDuration)} unit="" color="#A0A0A0" />
@@ -863,12 +854,12 @@ const RunningAnalytics = ({ state }) => {
       </div>
 
       <TabBar
-        tabs={[{ id: "weekly", label: "Weekly Distance" }, { id: "monthly", label: "Monthly Distance" }, { id: "calories", label: "Calories" }, { id: "pace", label: "Pace Trend" }, { id: "frequency", label: "Frequency" }]}
+        tabs={[{ id: "weekly", icon: CalendarDays, label: "Weekly Distance" }, { id: "monthly", icon: Calendar, label: "Monthly Distance" }, { id: "calories", icon: Flame, label: "Calories" }, { id: "pace", icon: Gauge, label: "Pace Trend" }, { id: "frequency", icon: Activity, label: "Frequency" }]}
         active={chartPeriod}
         onChange={setChartPeriod}
       />
 
-      <div className="glass" style={{ padding: 20, marginBottom: 20 }}>
+      <div className="rd-card">
         {chartPeriod === "weekly" && (
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={weeklyData}>
@@ -926,21 +917,24 @@ const RunningAnalytics = ({ state }) => {
         )}
       </div>
 
-      {/* Personal Best Timeline */}
-      <SectionTitle>Personal Best Timeline</SectionTitle>
-      <div className="glass" style={{ padding: 20, marginTop: 12 }}>
+      <SectionTitle><TrendingUp size={12} /> Personal Best Timeline</SectionTitle>
+      <div className="rd-card">
         {runs.length > 0 ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {runs.slice(-10).map((r, i) => {
               const isBest = i === 0 || r.avgPace < runs.slice(0, i).reduce((min, pr) => Math.min(min, pr.avgPace), Infinity);
               return (
-                <div key={r.id} className="dash-timeline-item">
-                  <div className="dash-timeline-dot" style={{ background: isBest ? "#FFD700" : "#C8FF00" }} />
-                  <div style={{ flex: 1 }}>
+                <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: i < Math.min(runs.length, 10) - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: isBest ? "#FFD700" : "#C8FF00", flexShrink: 0, boxShadow: isBest ? "0 0 8px rgba(255,215,0,0.5)" : "0 0 8px rgba(200,255,0,0.4)" }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{r.date}</div>
-                    <div style={{ fontSize: 12, color: "#A0A0A0" }}>{fmt2(r.distance, 2)} km · {fmtPace(r.avgPace)} /km · {fmtDuration(r.duration)}</div>
+                    <div className="rd-history-sub" style={{ marginTop: 2 }}>
+                      <span className="mono">{fmt2(r.distance, 2)} km</span>
+                      <span className="mono">{fmtPace(r.avgPace)} /km</span>
+                      <span className="mono">{fmtDuration(r.duration)}</span>
+                    </div>
                   </div>
-                  {isBest && <span className="run-pr-badge">PR</span>}
+                  {isBest && <span className="rd-pr-badge"><Trophy size={11} /> PR</span>}
                 </div>
               );
             })}
@@ -953,7 +947,6 @@ const RunningAnalytics = ({ state }) => {
   );
 };
 
-// ── AI Running Coach ────────────────────────────────────────────────────────
 const AICoach = ({ state }) => {
   const runs = state.runs || [];
   const [tipIndex, setTipIndex] = useState(0);
@@ -1012,25 +1005,23 @@ const AICoach = ({ state }) => {
   }, [runs]);
 
   return (
-    <div>
-      {/* Quick Stats */}
+    <div className="rd-stack">
       {insights.stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
+        <div className="rd-nut-stats">
           <RunMetricCard icon="🏃" label="Total Runs" value={insights.stats.totalRuns} unit="" />
-          <RunMetricCard icon="📏" label="Avg Distance" value={fmt2(insights.stats.avgDist, 1)} unit="km" />
+          <RunMetricCard icon="📏" label="Avg Distance" value={fmt2(insights.stats.avgDist, 1)} unit="km" color="#4D9FFF" />
           <RunMetricCard icon="⚡" label="Best Pace" value={fmtPace(insights.stats.bestPace)} unit="/km" color="#00C853" />
           <RunMetricCard icon="🔥" label="Streak" value={insights.stats.streak} unit="days" color="#FFA500" />
         </div>
       )}
 
-      {/* AI Insights */}
-      <SectionTitle>AI Coaching Insights</SectionTitle>
-      <div className="dash-ai-card" style={{ marginTop: 12, marginBottom: 24 }}>
+      <SectionTitle><Bot size={12} /> AI Coaching Insights</SectionTitle>
+      <div className="rd-card rd-ai-card">
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(200,255,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🤖</div>
+          <div className="rd-card-title-ico lime"><Bot size={16} /></div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#C8FF00" }}>Running Coach</div>
-            <div style={{ fontSize: 11, color: "#A0A0A0" }}>Personalized recommendations based on your data</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>Personalized recommendations based on your data</div>
           </div>
         </div>
         {insights.tips.map((tip, i) => (
@@ -1041,32 +1032,30 @@ const AICoach = ({ state }) => {
         ))}
       </div>
 
-      {/* Suggested Training Plan */}
       {trainingPlan && (
         <>
-          <SectionTitle>Suggested Weekly Plan</SectionTitle>
-          <div className="glass" style={{ padding: 0, overflow: "hidden", marginTop: 12 }}>
+          <SectionTitle><Calendar size={12} /> Suggested Weekly Plan</SectionTitle>
+          <div className="rd-card" style={{ padding: 0, overflow: "hidden" }}>
             {trainingPlan.map((day, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "60px 1fr 100px", gap: 12, padding: "12px 16px", borderBottom: i < trainingPlan.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", alignItems: "center" }}>
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "60px 1fr 100px", gap: 12, padding: "13px 18px", borderBottom: i < trainingPlan.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", alignItems: "center" }}>
                 <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "#C8FF00" }}>{day.day}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{day.type}</div>
-                  <div style={{ fontSize: 11, color: "#A0A0A0" }}>{day.note}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{day.note}</div>
                 </div>
-                <span className="mono" style={{ fontSize: 13, color: "#A0A0A0", textAlign: "right" }}>{day.distance}</span>
+                <span className="mono" style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", textAlign: "right" }}>{day.distance}</span>
               </div>
             ))}
           </div>
         </>
       )}
 
-      {/* Hydration Reminder */}
-      <div style={{ marginTop: 20, padding: 16, borderRadius: 14, background: "rgba(0,188,212,0.06)", border: "1px solid rgba(0,188,212,0.12)" }}>
+      <div style={{ padding: 16, borderRadius: 14, background: "rgba(0,188,212,0.06)", border: "1px solid rgba(0,188,212,0.12)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 20 }}>💧</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#00BCD4" }}>Hydration Tip</div>
-            <div style={{ fontSize: 12, color: "#A0A0A0" }}>Drink 500ml of water 2 hours before your next run. Dehydration can reduce performance by up to 15%.</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>Drink 500ml of water 2 hours before your next run. Dehydration can reduce performance by up to 15%.</div>
           </div>
         </div>
       </div>
@@ -1074,7 +1063,6 @@ const AICoach = ({ state }) => {
   );
 };
 
-// ── Running Goals ───────────────────────────────────────────────────────────
 const RunningGoals = ({ state, dispatch }) => {
   const runs = state.runs || [];
   const goals = state.runningGoals || { dailyKm: 5, weeklyKm: 25, monthlyKm: 100, calories: 500, streakTarget: 7 };
@@ -1109,50 +1097,55 @@ const RunningGoals = ({ state, dispatch }) => {
     setEditing(false);
   };
 
+  const formKeyFor = (label) =>
+    label === "Daily Distance" ? "dailyKm" : label === "Weekly Distance" ? "weeklyKm" : label === "Monthly Distance" ? "monthlyKm" : label === "Calories Goal" ? "calories" : "streakTarget";
+
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+    <div className="rd-stack">
+      <div className="rd-tab-head">
+        <div className="rd-count"><Target size={13} /> <b>{goalItems.length}</b> goals</div>
         {!editing ? (
-          <button className="ghost-btn" onClick={() => setEditing(true)}>Edit Goals</button>
+          <button className="rd-btn-sm ghost" onClick={() => setEditing(true)}><Pencil size={13} /> Edit Goals</button>
         ) : (
           <div style={{ display: "flex", gap: 8 }}>
-            <button className="ghost-btn" onClick={() => setEditing(false)}>Cancel</button>
-            <button className="neon-btn" onClick={handleSave} style={{ padding: "8px 18px" }}>Save</button>
+            <button className="rd-btn-sm ghost" onClick={() => setEditing(false)}>Cancel</button>
+            <button className="rd-btn-sm primary" onClick={handleSave}><Check size={13} /> Save</button>
           </div>
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+      <div className="rd-pr-grid">
         {goalItems.map((g) => {
           const pct = Math.min(100, (g.current / (g.target || 1)) * 100);
           const met = pct >= 100;
           return (
-            <div key={g.label} className={`run-goal-card ${met ? "met" : ""}`}>
+            <div key={g.label} className="rd-pr-card" style={{ borderColor: met ? "rgba(0,200,83,0.25)" : undefined }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ fontSize: 20 }}>{g.icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{g.label}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="rd-pr-name">{g.label}</div>
                 </div>
-                {met && <span style={{ fontSize: 16 }}>✅</span>}
+                {met && <span className="rd-ex-tag green">Done</span>}
               </div>
               {editing ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: "#A0A0A0" }}>Target:</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>Target:</span>
                   <input
+                    className="rd-input"
                     type="number"
-                    value={form[g.label === "Daily Distance" ? "dailyKm" : g.label === "Weekly Distance" ? "weeklyKm" : g.label === "Monthly Distance" ? "monthlyKm" : g.label === "Calories Goal" ? "calories" : "streakTarget"]}
-                    onChange={(e) => setForm((f) => ({ ...f, [g.label === "Daily Distance" ? "dailyKm" : g.label === "Weekly Distance" ? "weeklyKm" : g.label === "Monthly Distance" ? "monthlyKm" : g.label === "Calories Goal" ? "calories" : "streakTarget"]: Number(e.target.value) }))}
-                    style={{ width: 80, padding: "4px 8px", fontSize: 13, height: 32 }}
+                    value={form[formKeyFor(g.label)]}
+                    onChange={(e) => setForm((f) => ({ ...f, [formKeyFor(g.label)]: Number(e.target.value) }))}
+                    style={{ width: 80, padding: "4px 8px", fontSize: 13, height: 34 }}
                   />
-                  <span style={{ fontSize: 12, color: "#A0A0A0" }}>{g.unit}</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>{g.unit}</span>
                 </div>
               ) : null}
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: g.color }}>{fmt2(g.current, 1)} <span style={{ fontSize: 11, fontWeight: 400, color: "#A0A0A0" }}>{g.unit}</span></span>
-                <span className="mono" style={{ fontSize: 12, color: "#A0A0A0" }}>{fmt2(pct, 0)}%</span>
+                <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: g.color }}>{fmt2(g.current, 1)} <span style={{ fontSize: 11, fontWeight: 400, color: "rgba(255,255,255,0.45)" }}>{g.unit}</span></span>
+                <span className="mono" style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>{fmt2(pct, 0)}%</span>
               </div>
-              <div className="dash-progress">
-                <div className="dash-progress-fill" style={{ width: `${pct}%`, background: met ? "#00C853" : g.color }} />
+              <div className="rd-macro-track">
+                <div className="rd-macro-fill" style={{ width: `${pct}%`, background: met ? "#00C853" : g.color }} />
               </div>
             </div>
           );
@@ -1162,7 +1155,6 @@ const RunningGoals = ({ state, dispatch }) => {
   );
 };
 
-// ── Running Dashboard (Main View) ───────────────────────────────────────────
 const RunningDashboard = ({ state, dispatch, onStartRun }) => {
   const runs = state.runs || [];
   const goals = state.runningGoals || { dailyKm: 5, weeklyKm: 25, monthlyKm: 100, calories: 500, streakTarget: 7 };
@@ -1176,57 +1168,62 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
   const lastRun = runs.length > 0 ? runs[runs.length - 1] : null;
 
   return (
-    <div>
-      {/* Header */}
-      <div className="dash-header" style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, position: "relative", zIndex: 1 }}>
-          <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>🏃</div>
+    <div className="rd-stack">
+      <div className="rd-grid">
+        <div className="rd-span-4 rd-hero rd-card-click" onClick={onStartRun} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") onStartRun(); }}>
+          <span className="rd-hero-tag"><Zap size={12} /> Live GPS Tracker</span>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#FFFFFF" }}>Running Mode</h1>
-            <p style={{ fontSize: 13, color: "#A0A0A0", marginTop: 2 }}>Track your runs, crush your goals</p>
+            <div className="rd-hero-name">Start an Outdoor Run</div>
+            <div className="rd-hero-focus">Track distance, pace, heart rate & elevation in real time</div>
+          </div>
+          <div className="rd-hero-stats">
+            <div className="rd-hero-stat"><div className="v">{todayRuns.length}</div><div className="l">Runs today</div></div>
+            <div className="rd-hero-stat"><div className="v">{fmt2(todayDist, 1)}</div><div className="l">km today</div></div>
+            <div className="rd-hero-stat"><div className="v">{streak}</div><div className="l">day streak</div></div>
+          </div>
+          <div className="rd-hero-actions">
+            <button className="rd-btn-primary" onClick={(e) => { e.stopPropagation(); onStartRun(); }}><Play size={15} /> Start Run</button>
           </div>
         </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 24 }}>
-        <div className="dash-quick" onClick={onStartRun}>
-          <div className="q-icon" style={{ background: "rgba(200,255,0,0.1)" }}>▶️</div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Start Run</div>
-            <div style={{ fontSize: 11, color: "#A0A0A0" }}>Begin tracking</div>
-          </div>
-        </div>
-        {lastRun && (
-          <div className="dash-quick">
-            <div className="q-icon" style={{ background: "rgba(0,200,83,0.1)" }}>📊</div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Last Run</div>
-              <div style={{ fontSize: 11, color: "#A0A0A0" }}>{fmt2(lastRun.distance, 1)} km · {fmtPace(lastRun.avgPace)} /km</div>
+        <div className="rd-span-2 rd-card">
+          <div className="rd-card-head">
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico lime"><Footprints size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Last Run</div>
+                <div className="rd-card-name">{lastRun ? lastRun.date : "No runs yet"}</div>
+              </div>
             </div>
           </div>
-        )}
-        <div className="dash-quick">
-          <div className="q-icon" style={{ background: "rgba(255,165,0,0.1)" }}>🔥</div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Streak</div>
-            <div style={{ fontSize: 11, color: "#A0A0A0" }}>{streak} day{streak !== 1 ? "s" : ""} running</div>
-          </div>
+          {lastRun ? (
+            <>
+              <div className="rd-big-metric">{fmt2(lastRun.distance, 1)}<span> km</span></div>
+              <div className="rd-metric-label">avg pace {fmtPace(lastRun.avgPace)} /km</div>
+              <div className="rd-history-sub" style={{ marginTop: 12 }}>
+                <span className="mono">{fmtDuration(lastRun.duration)}</span>
+                <span className="mono">{lastRun.calories} kcal</span>
+              </div>
+            </>
+          ) : (
+            <div className="rd-empty" style={{ minHeight: 110, padding: 12 }}>
+              <div className="rd-empty-title">No runs yet</div>
+              <div className="rd-empty-sub">Complete your first run to see your stats here.</div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Today's Stats */}
-      <SectionTitle>Today's Activity</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12, marginTop: 12, marginBottom: 24 }}>
+      <SectionTitle><Activity size={12} /> Today's Activity</SectionTitle>
+      <div className="rd-nut-stats">
         <RunMetricCard icon="📏" label="Distance" value={fmt2(todayDist, 2)} unit="km" color="#C8FF00" />
         <RunMetricCard icon="🔥" label="Calories" value={todayCal} unit="kcal" color="#FF4757" />
         <RunMetricCard icon="🏃" label="Runs Today" value={todayRuns.length} unit="" color="#00C853" />
         <RunMetricCard icon="🌍" label="Total Distance" value={fmt2(totalDist, 1)} unit="km" color="#A0A0A0" />
       </div>
 
-      {/* Goal Progress */}
-      <SectionTitle>Goal Progress</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginTop: 12, marginBottom: 24 }}>
+      <SectionTitle><Target size={12} /> Goal Progress</SectionTitle>
+      <div className="rd-pr-grid">
         {[
           { label: "Daily", current: todayDist, target: goals.dailyKm, color: "#C8FF00" },
           { label: "Weekly", current: (() => { const ws = new Date(); ws.setDate(ws.getDate() - ws.getDay()); return runs.filter((r) => new Date(r.date) >= ws).reduce((s, r) => s + r.distance, 0); })(), target: goals.weeklyKm, color: "#00C853" },
@@ -1234,15 +1231,15 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
         ].map((g) => {
           const pct = Math.min(100, (g.current / (g.target || 1)) * 100);
           return (
-            <div key={g.label} className="glass-sm" style={{ padding: 16 }}>
+            <div key={g.label} className="rd-pr-card">
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{g.label} Goal</span>
-                <span className="mono" style={{ fontSize: 12, color: "#A0A0A0" }}>{fmt2(pct, 0)}%</span>
+                <span className="rd-pr-name">{g.label} Goal</span>
+                <span className="mono" style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>{fmt2(pct, 0)}%</span>
               </div>
-              <div className="dash-progress" style={{ marginBottom: 6 }}>
-                <div className="dash-progress-fill" style={{ width: `${pct}%`, background: pct >= 100 ? "#00C853" : g.color }} />
+              <div className="rd-macro-track" style={{ marginBottom: 8 }}>
+                <div className="rd-macro-fill" style={{ width: `${pct}%`, background: pct >= 100 ? "#00C853" : g.color }} />
               </div>
-              <div style={{ fontSize: 12, color: "#A0A0A0" }}>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
                 <span className="mono" style={{ color: g.color, fontWeight: 600 }}>{fmt2(g.current, 1)}</span> / {fmt2(g.target, 0)} km
               </div>
             </div>
@@ -1250,30 +1247,27 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
         })}
       </div>
 
-      {/* Map Preview */}
-      <SectionTitle>Route Map</SectionTitle>
-      <div style={{ marginTop: 12, marginBottom: 24 }}>
+      <SectionTitle><MapPin size={12} /> Route Map</SectionTitle>
+      <div className="rd-card" style={{ padding: 0, overflow: "hidden" }}>
         <RunMap route={lastRun?.route || []} height={250} />
       </div>
 
-      {/* Recent Runs */}
-      <SectionTitle>Recent Runs</SectionTitle>
-      <div style={{ marginTop: 12 }}>
+      <SectionTitle><History size={12} /> Recent Runs</SectionTitle>
+      <div className="rd-card">
         {recentRuns.length === 0 ? (
-          <EmptyState icon="🏃" title="No runs yet" desc="Start your first run to begin tracking!" />
+          <EmptyState icon={Footprints} title="No runs yet" desc="Start your first run to begin tracking!" />
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {recentRuns.map((run) => (
-              <div key={run.id} className="run-history-item" style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(200,255,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🏃</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF" }}>{run.date}</div>
-                  <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#A0A0A0", marginTop: 2 }}>
-                    <span className="mono">{fmt2(run.distance, 2)} km</span>
-                    <span className="mono">{fmtPace(run.avgPace)} /km</span>
-                    <span className="mono">{fmtDuration(run.duration)}</span>
-                    <span className="mono">{run.calories} kcal</span>
-                  </div>
+              <div key={run.id} className="rd-recent-item" style={{ cursor: "default" }}>
+                <div className="rd-recent-icon"><Footprints size={15} /></div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div className="rd-recent-name">{run.date}</div>
+                  <div className="rd-recent-meta">{fmt2(run.distance, 2)} km · {fmtPace(run.avgPace)} /km · {run.calories} kcal</div>
+                </div>
+                <div className="rd-recent-right">
+                  <div className="rd-recent-dur">{fmtDuration(run.duration)}</div>
+                  <div className="rd-recent-date">{fmt2(run.distance, 2)} km</div>
                 </div>
               </div>
             ))}
@@ -1284,29 +1278,25 @@ const RunningDashboard = ({ state, dispatch, onStartRun }) => {
   );
 };
 
-// ── Running Notifications ───────────────────────────────────────────────────
 const RunningNotifications = ({ notifications, onClear }) => {
   if (!notifications || notifications.length === 0) return null;
   return (
     <div style={{ position: "fixed", top: 80, right: 24, zIndex: 9998, display: "flex", flexDirection: "column", gap: 8, maxWidth: 340 }}>
       {notifications.map((n) => (
         <motion.div key={n.id} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}
-          style={{ background: "#151515", border: "1px solid rgba(200,255,0,0.15)", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+          style={{ background: "#141414", border: "1px solid rgba(200,255,0,0.16)", borderRadius: 12, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
           <span style={{ fontSize: 18 }}>{n.icon}</span>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{n.title}</div>
-            <div style={{ fontSize: 11, color: "#A0A0A0" }}>{n.message}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{n.message}</div>
           </div>
-          <button onClick={() => onClear(n.id)} style={{ background: "none", border: "none", color: "#A0A0A0", fontSize: 14, cursor: "pointer", padding: 4 }}>✕</button>
+          <button onClick={() => onClear(n.id)} className="rd-iconbtn danger" aria-label="Dismiss"><X size={13} /></button>
         </motion.div>
       ))}
     </div>
   );
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ── Main RunningMode Component ──────────────────────────────────────────────
-// ══════════════════════════════════════════════════════════════════════════════
 export default function RunningMode({ state, dispatch }) {
   const [mode, setMode] = useState("dashboard");
   const [subTab, setSubTab] = useState("overview");
@@ -1330,7 +1320,6 @@ export default function RunningMode({ state, dispatch }) {
     setMode("dashboard");
     setSubTab("overview");
 
-    // Check for PRs and badges
     const prevRuns = runs;
     const newBadges = [];
     const totalRuns = prevRuns.length + 1;
@@ -1361,7 +1350,6 @@ export default function RunningMode({ state, dispatch }) {
       if (badgeDef) addNotification(badgeDef.icon, "Badge Earned!", badgeDef.label);
     });
 
-    // Check PRs
     if (prevRuns.length > 0) {
       const bestPace = Math.min(...prevRuns.filter((r) => r.avgPace > 0).map((r) => r.avgPace));
       if (run.avgPace > 0 && run.avgPace < bestPace) {
@@ -1373,7 +1361,6 @@ export default function RunningMode({ state, dispatch }) {
       }
     }
 
-    // Goal notifications
     const goals = state.runningGoals || { dailyKm: 5, weeklyKm: 25 };
     const todayDist = [...prevRuns, { date: run.date, distance: run.distance }]
       .filter((r) => r.date === run.date)
@@ -1427,8 +1414,7 @@ export default function RunningMode({ state, dispatch }) {
   };
 
   return (
-    <>
-      <style>{RUNNING_STYLES}</style>
+    <div className="rd-page">
       <RunningNotifications notifications={notifications} onClear={clearNotification} />
 
       <AnimatePresence>
@@ -1437,16 +1423,23 @@ export default function RunningMode({ state, dispatch }) {
         )}
       </AnimatePresence>
 
-      {/* Tab Navigation */}
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><Footprints size={13} /> Running</span>
+          <h1 className="rd-title">Running Mode</h1>
+          <p className="rd-sub">Track outdoor runs with live GPS, chase distance goals, and beat your records.</p>
+        </div>
+      </div>
+
       {mode !== "active" && (
         <TabBar
           tabs={[
-            { id: "overview", icon: "🏠", label: "Overview" },
-            { id: "history", icon: "📋", label: "History" },
-            { id: "records", icon: "🏆", label: "Records" },
-            { id: "analytics", icon: "📊", label: "Analytics" },
-            { id: "goals", icon: "🎯", label: "Goals" },
-            { id: "coach", icon: "🤖", label: "Coach" },
+            { id: "overview", icon: Home, label: "Overview" },
+            { id: "history", icon: History, label: "History" },
+            { id: "records", icon: Trophy, label: "Records" },
+            { id: "analytics", icon: BarChart3, label: "Analytics" },
+            { id: "goals", icon: Target, label: "Goals" },
+            { id: "coach", icon: Bot, label: "Coach" },
           ]}
           active={subTab}
           onChange={setSubTab}
@@ -1462,6 +1455,6 @@ export default function RunningMode({ state, dispatch }) {
       >
         {renderContent()}
       </motion.div>
-    </>
+    </div>
   );
 }

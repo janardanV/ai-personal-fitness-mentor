@@ -1,281 +1,38 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const s = {
-  container: {
-    minHeight: "100vh",
-    background: "#0B0B0B",
-    color: "#FFFFFF",
-    padding: "20px",
-    paddingBottom: "100px",
-    fontFamily: "'Inter', -apple-system, sans-serif",
-  },
-  header: {
-    marginBottom: "30px",
-    paddingTop: "10px",
-  },
-  title: {
-    fontSize: "28px",
-    fontWeight: "700",
-    color: "#FFFFFF",
-    marginBottom: "4px",
-  },
-  subtitle: {
-    fontSize: "14px",
-    color: "#A0A0A0",
-  },
-  section: {
-    background: "#151515",
-    borderRadius: "16px",
-    padding: "20px",
-    marginBottom: "16px",
-  },
-  sectionTitle: {
-    fontSize: "13px",
-    fontWeight: "600",
-    color: "#A0A0A0",
-    textTransform: "uppercase",
-    letterSpacing: "1px",
-    marginBottom: "16px",
-  },
-  row: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "14px 0",
-    borderBottom: "1px solid #1E1E1E",
-  },
-  lastRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "14px 0",
-  },
-  label: {
-    fontSize: "15px",
-    color: "#FFFFFF",
-    fontWeight: "500",
-  },
-  sublabel: {
-    fontSize: "12px",
-    color: "#A0A0A0",
-    marginTop: "2px",
-  },
-  toggle: {
-    width: "48px",
-    height: "26px",
-    borderRadius: "13px",
-    border: "none",
-    cursor: "pointer",
-    position: "relative",
-    transition: "background 0.25s ease",
-    padding: 0,
-  },
-  toggleOn: {
-    background: "#C8FF00",
-  },
-  toggleOff: {
-    background: "#333333",
-  },
-  knob: {
-    width: "20px",
-    height: "20px",
-    borderRadius: "50%",
-    background: "#FFFFFF",
-    position: "absolute",
-    top: "3px",
-    transition: "left 0.25s ease",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
-  },
-  input: {
-    background: "#1E1E1E",
-    border: "1px solid #2A2A2A",
-    borderRadius: "10px",
-    padding: "12px 14px",
-    color: "#FFFFFF",
-    fontSize: "14px",
-    width: "100%",
-    outline: "none",
-    fontFamily: "inherit",
-  },
-  inputReadOnly: {
-    background: "#1E1E1E",
-    border: "1px solid #2A2A2A",
-    borderRadius: "10px",
-    padding: "12px 14px",
-    color: "#666666",
-    fontSize: "14px",
-    width: "100%",
-    outline: "none",
-    fontFamily: "inherit",
-    cursor: "not-allowed",
-  },
-  toggleGroup: {
-    display: "flex",
-    background: "#1E1E1E",
-    borderRadius: "10px",
-    overflow: "hidden",
-    border: "1px solid #2A2A2A",
-  },
-  toggleBtn: {
-    flex: 1,
-    padding: "8px 16px",
-    fontSize: "13px",
-    fontWeight: "600",
-    border: "none",
-    cursor: "pointer",
-    transition: "all 0.25s ease",
-    fontFamily: "inherit",
-    textAlign: "center",
-  },
-  toggleBtnActive: {
-    background: "#C8FF00",
-    color: "#0B0B0B",
-  },
-  toggleBtnInactive: {
-    background: "transparent",
-    color: "#A0A0A0",
-  },
-  accentDot: {
-    width: "14px",
-    height: "14px",
-    borderRadius: "50%",
-    background: "#C8FF00",
-    marginRight: "10px",
-    flexShrink: 0,
-  },
-  accentRow: {
-    display: "flex",
-    alignItems: "center",
-    padding: "14px 0",
-  },
-  btn: {
-    width: "100%",
-    padding: "14px",
-    borderRadius: "12px",
-    border: "none",
-    fontSize: "15px",
-    fontWeight: "600",
-    cursor: "pointer",
-    fontFamily: "inherit",
-    transition: "opacity 0.2s ease",
-  },
-  btnPrimary: {
-    background: "#C8FF00",
-    color: "#0B0B0B",
-  },
-  btnSecondary: {
-    background: "#1E1E1E",
-    color: "#FFFFFF",
-    border: "1px solid #2A2A2A",
-  },
-  btnDanger: {
-    background: "#FF3B30",
-    color: "#FFFFFF",
-  },
-  btnOutlineDanger: {
-    background: "transparent",
-    color: "#FF3B30",
-    border: "1px solid #FF3B30",
-  },
-  overlay: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.8)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-    padding: "20px",
-  },
-  modal: {
-    background: "#151515",
-    borderRadius: "20px",
-    padding: "28px",
-    width: "100%",
-    maxWidth: "380px",
-  },
-  modalTitle: {
-    fontSize: "20px",
-    fontWeight: "700",
-    color: "#FFFFFF",
-    marginBottom: "8px",
-  },
-  modalText: {
-    fontSize: "14px",
-    color: "#A0A0A0",
-    lineHeight: "1.5",
-    marginBottom: "20px",
-  },
-  modalBtnRow: {
-    display: "flex",
-    gap: "12px",
-  },
-  modalBtn: {
-    flex: 1,
-    padding: "12px",
-    borderRadius: "10px",
-    border: "none",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    fontFamily: "inherit",
-  },
-  hiddenInput: {
-    display: "none",
-  },
-  badge: {
-    display: "inline-flex",
-    alignItems: "center",
-    background: "#1E1E1E",
-    borderRadius: "8px",
-    padding: "6px 12px",
-    fontSize: "13px",
-    color: "#C8FF00",
-    fontWeight: "600",
-  },
-  warningBox: {
-    background: "#2A1500",
-    border: "1px solid #FF3B30",
-    borderRadius: "10px",
-    padding: "14px",
-    marginBottom: "20px",
-  },
-  warningText: {
-    fontSize: "13px",
-    color: "#FF9500",
-    lineHeight: "1.5",
-  },
-  infoRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "10px 0",
-  },
-  infoLabel: {
-    fontSize: "13px",
-    color: "#A0A0A0",
-  },
-  infoValue: {
-    fontSize: "13px",
-    color: "#FFFFFF",
-    fontWeight: "600",
-  },
-};
+import { Settings as SettingsIcon, User, Bell, Shield, Palette, Ruler, Droplets, Trash2, RefreshCw, Scale, Map, Trophy, Database, Download, Upload, Activity, Gauge, Sparkles } from "lucide-react";
 
 function Toggle({ on, onToggle }) {
   return (
     <button
+      className="rd-toggle"
       style={{
-        ...s.toggle,
-        ...(on ? s.toggleOn : s.toggleOff),
+        width: 40,
+        height: 22,
+        borderRadius: 11,
+        border: "none",
+        cursor: "pointer",
+        position: "relative",
+        padding: 0,
+        flexShrink: 0,
+        background: on ? "#C8FF00" : "#262626",
+        boxShadow: on ? "0 0 12px rgba(200,255,0,0.25)" : "none",
+        transition: "background 0.25s ease",
       }}
       onClick={onToggle}
     >
       <div
+        className="rd-toggle-knob"
         style={{
-          ...s.knob,
-          left: on ? "25px" : "3px",
+          width: 18,
+          height: 18,
+          borderRadius: "50%",
+          background: on ? "#0B0B0B" : "#FFFFFF",
+          position: "absolute",
+          top: 2,
+          left: on ? 20 : 2,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+          transition: "left 0.25s ease, background 0.25s ease",
         }}
       />
     </button>
@@ -284,14 +41,12 @@ function Toggle({ on, onToggle }) {
 
 function ToggleGroup({ options, value, onChange }) {
   return (
-    <div style={s.toggleGroup}>
+    <div className="rd-tabbar" style={{ padding: 3 }}>
       {options.map((opt) => (
         <button
           key={opt.value}
-          style={{
-            ...s.toggleBtn,
-            ...(value === opt.value ? s.toggleBtnActive : s.toggleBtnInactive),
-          }}
+          className={`rd-tab ${value === opt.value ? "active" : ""}`}
+          style={{ padding: "7px 14px", fontSize: 12 }}
           onClick={() => onChange(opt.value)}
         >
           {opt.label}
@@ -301,46 +56,75 @@ function ToggleGroup({ options, value, onChange }) {
   );
 }
 
+function SettingRow({ icon: Icon, tone, name, desc, last, children }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 14,
+        padding: "12px 2px",
+        borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.055)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+        <div
+          className={`rd-card-title-ico ${tone}`}
+          style={{ width: 36, height: 36, borderRadius: 11, flexShrink: 0 }}
+        >
+          <Icon size={16} />
+        </div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>{name}</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{desc}</div>
+        </div>
+      </div>
+      <div style={{ flexShrink: 0 }}>{children}</div>
+    </div>
+  );
+}
+
+function CardHead({ icon: Icon, tone, kicker, name, iconStyle }) {
+  return (
+    <div className="rd-card-head">
+      <div className="rd-card-title">
+        <div className={`rd-card-title-ico ${tone}`} style={iconStyle}><Icon size={15} /></div>
+        <div>
+          <div className="rd-card-kicker">{kicker}</div>
+          <div className="rd-card-name">{name}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ConfirmModal({ open, title, message, confirmLabel, onConfirm, onCancel, children }) {
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          style={s.overlay}
+          className="rd-modal-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
           <motion.div
-            style={s.modal}
-            initial={{ scale: 0.9, opacity: 0 }}
+            className="rd-modal"
+            initial={{ scale: 0.92, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            exit={{ scale: 0.92, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div style={s.modalTitle}>{title}</div>
-            <div style={s.modalText}>{message}</div>
+            <div className="rd-modal-title">{title}</div>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, margin: "8px 0 20px" }}>{message}</p>
             {children}
-            <div style={s.modalBtnRow}>
-              <button
-                style={{
-                  ...s.modalBtn,
-                  background: "#1E1E1E",
-                  color: "#A0A0A0",
-                }}
-                onClick={onCancel}
-              >
+            <div style={{ display: "flex", gap: 12 }}>
+              <button className="rd-btn-secondary" style={{ flex: 1 }} onClick={onCancel}>
                 Cancel
               </button>
-              <button
-                style={{
-                  ...s.modalBtn,
-                  background: "#FF3B30",
-                  color: "#FFFFFF",
-                }}
-                onClick={onConfirm}
-              >
+              <button className="rd-btn-primary" style={{ flex: 1 }} onClick={onConfirm}>
                 {confirmLabel || "Confirm"}
               </button>
             </div>
@@ -463,250 +247,238 @@ export default function Settings({ state, dispatch }) {
     : "Unknown";
 
   return (
-    <div style={s.container}>
-      <motion.div
-        style={s.header}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div style={s.title}>Settings</div>
-        <div style={s.subtitle}>Customize your experience</div>
-      </motion.div>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><SettingsIcon size={13} /> Settings</span>
+          <h1 className="rd-title">Settings</h1>
+          <p className="rd-sub">Customize your experience</p>
+        </div>
+      </div>
 
-      {/* Appearance */}
-      <motion.div
-        style={s.section}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.05 }}
-      >
-        <div style={s.sectionTitle}>Appearance</div>
-        <div style={s.row}>
-          <div>
-            <div style={s.label}>Dark Mode</div>
-            <div style={s.sublabel}>Currently always on</div>
-          </div>
-          <Toggle on={darkMode} onToggle={() => setDarkMode(!darkMode)} />
+      <div className="rd-stack">
+        <div className="rd-card">
+          <CardHead icon={Palette} tone="purple" kicker="Personalize" name="Appearance" />
+          <SettingRow
+            icon={Palette}
+            tone="purple"
+            name="Dark Mode"
+            desc="Currently always on"
+            last={false}
+          >
+            <Toggle on={darkMode} onToggle={() => setDarkMode(!darkMode)} />
+          </SettingRow>
+          <SettingRow
+            icon={Sparkles}
+            tone="purple"
+            name="Accent Color"
+            desc={<span style={{ color: "#C8FF00" }}>#C8FF00</span>}
+            last={true}
+          >
+            <span className="rd-chip active"><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#C8FF00" }} /> Lime</span>
+          </SettingRow>
         </div>
-        <div style={s.accentRow}>
-          <div style={s.accentDot} />
-          <div>
-            <div style={s.label}>Accent Color</div>
-            <div style={{ ...s.sublabel, color: "#C8FF00" }}>#C8FF00</div>
-          </div>
-        </div>
-      </motion.div>
 
-      {/* Units */}
-      <motion.div
-        style={s.section}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <div style={s.sectionTitle}>Units</div>
-        <div style={s.row}>
-          <div style={s.label}>Weight</div>
-          <ToggleGroup
-            value={units.weight}
-            onChange={(v) => updateUnit("weight", v)}
-            options={[
-              { value: "kg", label: "kg" },
-              { value: "lbs", label: "lbs" },
-            ]}
-          />
-        </div>
-        <div style={s.row}>
-          <div style={s.label}>Height</div>
-          <ToggleGroup
-            value={units.height}
-            onChange={(v) => updateUnit("height", v)}
-            options={[
-              { value: "cm", label: "cm" },
-              { value: "ft", label: "ft" },
-            ]}
-          />
-        </div>
-        <div style={s.lastRow}>
-          <div style={s.label}>Distance</div>
-          <ToggleGroup
-            value={units.distance}
-            onChange={(v) => updateUnit("distance", v)}
-            options={[
-              { value: "km", label: "km" },
-              { value: "miles", label: "mi" },
-            ]}
-          />
-        </div>
-      </motion.div>
-
-      {/* Notifications */}
-      <motion.div
-        style={s.section}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.15 }}
-      >
-        <div style={s.sectionTitle}>Notifications</div>
-        <div style={s.row}>
-          <div style={s.label}>Workout Reminders</div>
-          <Toggle
-            on={notifications.workoutReminders}
-            onToggle={() => updateNotification("workoutReminders", !notifications.workoutReminders)}
-          />
-        </div>
-        <div style={s.row}>
-          <div style={s.label}>Water Reminders</div>
-          <Toggle
-            on={notifications.waterReminders}
-            onToggle={() => updateNotification("waterReminders", !notifications.waterReminders)}
-          />
-        </div>
-        <div style={s.lastRow}>
-          <div style={s.label}>Goal Reminders</div>
-          <Toggle
-            on={notifications.goalReminders}
-            onToggle={() => updateNotification("goalReminders", !notifications.goalReminders)}
-          />
-        </div>
-      </motion.div>
-
-      {/* Account */}
-      <motion.div
-        style={s.section}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-      >
-        <div style={s.sectionTitle}>Account</div>
-        <div style={{ marginBottom: "14px" }}>
-          <div style={{ ...s.sublabel, marginBottom: "6px" }}>Display Name</div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <input
-              style={{ ...s.input, flex: 1 }}
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              onBlur={saveProfile}
-              placeholder="Enter name"
+        <div className="rd-card">
+          <CardHead icon={Ruler} tone="lime" kicker="Measurement" name="Units" />
+          <SettingRow icon={Scale} tone="lime" name="Weight" desc="Barbell and bodyweight" last={false}>
+            <ToggleGroup
+              value={units.weight}
+              onChange={(v) => updateUnit("weight", v)}
+              options={[
+                { value: "kg", label: "kg" },
+                { value: "lbs", label: "lbs" },
+              ]}
             />
+          </SettingRow>
+          <SettingRow icon={Ruler} tone="blue" name="Height" desc="Body height unit" last={false}>
+            <ToggleGroup
+              value={units.height}
+              onChange={(v) => updateUnit("height", v)}
+              options={[
+                { value: "cm", label: "cm" },
+                { value: "ft", label: "ft" },
+              ]}
+            />
+          </SettingRow>
+          <SettingRow icon={Map} tone="orange" name="Distance" desc="Run and cardio unit" last={true}>
+            <ToggleGroup
+              value={units.distance}
+              onChange={(v) => updateUnit("distance", v)}
+              options={[
+                { value: "km", label: "km" },
+                { value: "miles", label: "mi" },
+              ]}
+            />
+          </SettingRow>
+        </div>
+
+        <div className="rd-card">
+          <CardHead icon={Bell} tone="blue" kicker="Alerts" name="Notifications" />
+          <SettingRow
+            icon={Bell}
+            tone="blue"
+            name="Workout Reminders"
+            desc="Nudge for your training sessions"
+            last={false}
+          >
+            <Toggle
+              on={notifications.workoutReminders}
+              onToggle={() => updateNotification("workoutReminders", !notifications.workoutReminders)}
+            />
+          </SettingRow>
+          <SettingRow
+            icon={Droplets}
+            tone="blue"
+            name="Water Reminders"
+            desc="Hydration check-ins"
+            last={false}
+          >
+            <Toggle
+              on={notifications.waterReminders}
+              onToggle={() => updateNotification("waterReminders", !notifications.waterReminders)}
+            />
+          </SettingRow>
+          <SettingRow
+            icon={Trophy}
+            tone="purple"
+            name="Goal Reminders"
+            desc="Milestone and goal updates"
+            last={true}
+          >
+            <Toggle
+              on={notifications.goalReminders}
+              onToggle={() => updateNotification("goalReminders", !notifications.goalReminders)}
+            />
+          </SettingRow>
+        </div>
+
+        <div className="rd-card">
+          <CardHead icon={User} tone="lime" kicker="Profile" name="Account" />
+          <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 10 }}>
+            <div className="rd-field">
+              <label>Display Name</label>
+              <input
+                className="rd-input"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                onBlur={saveProfile}
+                placeholder="Enter name"
+              />
+            </div>
+            <div className="rd-field">
+              <label>Email</label>
+              <input
+                className="rd-input"
+                style={{ color: "rgba(255,255,255,0.35)", cursor: "not-allowed" }}
+                value={profile.email || "Not set"}
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="rd-break-row">
+            <span className="n">Member Since</span>
+            <span className="m">{memberSince}</span>
+          </div>
+          <div className="rd-break-row">
+            <span className="n">Current Level</span>
+            <span className="m"><b>Level {level}</b></span>
+          </div>
+          <div className="rd-break-row" style={{ borderBottom: "none" }}>
+            <span className="n">Experience Points</span>
+            <span className="m" style={{ color: "#FFFFFF" }}><b style={{ color: "#C8FF00" }}>{xp} XP</b></span>
           </div>
         </div>
-        <div style={{ marginBottom: "14px" }}>
-          <div style={{ ...s.sublabel, marginBottom: "6px" }}>Email</div>
-          <input
-            style={s.inputReadOnly}
-            value={profile.email || "Not set"}
-            readOnly
-          />
-        </div>
-        <div style={s.infoRow}>
-          <span style={s.infoLabel}>Member Since</span>
-          <span style={s.infoValue}>{memberSince}</span>
-        </div>
-        <div style={s.infoRow}>
-          <span style={s.infoLabel}>Current Level</span>
-          <span style={s.badge}>Level {level}</span>
-        </div>
-        <div style={s.infoRow}>
-          <span style={s.infoLabel}>Experience Points</span>
-          <span style={{ ...s.badge, color: "#FFFFFF" }}>{xp} XP</span>
-        </div>
-      </motion.div>
 
-      {/* Data Management */}
-      <motion.div
-        style={s.section}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.25 }}
-      >
-        <div style={s.sectionTitle}>Data Management</div>
-        <div style={{ marginBottom: "12px" }}>
-          <button
-            style={{ ...s.btn, ...s.btnPrimary }}
-            onClick={exportData}
-          >
-            Export All Data
-          </button>
-        </div>
-        <div style={{ marginBottom: "12px" }}>
-          <button
-            style={{ ...s.btn, ...s.btnSecondary }}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Import Data
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            style={s.hiddenInput}
-            onChange={importData}
-          />
-        </div>
-        <button
-          style={{ ...s.btn, ...s.btnOutlineDanger }}
-          onClick={() => setShowResetModal(true)}
-        >
-          Reset All Data
-        </button>
-      </motion.div>
-
-      {/* Privacy */}
-      <motion.div
-        style={s.section}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
-        <div style={s.sectionTitle}>Privacy</div>
-        <div style={s.row}>
-          <div style={s.label}>Activity Tracking</div>
-          <Toggle
-            on={privacy.activityTracking}
-            onToggle={() => updatePrivacy("activityTracking", !privacy.activityTracking)}
-          />
-        </div>
-        <div style={s.row}>
-          <div style={s.label}>Data Sharing</div>
-          <Toggle
-            on={privacy.dataSharing}
-            onToggle={() => updatePrivacy("dataSharing", !privacy.dataSharing)}
-          />
-        </div>
-        <div style={s.lastRow}>
-          <div style={s.label}>Analytics</div>
-          <Toggle
-            on={privacy.analytics}
-            onToggle={() => updatePrivacy("analytics", !privacy.analytics)}
-          />
-        </div>
-      </motion.div>
-
-      {/* Danger Zone */}
-      <motion.div
-        style={{ ...s.section, border: "1px solid #FF3B30" }}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.35 }}
-      >
-        <div style={{ ...s.sectionTitle, color: "#FF3B30" }}>Danger Zone</div>
-        <div style={s.warningBox}>
-          <div style={s.warningText}>
-            Deleting your account is permanent. All your data, progress, and settings will be
-            permanently removed. This action cannot be undone.
+        <div className="rd-card">
+          <CardHead icon={Database} tone="orange" kicker="Backup" name="Data Management" />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <button className="rd-btn-primary" style={{ width: "100%" }} onClick={exportData}>
+              <Download size={15} /> Export All Data
+            </button>
+            <button className="rd-btn-secondary" style={{ width: "100%" }} onClick={() => fileInputRef.current?.click()}>
+              <Upload size={15} /> Import Data
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              style={{ display: "none" }}
+              onChange={importData}
+            />
+            <button
+              className="rd-btn-secondary"
+              style={{ width: "100%", color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}
+              onClick={() => setShowResetModal(true)}
+            >
+              <RefreshCw size={15} /> Reset All Data
+            </button>
           </div>
         </div>
-        <button
-          style={{ ...s.btn, ...s.btnDanger }}
-          onClick={() => setShowDeleteModal(true)}
-        >
-          Delete Account
-        </button>
-      </motion.div>
 
-      {/* Reset Modal */}
+        <div className="rd-card">
+          <CardHead icon={Shield} tone="blue" kicker="Control" name="Privacy" />
+          <SettingRow
+            icon={Activity}
+            tone="blue"
+            name="Activity Tracking"
+            desc="Record your workout activity"
+            last={false}
+          >
+            <Toggle
+              on={privacy.activityTracking}
+              onToggle={() => updatePrivacy("activityTracking", !privacy.activityTracking)}
+            />
+          </SettingRow>
+          <SettingRow
+            icon={Shield}
+            tone="blue"
+            name="Data Sharing"
+            desc="Share data with partners"
+            last={false}
+          >
+            <Toggle
+              on={privacy.dataSharing}
+              onToggle={() => updatePrivacy("dataSharing", !privacy.dataSharing)}
+            />
+          </SettingRow>
+          <SettingRow
+            icon={Gauge}
+            tone="purple"
+            name="Analytics"
+            desc="Help improve the product"
+            last={true}
+          >
+            <Toggle
+              on={privacy.analytics}
+              onToggle={() => updatePrivacy("analytics", !privacy.analytics)}
+            />
+          </SettingRow>
+        </div>
+
+        <div className="rd-card" style={{ border: "1px solid rgba(255,71,87,0.35)" }}>
+          <CardHead
+            icon={Trash2}
+            iconStyle={{ background: "rgba(255,71,87,0.1)", borderColor: "rgba(255,71,87,0.2)", color: "#FF4757" }}
+            kicker="Irreversible"
+            name="Danger Zone"
+          />
+          <div style={{ background: "rgba(255,71,87,0.06)", border: "1px solid rgba(255,71,87,0.2)", borderRadius: 12, padding: 14, marginBottom: 16 }}>
+            <div style={{ fontSize: 13, color: "#FF9F43", lineHeight: 1.6 }}>
+              Deleting your account is permanent. All your data, progress, and settings will be
+              permanently removed. This action cannot be undone.
+            </div>
+          </div>
+          <button
+            className="rd-btn-secondary"
+            style={{ width: "100%", color: "#FF4757", borderColor: "rgba(255,71,87,0.35)" }}
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <Trash2 size={15} /> Delete Account
+          </button>
+        </div>
+      </div>
+
       <ConfirmModal
         open={showResetModal}
         title="Reset All Data?"
@@ -718,55 +490,49 @@ export default function Settings({ state, dispatch }) {
         }}
       />
 
-      {/* Delete Account Modal */}
       <AnimatePresence>
         {showDeleteModal && (
           <motion.div
-            style={s.overlay}
+            className="rd-modal-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
             <motion.div
-              style={s.modal}
-              initial={{ scale: 0.9, opacity: 0 }}
+              className="rd-modal"
+              initial={{ scale: 0.92, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              exit={{ scale: 0.92, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <div style={s.modalTitle}>Delete Account</div>
-              <div style={s.modalText}>
+              <div className="rd-modal-title">Delete Account</div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, margin: "8px 0 16px" }}>
                 This action is permanent and cannot be undone. To confirm, type your email address
                 below.
-              </div>
-              <div style={s.warningBox}>
-                <div style={s.warningText}>
+              </p>
+              <div style={{ background: "rgba(255,71,87,0.06)", border: "1px solid rgba(255,71,87,0.2)", borderRadius: 12, padding: 14, marginBottom: 18 }}>
+                <div style={{ fontSize: 13, color: "#FF9F43", lineHeight: 1.6 }}>
                   All your data including workouts, progress, achievements, and settings will be
                   permanently deleted.
                 </div>
               </div>
-              <div style={{ marginBottom: "20px" }}>
-                <div style={{ ...s.sublabel, marginBottom: "6px" }}>
-                  Your email: <span style={{ color: "#FFFFFF" }}>{profile.email}</span>
-                </div>
+              <div className="rd-field" style={{ marginBottom: 18 }}>
+                <label>
+                  Your email: <span style={{ color: "#FFFFFF", textTransform: "none", letterSpacing: "normal" }}>{profile.email}</span>
+                </label>
                 <input
-                  style={{
-                    ...s.input,
-                    borderColor: deleteEmail && deleteEmail !== profile.email ? "#FF3B30" : "#2A2A2A",
-                  }}
+                  className="rd-input"
+                  style={{ borderColor: deleteEmail && deleteEmail !== profile.email ? "rgba(255,71,87,0.5)" : undefined }}
                   value={deleteEmail}
                   onChange={(e) => setDeleteEmail(e.target.value)}
                   placeholder="Type your email to confirm"
                 />
               </div>
-              <div style={s.modalBtnRow}>
+              <div style={{ display: "flex", gap: 12 }}>
                 <button
-                  style={{
-                    ...s.modalBtn,
-                    background: "#1E1E1E",
-                    color: "#A0A0A0",
-                  }}
+                  className="rd-btn-secondary"
+                  style={{ flex: 1 }}
                   onClick={() => {
                     setShowDeleteModal(false);
                     setDeleteEmail("");
@@ -775,16 +541,18 @@ export default function Settings({ state, dispatch }) {
                   Cancel
                 </button>
                 <button
+                  className="rd-btn-secondary"
                   style={{
-                    ...s.modalBtn,
-                    background: deleteEmail === profile.email ? "#FF3B30" : "#333333",
-                    color: deleteEmail === profile.email ? "#FFFFFF" : "#666666",
+                    flex: 1,
+                    background: deleteEmail === profile.email ? "rgba(255,71,87,0.12)" : "rgba(255,255,255,0.03)",
+                    color: deleteEmail === profile.email ? "#FF4757" : "rgba(255,255,255,0.3)",
+                    borderColor: deleteEmail === profile.email ? "rgba(255,71,87,0.4)" : "rgba(255,255,255,0.07)",
                     cursor: deleteEmail === profile.email ? "pointer" : "not-allowed",
                   }}
                   onClick={handleDelete}
                   disabled={deleteEmail !== profile.email}
                 >
-                  Delete Forever
+                  <Trash2 size={14} /> Delete Forever
                 </button>
               </div>
             </motion.div>

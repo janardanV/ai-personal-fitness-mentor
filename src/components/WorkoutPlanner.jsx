@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CalendarDays, ClipboardList, Copy, Dumbbell, FolderOpen, GripVertical, LayoutTemplate, Play, Plus, Save, Search, Trash2, X } from "lucide-react";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -365,253 +366,33 @@ export default function WorkoutPlanner({ state, dispatch }) {
   const currentDayIdx = new Date().getDay();
   const currentDayName = DAYS[(currentDayIdx + 6) % 7];
 
-  const s = {
-    root: { padding: "0 0 32px" },
-    header: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 },
-    title: { fontSize: 22, fontWeight: 800, color: "#FFFFFF" },
-    subtitle: { fontSize: 13, color: "#A0A0A0", marginTop: 2 },
-    tabs: { display: "flex", gap: 4, padding: 4, background: "#151515", borderRadius: 12, border: "1px solid rgba(200,255,0,0.06)" },
-    tab: { padding: "8px 18px", borderRadius: 8, fontSize: 13, fontWeight: 500, background: "none", color: "#A0A0A0", cursor: "pointer", transition: "all 0.2s", border: "none" },
-    tabActive: { background: "rgba(200,255,0,0.12)", color: "#C8FF00" },
-    dayBar: { display: "flex", gap: 6, marginBottom: 20, overflowX: "auto", paddingBottom: 4 },
-    dayBtn: (isToday, isActive, hasEx) => ({
-      minWidth: 56,
-      padding: "10px 12px",
-      borderRadius: 12,
-      border: `1.5px solid ${isActive ? "rgba(200,255,0,0.4)" : isToday ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.04)"}`,
-      background: isActive
-        ? "rgba(200,255,0,0.1)"
-        : hasEx
-          ? "rgba(200,255,0,0.03)"
-          : "#151515",
-      color: isActive ? "#C8FF00" : isToday ? "#E8E8E8" : "#A0A0A0",
-      cursor: "pointer",
-      transition: "all 0.2s",
-      textAlign: "center",
-      flexShrink: 0,
-      position: "relative",
-    }),
-    dayLabel: { fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" },
-    dayCount: (has) => ({
-      fontSize: 10,
-      fontWeight: 600,
-      color: has ? "#C8FF00" : "rgba(160,160,160,0.3)",
-      marginTop: 4,
-    }),
-    todayDot: {
-      position: "absolute",
-      top: -3,
-      right: -3,
-      width: 7,
-      height: 7,
-      borderRadius: "50%",
-      background: "#C8FF00",
-      boxShadow: "0 0 8px rgba(200,255,0,0.4)",
-    },
-    panel: {
-      background: "#151515",
-      border: "1px solid rgba(200,255,0,0.06)",
-      borderRadius: 16,
-      padding: 20,
-      minHeight: 200,
-      transition: "border-color 0.2s",
-    },
-    panelDrop: {
-      background: "#151515",
-      border: "1px solid rgba(200,255,0,0.25)",
-      borderRadius: 16,
-      padding: 20,
-      minHeight: 200,
-      transition: "all 0.2s",
-      boxShadow: "0 0 24px rgba(200,255,0,0.06)",
-    },
-    dayTitle: { fontSize: 15, fontWeight: 700, color: "#FFFFFF", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" },
-    dayTitleLeft: { display: "flex", alignItems: "center", gap: 8 },
-    exCard: (isDragging) => ({
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      padding: "10px 12px",
-      background: isDragging ? "rgba(200,255,0,0.06)" : "rgba(255,255,255,0.02)",
-      border: `1px solid ${isDragging ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.03)"}`,
-      borderRadius: 10,
-      marginBottom: 6,
-      cursor: "grab",
-      transition: "all 0.15s",
-      userSelect: "none",
-    }),
-    exGrip: { color: "rgba(160,160,160,0.3)", fontSize: 14, cursor: "grab", flexShrink: 0, lineHeight: 1 },
-    exInfo: { flex: 1, minWidth: 0 },
-    exName: { fontSize: 13, fontWeight: 600, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-    exMeta: { fontSize: 11, color: "#A0A0A0", marginTop: 1 },
-    exInputs: { display: "flex", alignItems: "center", gap: 4, flexShrink: 0 },
-    smallInput: {
-      width: 44,
-      padding: "4px 6px",
-      fontSize: 12,
-      textAlign: "center",
-      borderRadius: 6,
-      background: "#1D1D1D",
-      border: "1px solid rgba(200,255,0,0.08)",
-      color: "#FFFFFF",
-      fontFamily: "'JetBrains Mono', monospace",
-      outline: "none",
-    },
-    exTimes: { fontSize: 11, color: "#A0A0A0", flexShrink: 0 },
-    exRemove: {
-      width: 24,
-      height: 24,
-      borderRadius: 6,
-      background: "none",
-      border: "none",
-      color: "rgba(255,71,87,0.5)",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 14,
-      transition: "all 0.15s",
-      flexShrink: 0,
-    },
-    emptyState: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 16px", color: "#A0A0A0" },
-    emptyIcon: { fontSize: 36, marginBottom: 12, opacity: 0.3 },
-    emptyText: { fontSize: 13, marginBottom: 14, textAlign: "center" },
-    addBtn: {
-      padding: "8px 14px",
-      borderRadius: 8,
-      background: "none",
-      border: "1px dashed rgba(200,255,0,0.2)",
-      color: "#C8FF00",
-      fontSize: 12,
-      fontWeight: 600,
-      cursor: "pointer",
-      transition: "all 0.2s",
-      display: "flex",
-      alignItems: "center",
-      gap: 6,
-    },
-    actionRow: { display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 },
-    neonBtn: {
-      padding: "10px 20px",
-      borderRadius: 10,
-      background: "#C8FF00",
-      color: "#0B0B0B",
-      fontWeight: 700,
-      fontSize: 13,
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    ghostBtn: {
-      padding: "10px 16px",
-      borderRadius: 10,
-      background: "#1D1D1D",
-      border: "1px solid rgba(200,255,0,0.1)",
-      color: "#A0A0A0",
-      fontSize: 12,
-      fontWeight: 500,
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    dangerBtn: {
-      padding: "10px 16px",
-      borderRadius: 10,
-      background: "rgba(255,71,87,0.08)",
-      border: "1px solid rgba(255,71,87,0.2)",
-      color: "#FF4757",
-      fontSize: 12,
-      fontWeight: 500,
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    overlay: {
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.85)",
-      backdropFilter: "blur(12px)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-      padding: 20,
-    },
-    modal: {
-      width: "100%",
-      maxWidth: 520,
-      maxHeight: "85vh",
-      overflowY: "auto",
-      background: "rgba(15,15,15,0.98)",
-      border: "1px solid rgba(200,255,0,0.12)",
-      borderRadius: 20,
-      padding: 28,
-    },
-    modalTitle: { fontSize: 18, fontWeight: 800, color: "#FFFFFF", marginBottom: 16 },
-    pickerItem: {
-      padding: "10px 12px",
-      borderRadius: 8,
-      cursor: "pointer",
-      transition: "all 0.15s",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderBottom: "1px solid rgba(255,255,255,0.03)",
-    },
-    chip: (active) => ({
-      padding: "6px 14px",
-      borderRadius: 20,
-      fontSize: 12,
-      fontWeight: 500,
-      background: active ? "rgba(200,255,0,0.1)" : "#1D1D1D",
-      border: `1px solid ${active ? "rgba(200,255,0,0.25)" : "rgba(200,255,0,0.06)"}`,
-      color: active ? "#C8FF00" : "#A0A0A0",
-      cursor: "pointer",
-      transition: "all 0.2s",
-    }),
-    templateGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10, marginBottom: 16 },
-    templateCard: {
-      padding: 16,
-      borderRadius: 14,
-      background: "#151515",
-      border: "1px solid rgba(200,255,0,0.06)",
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    templateName: { fontSize: 14, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 },
-    templateDesc: { fontSize: 11, color: "#A0A0A0", marginBottom: 8 },
-    savedCard: {
-      padding: 16,
-      borderRadius: 14,
-      background: "#151515",
-      border: "1px solid rgba(200,255,0,0.06)",
-      marginBottom: 8,
-      transition: "all 0.2s",
-    },
-    savedName: { fontSize: 14, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 },
-    savedMeta: { fontSize: 11, color: "#A0A0A0", marginBottom: 10 },
-    statRow: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 },
-    stat: { fontSize: 12, color: "#A0A0A0" },
-    statVal: { color: "#C8FF00", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
-  };
-
   const renderExercises = (day) => {
     const exercises = week[day];
     if (exercises.length === 0) {
       return (
-        <div style={s.emptyState}>
-          <div style={s.emptyIcon}>📋</div>
-          <div style={s.emptyText}>No exercises for this day</div>
-          <button style={s.addBtn} onClick={() => setShowPicker(true)}>
-            + Add Exercise
+        <div className="rd-empty" style={{ padding: "36px 16px" }}>
+          <ClipboardList size={30} style={{ color: "rgba(255,255,255,0.2)" }} />
+          <div className="rd-empty-title">No exercises for this day</div>
+          <div className="rd-empty-sub">Add exercises to build your {day} session.</div>
+          <button className="rd-btn-primary rd-btn-sm" onClick={() => setShowPicker(true)} style={{ marginTop: 10 }}>
+            <Plus size={15} /> Add Exercise
           </button>
         </div>
       );
     }
     return (
-      <div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {exercises.map((ex) => (
           <motion.div
             key={ex.uid}
-            style={s.exCard(dragItem?.uid === ex.uid)}
+            className="rd-ex-row"
+            style={{
+              cursor: "grab",
+              userSelect: "none",
+              gap: 10,
+              borderColor: dragItem?.uid === ex.uid ? "rgba(200,255,0,0.3)" : undefined,
+              background: dragItem?.uid === ex.uid ? "rgba(200,255,0,0.05)" : undefined,
+            }}
             draggable
             onDragStart={(e) => handleDragStart(e, ex.uid, day)}
             onDragEnd={handleDragEnd}
@@ -621,14 +402,15 @@ export default function WorkoutPlanner({ state, dispatch }) {
             layout
             whileHover={{ background: "rgba(255,255,255,0.04)" }}
           >
-            <span style={s.exGrip}>&#9776;</span>
-            <div style={s.exInfo}>
-              <div style={s.exName}>{ex.name}</div>
-              <div style={s.exMeta}>{ex.primary}</div>
+            <GripVertical size={16} style={{ color: "rgba(255,255,255,0.25)", flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{ex.name}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{ex.primary}</div>
             </div>
-            <div style={s.exInputs}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
               <input
-                style={s.smallInput}
+                className="rd-set-input"
+                style={{ width: 46, height: 30 }}
                 type="number"
                 min="1"
                 value={ex.sets}
@@ -636,9 +418,10 @@ export default function WorkoutPlanner({ state, dispatch }) {
                   updateExercise(day, ex.uid, "sets", Math.max(1, +e.target.value || 1))
                 }
               />
-              <span style={s.exTimes}>×</span>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>×</span>
               <input
-                style={s.smallInput}
+                className="rd-set-input"
+                style={{ width: 46, height: 30 }}
                 type="number"
                 min="1"
                 value={ex.reps}
@@ -647,124 +430,125 @@ export default function WorkoutPlanner({ state, dispatch }) {
                 }
               />
             </div>
-            <button
-              style={s.exRemove}
-              onClick={() => removeExercise(day, ex.uid)}
-              onMouseEnter={(e) => (e.target.style.color = "#FF4757")}
-              onMouseLeave={(e) => (e.target.style.color = "rgba(255,71,87,0.5)")}
-            >
-              ✕
+            <button className="rd-iconbtn danger" onClick={() => removeExercise(day, ex.uid)} aria-label="Remove exercise">
+              <Trash2 size={15} />
             </button>
           </motion.div>
         ))}
-        <button style={{ ...s.addBtn, marginTop: 8, width: "100%", justifyContent: "center" }} onClick={() => setShowPicker(true)}>
-          + Add Exercise
+        <button className="rd-add-dashed" style={{ marginTop: 2 }} onClick={() => setShowPicker(true)}>
+          <Plus size={15} /> Add Exercise
         </button>
       </div>
     );
   };
 
   return (
-    <div style={s.root}>
-      <div style={s.header}>
+    <div className="rd-page">
+      <div className="rd-page-head">
         <div>
-          <h2 style={s.title}>Workout Planner</h2>
-          <p style={s.subtitle}>Plan your weekly training split</p>
+          <span className="rd-kicker"><CalendarDays size={13} /> Planner</span>
+          <h1 className="rd-title">Workout Planner</h1>
+          <p className="rd-sub">Plan your weekly training split</p>
         </div>
-        <div style={s.tabs}>
-          <button style={{ ...s.tab, ...(view === "planner" ? s.tabActive : {}) }} onClick={() => setView("planner")}>
-            Planner
+        <div className="rd-tabbar" style={{ alignSelf: "center" }}>
+          <button className={`rd-tab ${view === "planner" ? "active" : ""}`} onClick={() => setView("planner")}>
+            <CalendarDays size={15} /> Planner
           </button>
-          <button style={{ ...s.tab, ...(view === "saved" ? s.tabActive : {}) }} onClick={() => setView("saved")}>
-            Saved ({(state.workoutTemplates || []).filter((t) => t.type === "weekly").length})
+          <button className={`rd-tab ${view === "saved" ? "active" : ""}`} onClick={() => setView("saved")}>
+            <Save size={15} /> Saved ({(state.workoutTemplates || []).filter((t) => t.type === "weekly").length})
           </button>
         </div>
       </div>
 
       {view === "planner" && (
         <>
-          <div style={s.statRow}>
-            <span style={s.stat}>
-              Total: <span style={s.statVal}>{totalExercises}</span> exercises
-            </span>
-            <span style={s.stat}>
-              Active: <span style={s.statVal}>{DAYS.filter((d) => week[d].length > 0).length}</span> days
-            </span>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
+            <div className="rd-nut-stat lime">
+              <div className="l">Total Exercises</div>
+              <div className="v">{totalExercises}</div>
+              <div className="s">planned this week</div>
+            </div>
+            <div className="rd-nut-stat blue">
+              <div className="l">Active Days</div>
+              <div className="v">{DAYS.filter((d) => week[d].length > 0).length}<span>/7</span></div>
+              <div className="s">days with exercises</div>
+            </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-            <button
-              style={{ ...s.neonBtn, fontSize: 12, padding: "8px 16px" }}
-              onClick={() => setTemplateModal(true)}
-            >
-              Templates
-            </button>
-            <button
-              style={{ ...s.ghostBtn, fontSize: 12, padding: "8px 14px" }}
-              onClick={() => setShowSaveModal(true)}
-              disabled={totalExercises === 0}
-            >
-              Save Routine
-            </button>
-            <button
-              style={{
-                ...s.ghostBtn,
-                fontSize: 12,
-                padding: "8px 14px",
-                color: week[activeDay].length > 0 ? "#C8FF00" : "#A0A0A0",
-                borderColor: week[activeDay].length > 0 ? "rgba(200,255,0,0.25)" : undefined,
-              }}
-              onClick={startTodaysWorkout}
-              disabled={week[activeDay].length === 0}
-            >
-              ▶ Start {activeDay}&apos;s Workout
-            </button>
-          </div>
-
-          <div style={s.dayBar}>
-            {DAYS.map((d) => {
-              const isToday = d === currentDayName;
-              const isActive = d === activeDay;
-              const has = week[d].length > 0;
-              return (
-                <button key={d} style={s.dayBtn(isToday, isActive, has)} onClick={() => setActiveDay(d)}>
-                  {isToday && <span style={s.todayDot} />}
-                  <div style={s.dayLabel}>{d}</div>
-                  <div style={s.dayCount(has)}>{week[d].length}</div>
+          <div className="rd-card" style={{ padding: 16 }}>
+            <div className="rd-card-head" style={{ marginBottom: 14 }}>
+              <div className="rd-card-title">
+                <span className="rd-card-title-ico blue"><CalendarDays size={16} /></span>
+                <div>
+                  <div className="rd-card-kicker">Week at a glance</div>
+                  <div className="rd-card-name">Training days</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button className="rd-btn-sm primary" onClick={() => setTemplateModal(true)}>
+                  <LayoutTemplate size={14} /> Templates
                 </button>
-              );
-            })}
+                <button className="rd-btn-sm ghost" style={{ opacity: totalExercises === 0 ? 0.5 : 1 }} onClick={() => setShowSaveModal(true)} disabled={totalExercises === 0}>
+                  <Save size={14} /> Save Routine
+                </button>
+                <button
+                  className={`rd-btn-sm ${week[activeDay].length > 0 ? "primary" : "ghost"}`}
+                  style={{ opacity: week[activeDay].length === 0 ? 0.5 : 1 }}
+                  onClick={startTodaysWorkout}
+                  disabled={week[activeDay].length === 0}
+                >
+                  <Play size={14} /> Start {activeDay}&apos;s Workout
+                </button>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+              {DAYS.map((d) => {
+                const isToday = d === currentDayName;
+                const isActive = d === activeDay;
+                const has = week[d].length > 0;
+                return (
+                  <button
+                    key={d}
+                    className={`rd-chip ${isActive ? "active" : ""}`}
+                    style={{ position: "relative", minWidth: 58, flexDirection: "column", gap: 3, flexShrink: 0 }}
+                    onClick={() => setActiveDay(d)}
+                  >
+                    {isToday && <span style={{ position: "absolute", top: 5, right: 7, width: 6, height: 6, borderRadius: "50%", background: "#C8FF00", boxShadow: "0 0 8px rgba(200,255,0,0.4)" }} />}
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: isToday && !isActive ? "#E8E8E8" : undefined }}>{d}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: has ? "#C8FF00" : "rgba(255,255,255,0.25)" }}>{week[d].length}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <motion.div
-            style={dragOverDay === activeDay ? s.panelDrop : s.panel}
+            className="rd-card"
+            style={{
+              borderColor: dragOverDay === activeDay ? "rgba(200,255,0,0.3)" : undefined,
+              boxShadow: dragOverDay === activeDay ? "0 0 24px rgba(200,255,0,0.08)" : undefined,
+            }}
             onDragOver={(e) => handleDragOver(e, activeDay)}
             onDrop={(e) => handleDrop(e, activeDay)}
             layout
           >
-            <div style={s.dayTitle}>
-              <div style={s.dayTitleLeft}>
-                <span>{activeDay}</span>
-                {activeDay === currentDayName && (
-                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontWeight: 600 }}>
-                    TODAY
-                  </span>
-                )}
+            <div className="rd-card-head">
+              <div className="rd-card-title">
+                <span className="rd-card-title-ico lime"><Dumbbell size={16} /></span>
+                <div>
+                  <div className="rd-card-kicker">{activeDay === currentDayName ? "Today" : "Daily plan"}</div>
+                  <div className="rd-card-name" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {activeDay} Workout
+                    {activeDay === currentDayName && <span className="rd-ex-tag">TODAY</span>}
+                  </div>
+                </div>
               </div>
-              <div style={{ display: "flex", gap: 4 }}>
-                <button
-                  style={{ ...s.ghostBtn, padding: "4px 10px", fontSize: 11 }}
-                  onClick={() => duplicateDay(activeDay)}
-                  title="Duplicate day"
-                >
-                  Duplicate
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <button className="rd-mini-btn" onClick={() => duplicateDay(activeDay)} title="Duplicate day">
+                  <Copy size={12} /> Duplicate
                 </button>
-                <button
-                  style={{ ...s.dangerBtn, padding: "4px 10px", fontSize: 11 }}
-                  onClick={() => clearDay(activeDay)}
-                  title="Clear day"
-                >
-                  Clear
+                <button className="rd-mini-btn danger" onClick={() => clearDay(activeDay)} title="Clear day">
+                  <Trash2 size={12} /> Clear
                 </button>
               </div>
             </div>
@@ -774,15 +558,13 @@ export default function WorkoutPlanner({ state, dispatch }) {
       )}
 
       {view === "saved" && (
-        <div>
+        <div className="rd-stack">
           {(state.workoutTemplates || []).filter((t) => t.type === "weekly").length === 0 ? (
-            <div style={{ ...s.emptyState, padding: "60px 16px" }}>
-              <div style={s.emptyIcon}>📁</div>
-              <div style={s.emptyText}>No saved routines yet</div>
-              <button
-                style={s.neonBtn}
-                onClick={() => setView("planner")}
-              >
+            <div className="rd-empty" style={{ padding: "60px 16px" }}>
+              <FolderOpen size={32} style={{ color: "rgba(255,255,255,0.2)" }} />
+              <div className="rd-empty-title">No saved routines yet</div>
+              <div className="rd-empty-sub">Save a week from the planner to reuse it later.</div>
+              <button className="rd-btn-primary rd-btn-sm" onClick={() => setView("planner")} style={{ marginTop: 10 }}>
                 Go to Planner
               </button>
             </div>
@@ -795,42 +577,42 @@ export default function WorkoutPlanner({ state, dispatch }) {
                 return (
                   <motion.div
                     key={t.id}
-                    style={s.savedCard}
+                    className="rd-card"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ borderColor: "rgba(200,255,0,0.12)" }}
+                    whileHover={{ borderColor: "rgba(200,255,0,0.16)" }}
                   >
-                    <div style={s.savedName}>{t.name}</div>
-                    <div style={s.savedMeta}>
-                      {dayCount} day{dayCount !== 1 ? "s" : ""} · {exCount} exercise{exCount !== 1 ? "s" : ""}
+                    <div className="rd-card-head" style={{ marginBottom: 10 }}>
+                      <div className="rd-card-title">
+                        <span className="rd-card-title-ico blue"><Save size={16} /></span>
+                        <div>
+                          <div className="rd-card-kicker">Saved routine</div>
+                          <div className="rd-card-name">{t.name}</div>
+                        </div>
+                      </div>
+                      <span className="rd-count">
+                        {dayCount} day{dayCount !== 1 ? "s" : ""} · {exCount} exercise{exCount !== 1 ? "s" : ""}
+                      </span>
                     </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
                       {DAYS.filter((d) => (t.days?.[d] || []).length > 0).map((d) => (
-                        <span key={d} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: "rgba(200,255,0,0.08)", color: "#C8FF00", fontWeight: 600 }}>
-                          {d}: {(t.days?.[d] || []).length} ex
-                        </span>
+                        <span key={d} className="rd-ex-tag">{d}: {(t.days?.[d] || []).length} ex</span>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      <button
-                        style={{ ...s.neonBtn, fontSize: 12, padding: "7px 16px" }}
-                        onClick={() => loadRoutine(t)}
-                      >
-                        Load
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button className="rd-btn-sm primary" onClick={() => loadRoutine(t)}>
+                        <Play size={13} /> Load
+                      </button>
+                      <button className="rd-btn-sm ghost" onClick={() => duplicateRoutine(t)}>
+                        <Copy size={13} /> Duplicate
                       </button>
                       <button
-                        style={{ ...s.ghostBtn, fontSize: 12, padding: "7px 14px" }}
-                        onClick={() => duplicateRoutine(t)}
-                      >
-                        Duplicate
-                      </button>
-                      <button
-                        style={{ ...s.dangerBtn, fontSize: 12, padding: "7px 14px" }}
+                        className="rd-btn-sm danger"
                         onClick={() => {
                           if (confirm(`Delete "${t.name}"?`)) deleteRoutine(t.id);
                         }}
                       >
-                        Delete
+                        <Trash2 size={13} /> Delete
                       </button>
                     </div>
                   </motion.div>
@@ -842,101 +624,87 @@ export default function WorkoutPlanner({ state, dispatch }) {
 
       <AnimatePresence>
         {showPicker && (
-          <div style={s.overlay} onClick={() => setShowPicker(false)}>
+          <motion.div
+            className="rd-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPicker(false)}
+          >
             <motion.div
-              style={s.modal}
-              onClick={(e) => e.stopPropagation()}
+              className="rd-modal rd-modal-lg"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={s.modalTitle}>Add Exercise</div>
-                <button
-                  style={{ background: "none", border: "none", color: "#A0A0A0", fontSize: 18, cursor: "pointer" }}
-                  onClick={() => setShowPicker(false)}
-                >
-                  ✕
-                </button>
+              <button className="rd-modal-close" onClick={() => setShowPicker(false)}><X size={16} /></button>
+              <div className="rd-modal-title" style={{ marginBottom: 16 }}>Add Exercise</div>
+              <div className="rd-search" style={{ marginBottom: 12 }}>
+                <Search size={15} />
+                <input placeholder="Search exercises..." value={pickerSearch} onChange={(e) => setPickerSearch(e.target.value)} autoFocus />
               </div>
-              <input
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", color: "#FFFFFF", fontSize: 14, outline: "none", marginBottom: 12 }}
-                placeholder="Search exercises..."
-                value={pickerSearch}
-                onChange={(e) => setPickerSearch(e.target.value)}
-                autoFocus
-              />
               <div style={{ maxHeight: 360, overflowY: "auto" }}>
                 {pickerResults.map((ex) => (
-                  <div
-                    key={ex.id}
-                    style={s.pickerItem}
-                    onClick={() => addExercise(ex)}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200,255,0,0.06)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
-                  >
-                    <div>
+                  <div key={ex.id} className="rd-ex-row" style={{ marginBottom: 6, cursor: "pointer" }} onClick={() => addExercise(ex)}>
+                    <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{ex.name}</div>
-                      <div style={{ fontSize: 11, color: "#A0A0A0" }}>{ex.primary} · {ex.sets}×{ex.reps}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{ex.primary} · {ex.sets}×{ex.reps}</div>
                     </div>
-                    <span style={{ color: "rgba(200,255,0,0.4)", fontSize: 16 }}>+</span>
+                    <Plus size={16} style={{ color: "rgba(200,255,0,0.4)", flexShrink: 0 }} />
                   </div>
                 ))}
                 {pickerResults.length === 0 && (
-                  <div style={{ padding: 24, textAlign: "center", fontSize: 13, color: "#A0A0A0" }}>
+                  <div style={{ padding: 24, textAlign: "center", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
                     No exercises found
                   </div>
                 )}
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {templateModal && (
-          <div style={s.overlay} onClick={() => setTemplateModal(false)}>
+          <motion.div
+            className="rd-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setTemplateModal(false)}
+          >
             <motion.div
-              style={s.modal}
-              onClick={(e) => e.stopPropagation()}
+              className="rd-modal"
+              style={{ maxWidth: 520 }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={s.modalTitle}>Quick Templates</div>
-                <button
-                  style={{ background: "none", border: "none", color: "#A0A0A0", fontSize: 18, cursor: "pointer" }}
-                  onClick={() => setTemplateModal(false)}
-                >
-                  ✕
-                </button>
-              </div>
-              <p style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 16 }}>
+              <button className="rd-modal-close" onClick={() => setTemplateModal(false)}><X size={16} /></button>
+              <div className="rd-modal-title" style={{ marginBottom: 6 }}>Quick Templates</div>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 16 }}>
                 Pre-fill your week with a popular training split
               </p>
-              <div style={s.templateGrid}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 10 }}>
                 {Object.entries(TEMPLATES).map(([key, tmpl]) => {
                   const dayCount = Object.values(tmpl.days).filter((e) => e.length > 0).length;
                   const exCount = Object.values(tmpl.days).reduce((s, e) => s + e.length, 0);
                   return (
                     <motion.div
                       key={key}
-                      style={s.templateCard}
-                      whileHover={{ borderColor: "rgba(200,255,0,0.2)", transform: "translateY(-2px)" }}
+                      className="rd-tmpl-card"
+                      whileHover={{ borderColor: "rgba(200,255,0,0.25)", transform: "translateY(-2px)" }}
                       onClick={() => applyTemplate(key)}
                     >
-                      <div style={s.templateName}>{tmpl.name}</div>
-                      <div style={s.templateDesc}>
-                        {dayCount} day split · {exCount} exercises
-                      </div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+                      <div className="rd-tmpl-name">{tmpl.name}</div>
+                      <div className="rd-tmpl-desc">{dayCount} day split · {exCount} exercises</div>
+                      <div className="rd-tmpl-chips">
                         {Object.entries(tmpl.days)
                           .filter(([, e]) => e.length > 0)
                           .map(([day]) => (
-                            <span key={day} style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>
-                              {day}
-                            </span>
+                            <span key={day} className="rd-ex-tag">{day}</span>
                           ))}
                       </div>
                     </motion.div>
@@ -944,34 +712,42 @@ export default function WorkoutPlanner({ state, dispatch }) {
                 })}
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {showSaveModal && (
-          <div style={s.overlay} onClick={() => setShowSaveModal(false)}>
+          <motion.div
+            className="rd-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowSaveModal(false)}
+          >
             <motion.div
-              style={{ ...s.modal, maxWidth: 400 }}
-              onClick={(e) => e.stopPropagation()}
+              className="rd-modal"
+              style={{ maxWidth: 400 }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div style={s.modalTitle}>Save Routine</div>
-              <input
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", color: "#FFFFFF", fontSize: 14, outline: "none", marginBottom: 16 }}
-                placeholder="Routine name..."
-                value={routineName}
-                onChange={(e) => setRoutineName(e.target.value)}
-                autoFocus
-              />
-              <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ ...s.ghostBtn, flex: 1 }} onClick={() => setShowSaveModal(false)}>
+              <button className="rd-modal-close" onClick={() => setShowSaveModal(false)}><X size={16} /></button>
+              <div className="rd-modal-title" style={{ marginBottom: 16 }}>Save Routine</div>
+              <div className="rd-form" style={{ marginBottom: 18 }}>
+                <div className="rd-field">
+                  <label>Routine name</label>
+                  <input className="rd-input" placeholder="Routine name..." value={routineName} onChange={(e) => setRoutineName(e.target.value)} autoFocus />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button className="rd-btn-secondary" style={{ flex: 1 }} onClick={() => setShowSaveModal(false)}>
                   Cancel
                 </button>
                 <button
-                  style={{ ...s.neonBtn, flex: 1, opacity: !routineName.trim() || totalExercises === 0 ? 0.5 : 1 }}
+                  className="rd-btn-primary"
+                  style={{ flex: 2, opacity: !routineName.trim() || totalExercises === 0 ? 0.5 : 1 }}
                   onClick={saveRoutine}
                   disabled={!routineName.trim() || totalExercises === 0}
                 >
@@ -979,7 +755,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                 </button>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

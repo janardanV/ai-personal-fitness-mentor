@@ -1,5 +1,7 @@
+import React from 'react';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CalendarDays, Database, Star, Search, X, Plus, Minus, Trash2, Heart, Check, Save, UtensilsCrossed, Flame } from 'lucide-react';
 
 const FOOD_DATABASE = [
   { id: 'b1', name: 'Chicken Breast', calories: 165, protein: 31, carbs: 0, fat: 3.6 },
@@ -64,33 +66,7 @@ const FOOD_DATABASE = [
   { id: 'b60', name: 'Granola', calories: 471, protein: 10, carbs: 64, fat: 20 },
 ];
 
-const colors = {
-  bg: '#0B0B0B',
-  surface: '#151515',
-  surfaceLight: '#1E1E1E',
-  neon: '#C8FF00',
-  secondary: '#A0A0A0',
-  danger: '#FF4444',
-  white: '#FFFFFF',
-  card: '#1A1A1A',
-};
-
-const ringStyles = {
-  container: { position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' },
-  svg: { transform: 'rotate(-90deg)' },
-  track: { fill: 'none', stroke: '#2A2A2A' },
-  fill: { fill: 'none', strokeLinecap: 'round', transition: 'stroke-dashoffset 0.6s ease' },
-  label: { position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' },
-};
-
-const buttonBase = {
-  border: 'none',
-  borderRadius: '12px',
-  cursor: 'pointer',
-  fontWeight: 600,
-  fontFamily: 'inherit',
-  transition: 'all 0.2s ease',
-};
+const MACRO_COLORS = { calories: '#C8FF00', protein: '#4D9FFF', carbs: '#FF9F43', fat: '#A78BFA' };
 
 function debounce(fn, ms) {
   let timer;
@@ -104,71 +80,49 @@ function MacroRing({ value, max, label, color, size = 110, strokeWidth = 8 }) {
   const pct = Math.min(value / (max || 1), 1);
   const radius = (size - strokeWidth) / 2;
   const circ = 2 * Math.PI * radius;
-  const offset = circ * (1 - pct);
+  const dash = circ * pct;
   return (
-    <div style={{ ...ringStyles.container, width: size, height: size }}>
-      <svg width={size} height={size} style={ringStyles.svg}>
-        <circle cx={size / 2} cy={size / 2} r={radius} style={{ ...ringStyles.track, strokeWidth }} />
-        <circle
-          cx={size / 2} cy={size / 2} r={radius}
-          style={{ ...ringStyles.fill, stroke: color, strokeWidth, strokeDasharray: circ, strokeDashoffset: offset }}
-        />
-      </svg>
-      <div style={ringStyles.label}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: colors.white }}>{Math.round(value)}</span>
-        <span style={{ fontSize: 10, color: colors.secondary }}>{label}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+      <div className="rd-ring" style={{ width: size, height: size }}>
+        <svg width={size} height={size}>
+          <circle cx={size / 2} cy={size / 2} r={radius} className="rd-ring-bg" strokeWidth={strokeWidth} />
+          <circle cx={size / 2} cy={size / 2} r={radius} className="rd-ring-fg" stroke={color} strokeWidth={strokeWidth}
+            strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
+        </svg>
+        <div className="rd-ring-center">
+          <span className="rd-ring-value" style={{ fontSize: size * 0.16 }}>{Math.round(value)}</span>
+        </div>
       </div>
+      <span className="rd-ring-label">{label}</span>
     </div>
   );
 }
 
 function FoodCard({ food, onClick, onAdd, compact }) {
-  const [hovered, setHovered] = useState(false);
   return (
     <motion.div
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onClick={onClick}
-      style={{
-        background: hovered ? colors.surfaceLight : colors.card,
-        border: `1px solid ${hovered ? '#333' : '#222'}`,
-        borderRadius: 12,
-        padding: compact ? '10px 14px' : '14px 16px',
-        cursor: 'pointer',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        transition: 'all 0.15s ease',
-      }}
+      className="rd-ex-row"
+      style={{ padding: compact ? '10px 14px' : '13px 16px', marginBottom: 8 }}
     >
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: compact ? 13 : 14, fontWeight: 600, color: colors.white, marginBottom: 4 }}>{food.name}</div>
-        <div style={{ display: 'flex', gap: 12, fontSize: 11, color: colors.secondary }}>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: compact ? 13 : 14, fontWeight: 600, color: '#FFFFFF', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{food.name}</div>
+        <div className="rd-meal-meta" style={{ fontSize: 11 }}>
           <span>{Math.round(food.calories)} kcal</span>
-          <span style={{ color: '#6EC6FF' }}>P: {Math.round(food.protein)}g</span>
-          <span style={{ color: '#FFB74D' }}>C: {Math.round(food.carbs)}g</span>
-          <span style={{ color: '#FF8A80' }}>F: {Math.round(food.fat)}g</span>
+          <span className="p">P {Math.round(food.protein)}g</span>
+          <span className="c">C {Math.round(food.carbs)}g</span>
+          <span className="f">F {Math.round(food.fat)}g</span>
         </div>
       </div>
       {onAdd && (
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          style={{
-            ...buttonBase,
-            background: hovered ? colors.neon : 'transparent',
-            color: hovered ? colors.bg : colors.neon,
-            border: `1px solid ${colors.neon}`,
-            padding: '6px 14px',
-            fontSize: 12,
-            marginLeft: 10,
-          }}
+        <button
+          className="rd-mini-btn rd-food-add"
           onClick={(e) => { e.stopPropagation(); onAdd(food); }}
         >
-          + Add
-        </motion.button>
+          <Plus size={13} /> Add
+        </button>
       )}
     </motion.div>
   );
@@ -181,111 +135,62 @@ function AddMealModal({ food, onSave, onClose }) {
   const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 1000, backdropFilter: 'blur(4px)',
-      }}
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: colors.surface, borderRadius: 20, padding: 28,
-          width: '90%', maxWidth: 400, border: '1px solid #333',
-        }}
-      >
-        <h3 style={{ margin: '0 0 20px', color: colors.white, fontSize: 18, fontWeight: 700 }}>{food.name}</h3>
+    <motion.div className="rd-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+      <motion.div className="rd-modal" style={{ maxWidth: 420 }} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={(e) => e.stopPropagation()}>
+        <button className="rd-modal-close" onClick={onClose}><X size={16} /></button>
+        <div className="rd-modal-title" style={{ marginBottom: 20 }}>{food.name}</div>
 
         <div style={{ marginBottom: 20 }}>
-          <label style={{ color: colors.secondary, fontSize: 12, display: 'block', marginBottom: 6 }}>Grams</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              type="range" min={10} max={500} step={10} value={grams}
-              onChange={(e) => setGrams(Number(e.target.value))}
-              style={{ flex: 1, accentColor: colors.neon }}
-            />
-            <input
-              type="number" value={grams} min={1}
-              onChange={(e) => setGrams(Math.max(1, Number(e.target.value)))}
-              style={{
-                width: 70, background: colors.card, border: '1px solid #333',
-                borderRadius: 8, color: colors.white, textAlign: 'center',
-                fontSize: 14, padding: '6px 0', outline: 'none',
-              }}
-            />
-            <span style={{ color: colors.secondary, alignSelf: 'center', fontSize: 13 }}>g</span>
+          <label className="rd-field"><span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Grams</span></label>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div className="rd-stepper">
+              <button className="rd-step-btn" onClick={() => setGrams(g => Math.max(10, g - 25))}><Minus size={14} /></button>
+              <input
+                type="number" value={grams} min={1}
+                onChange={(e) => setGrams(Math.max(1, Number(e.target.value)))}
+                className="rd-input" style={{ width: 84, textAlign: 'center', padding: '9px 0', fontSize: 14 }}
+              />
+              <button className="rd-step-btn" onClick={() => setGrams(g => Math.min(1000, g + 25))}><Plus size={14} /></button>
+            </div>
+            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>g</span>
+            <div style={{ display: 'flex', gap: 4, marginLeft: 'auto' }}>
+              {[50, 100, 150, 200, 250].map(v => (
+                <button key={v} className={`rd-chip ${grams === v ? 'active' : ''}`} style={{ padding: '6px 10px', fontSize: 11 }} onClick={() => setGrams(v)}>{v}</button>
+              ))}
+            </div>
           </div>
         </div>
 
         <div style={{ marginBottom: 20 }}>
-          <label style={{ color: colors.secondary, fontSize: 12, display: 'block', marginBottom: 6 }}>Meal</label>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <label className="rd-field"><span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Meal</span></label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {meals.map((m) => (
-              <button
-                key={m}
-                onClick={() => setMeal(m)}
-                style={{
-                  ...buttonBase,
-                  background: meal === m ? colors.neon : colors.card,
-                  color: meal === m ? colors.bg : colors.secondary,
-                  border: `1px solid ${meal === m ? colors.neon : '#333'}`,
-                  padding: '8px 12px',
-                  fontSize: 12,
-                  flex: 1,
-                }}
-              >
-                {m}
-              </button>
+              <button key={m} className={`rd-chip ${meal === m ? 'active' : ''}`} onClick={() => setMeal(m)} style={{ padding: '8px 14px', fontSize: 12 }}>{m}</button>
             ))}
           </div>
         </div>
 
         <div style={{
-          background: colors.card, borderRadius: 12, padding: 14,
-          marginBottom: 24, display: 'grid', gridTemplateColumns: '1fr 1fr',
-          gap: 8, fontSize: 13,
+          background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: 12, padding: 14, marginBottom: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 13,
         }}>
-          <div style={{ color: colors.neon, fontWeight: 600 }}>{Math.round(food.calories * factor)} kcal</div>
-          <div style={{ color: '#6EC6FF' }}>Protein: {Math.round(food.protein * factor)}g</div>
-          <div style={{ color: '#FFB74D' }}>Carbs: {Math.round(food.carbs * factor)}g</div>
-          <div style={{ color: '#FF8A80' }}>Fat: {Math.round(food.fat * factor)}g</div>
+          <div style={{ color: '#C8FF00', fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>{Math.round(food.calories * factor)} kcal</div>
+          <div style={{ color: '#4D9FFF' }}>Protein: {Math.round(food.protein * factor)}g</div>
+          <div style={{ color: '#FF9F43' }}>Carbs: {Math.round(food.carbs * factor)}g</div>
+          <div style={{ color: '#A78BFA' }}>Fat: {Math.round(food.fat * factor)}g</div>
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button
-            onClick={onClose}
-            style={{
-              ...buttonBase, flex: 1, padding: '12px 0',
-              background: colors.card, color: colors.secondary, border: '1px solid #333',
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => onSave({
-              food: food.name,
-              calories: Math.round(food.calories * factor),
-              protein: Math.round(food.protein * factor * 10) / 10,
-              carbs: Math.round(food.carbs * factor * 10) / 10,
-              fat: Math.round(food.fat * factor * 10) / 10,
-              meal,
-              grams,
-            })}
-            style={{
-              ...buttonBase, flex: 1, padding: '12px 0',
-              background: colors.neon, color: colors.bg,
-            }}
-          >
-            Add to {meal}
-          </button>
+          <button className="rd-btn-secondary" onClick={onClose} style={{ flex: 1 }}>Cancel</button>
+          <button className="rd-btn-primary" onClick={() => onSave({
+            food: food.name,
+            calories: Math.round(food.calories * factor),
+            protein: Math.round(food.protein * factor * 10) / 10,
+            carbs: Math.round(food.carbs * factor * 10) / 10,
+            fat: Math.round(food.fat * factor * 10) / 10,
+            meal,
+            grams,
+          })} style={{ flex: 1 }}><Check size={15} /> Add to {meal}</button>
         </div>
       </motion.div>
     </motion.div>
@@ -293,53 +198,24 @@ function AddMealModal({ food, onSave, onClose }) {
 }
 
 function FavoriteCard({ fav, onAdd, onRemove }) {
-  const [hovered, setHovered] = useState(false);
   return (
-    <motion.div
-      whileHover={{ scale: 1.01 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: colors.card, border: `1px solid ${hovered ? '#333' : '#222'}`,
-        borderRadius: 12, padding: '14px 16px', marginBottom: 8,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      }}
-    >
-      <div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: colors.white, marginBottom: 4 }}>{fav.name}</div>
-        <div style={{ fontSize: 11, color: colors.secondary }}>
+    <motion.div whileHover={{ scale: 1.01 }} className="rd-meal-row">
+      <div className="rd-card-title-ico purple" style={{ flexShrink: 0 }}><Heart size={15} /></div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF', marginBottom: 4 }}>{fav.name}</div>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {fav.items.map((i) => i.food).join(', ')}
         </div>
-        <div style={{ display: 'flex', gap: 10, fontSize: 11, color: colors.secondary, marginTop: 4 }}>
+        <div className="rd-meal-meta" style={{ fontSize: 11 }}>
           <span>{fav.totalCalories} kcal</span>
-          <span style={{ color: '#6EC6FF' }}>P: {fav.totalProtein}g</span>
-          <span style={{ color: '#FFB74D' }}>C: {fav.totalCarbs}g</span>
-          <span style={{ color: '#FF8A80' }}>F: {fav.totalFat}g</span>
+          <span className="p">P {fav.totalProtein}g</span>
+          <span className="c">C {fav.totalCarbs}g</span>
+          <span className="f">F {fav.totalFat}g</span>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 6 }}>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => onAdd(fav)}
-          style={{
-            ...buttonBase, background: 'transparent',
-            color: colors.neon, border: `1px solid ${colors.neon}`,
-            padding: '8px 14px', fontSize: 12,
-          }}
-        >
-          Quick Add
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => onRemove(fav.id)}
-          style={{
-            ...buttonBase, background: 'transparent',
-            color: colors.danger, border: `1px solid ${colors.danger}`,
-            padding: '8px 10px', fontSize: 12,
-          }}
-        >
-          ✕
-        </motion.button>
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <button className="rd-mini-btn" onClick={() => onAdd(fav)} style={{ color: '#C8FF00', borderColor: 'rgba(200,255,0,0.25)' }}><Plus size={13} /> Quick Add</button>
+        <button className="rd-mini-btn danger" onClick={() => onRemove(fav.id)}><Trash2 size={13} /></button>
       </div>
     </motion.div>
   );
@@ -485,9 +361,9 @@ export default function SmartNutrition({ state, dispatch }) {
   }, []);
 
   const tabs = [
-    { key: 'today', label: 'Today' },
-    { key: 'database', label: 'Food Database' },
-    { key: 'favorites', label: 'Favorites' },
+    { key: 'today', label: 'Today', icon: CalendarDays },
+    { key: 'database', label: 'Food Database', icon: Database },
+    { key: 'favorites', label: 'Favorites', icon: Star },
   ];
 
   const groupedMeals = useMemo(() => {
@@ -506,66 +382,46 @@ export default function SmartNutrition({ state, dispatch }) {
   const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg, padding: '20px 16px', maxWidth: 600, margin: '0 auto' }}>
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        style={{ color: colors.white, fontSize: 22, fontWeight: 700, margin: '0 0 18px' }}
-      >
-        <span style={{ color: colors.neon }}>Smart</span> Nutrition
-      </motion.h1>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><UtensilsCrossed size={13} /> Smart Nutrition</span>
+          <h1 className="rd-title">Meal Tracker</h1>
+          <p className="rd-sub">Log meals, browse foods, and save your favorite combos.</p>
+        </div>
+      </div>
 
-      <div style={{ display: 'flex', gap: 6, marginBottom: 24 }}>
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setActiveTab(t.key)}
-            style={{
-              ...buttonBase,
-              background: activeTab === t.key ? colors.neon : colors.surface,
-              color: activeTab === t.key ? colors.bg : colors.secondary,
-              padding: '10px 18px',
-              fontSize: 13,
-              border: `1px solid ${activeTab === t.key ? colors.neon : '#333'}`,
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="rd-tabbar">
+        {tabs.map((t) => {
+          const Icon = t.icon;
+          return (
+            <button key={t.key} className={`rd-tab ${activeTab === t.key ? 'active' : ''}`} onClick={() => setActiveTab(t.key)}>
+              <Icon size={15} /> {t.label}
+            </button>
+          );
+        })}
       </div>
 
       <AnimatePresence mode="wait">
         {activeTab === 'today' && (
-          <motion.div
-            key="today"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div style={{
-              background: colors.surface, borderRadius: 20, padding: 24,
-              border: '1px solid #222', marginBottom: 20,
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 12 }}>
-                <MacroRing value={totals.calories} max={targets.calories} label="kcal" color={colors.neon} />
-                <MacroRing value={totals.protein} max={targets.protein} label="Protein" color="#6EC6FF" />
-                <MacroRing value={totals.carbs} max={targets.carbs} label="Carbs" color="#FFB74D" />
-                <MacroRing value={totals.fat} max={targets.fat} label="Fat" color="#FF8A80" />
+          <motion.div key="today" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            <div className="rd-card" style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 16 }}>
+                <MacroRing value={totals.calories} max={targets.calories} label="Calories" color={MACRO_COLORS.calories} />
+                <MacroRing value={totals.protein} max={targets.protein} label="Protein" color={MACRO_COLORS.protein} />
+                <MacroRing value={totals.carbs} max={targets.carbs} label="Carbs" color={MACRO_COLORS.carbs} />
+                <MacroRing value={totals.fat} max={targets.fat} label="Fat" color={MACRO_COLORS.fat} />
               </div>
-              <div style={{
-                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8,
-                marginTop: 18, fontSize: 11,
-              }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 18 }}>
                 {[
-                  { label: 'Calories', current: totals.calories, target: targets.calories, color: colors.neon },
-                  { label: 'Protein', current: totals.protein, target: targets.protein, color: '#6EC6FF' },
-                  { label: 'Carbs', current: totals.carbs, target: targets.carbs, color: '#FFB74D' },
-                  { label: 'Fat', current: totals.fat, target: targets.fat, color: '#FF8A80' },
+                  { label: 'Calories', current: totals.calories, target: targets.calories, color: '#C8FF00' },
+                  { label: 'Protein', current: totals.protein, target: targets.protein, color: '#4D9FFF' },
+                  { label: 'Carbs', current: totals.carbs, target: targets.carbs, color: '#FF9F43' },
+                  { label: 'Fat', current: totals.fat, target: targets.fat, color: '#A78BFA' },
                 ].map((m) => (
                   <div key={m.label} style={{ textAlign: 'center' }}>
-                    <div style={{ color: colors.secondary }}>{m.label}</div>
-                    <div style={{ color: colors.white, fontWeight: 600, fontSize: 13 }}>
+                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
+                    <div style={{ color: m.color, fontWeight: 700, fontSize: 14, fontFamily: "'JetBrains Mono',monospace", marginTop: 3 }}>
                       {Math.max(0, Math.round(m.target - m.current))} left
                     </div>
                   </div>
@@ -574,53 +430,19 @@ export default function SmartNutrition({ state, dispatch }) {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h3 style={{ color: colors.white, fontSize: 15, fontWeight: 600, margin: 0 }}>Meals</h3>
-              <div style={{ display: 'flex', gap: 4 }}>
-                <button
-                  onClick={() => setShowSaveFav(true)}
-                  disabled={todayMeals.length === 0}
-                  style={{
-                    ...buttonBase,
-                    background: 'transparent',
-                    color: colors.neon,
-                    border: `1px solid ${colors.neon}`,
-                    padding: '6px 12px',
-                    fontSize: 11,
-                    opacity: todayMeals.length === 0 ? 0.4 : 1,
-                  }}
-                >
-                  Save as Fav
-                </button>
-              </div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', margin: 0 }}>Meals</h3>
+              <button className="rd-mini-btn" onClick={() => setShowSaveFav(true)} disabled={todayMeals.length === 0}
+                style={{ opacity: todayMeals.length === 0 ? 0.4 : 1 }}>
+                <Save size={13} /> Save as Fav
+              </button>
             </div>
 
             <div style={{ display: 'flex', gap: 4, marginBottom: 14, flexWrap: 'wrap' }}>
-              <button
-                onClick={() => setTodayMealSelection('all')}
-                style={{
-                  ...buttonBase,
-                  background: todayMealSelection === 'all' ? '#333' : 'transparent',
-                  color: todayMealSelection === 'all' ? colors.white : colors.secondary,
-                  border: `1px solid ${todayMealSelection === 'all' ? '#555' : '#333'}`,
-                  padding: '6px 12px',
-                  fontSize: 11,
-                }}
-              >
+              <button className={`rd-chip ${todayMealSelection === 'all' ? 'active' : ''}`} style={{ padding: '7px 14px', fontSize: 11 }} onClick={() => setTodayMealSelection('all')}>
                 All ({todayMeals.length})
               </button>
               {mealTypes.map((mt) => (
-                <button
-                  key={mt}
-                  onClick={() => setTodayMealSelection(mt)}
-                  style={{
-                    ...buttonBase,
-                    background: todayMealSelection === mt ? '#333' : 'transparent',
-                    color: todayMealSelection === mt ? colors.white : colors.secondary,
-                    border: `1px solid ${todayMealSelection === mt ? '#555' : '#333'}`,
-                    padding: '6px 12px',
-                    fontSize: 11,
-                  }}
-                >
+                <button key={mt} className={`rd-chip ${todayMealSelection === mt ? 'active' : ''}`} style={{ padding: '7px 14px', fontSize: 11 }} onClick={() => setTodayMealSelection(mt)}>
                   {mt} ({(groupedMeals[mt] || []).length})
                 </button>
               ))}
@@ -628,166 +450,77 @@ export default function SmartNutrition({ state, dispatch }) {
 
             <AnimatePresence>
               {filteredMeals.length === 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  style={{
-                    background: colors.surface, borderRadius: 16, padding: 40,
-                    textAlign: 'center', border: '1px solid #222',
-                  }}
-                >
-                  <div style={{ color: colors.secondary, fontSize: 14, marginBottom: 6 }}>No meals logged yet</div>
-                  <div style={{ color: '#555', fontSize: 12 }}>Add food from the Food Database tab</div>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rd-card rd-empty" style={{ padding: 40 }}>
+                  <div className="rd-empty-title">No meals logged yet</div>
+                  <div className="rd-empty-sub">Add food from the Food Database tab</div>
                 </motion.div>
               )}
               {filteredMeals.map((meal) => (
-                <motion.div
-                  key={meal.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  layout
-                  style={{
-                    background: colors.card, borderRadius: 12, padding: '12px 16px',
-                    marginBottom: 8, display: 'flex', justifyContent: 'space-between',
-                    alignItems: 'center', border: '1px solid #222',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: 10, color: colors.neon, fontWeight: 600, marginBottom: 2, textTransform: 'uppercase', letterSpacing: 1 }}>
-                      {meal.meal}
-                    </div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: colors.white, marginBottom: 2 }}>
-                      {meal.food} {meal.grams ? `(${meal.grams}g)` : ''}
-                    </div>
-                    <div style={{ display: 'flex', gap: 10, fontSize: 11, color: colors.secondary }}>
+                <motion.div key={meal.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20 }} layout className="rd-meal-row">
+                  <div className="rd-card-title-ico lime" style={{ flexShrink: 0 }}><Flame size={15} /></div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div className="rd-meal-tag">{meal.meal}</div>
+                    <div className="rd-meal-name">{meal.food} {meal.grams ? `(${meal.grams}g)` : ''}</div>
+                    <div className="rd-meal-meta" style={{ fontSize: 11 }}>
                       <span>{meal.calories} kcal</span>
-                      <span style={{ color: '#6EC6FF' }}>P: {meal.protein}g</span>
-                      <span style={{ color: '#FFB74D' }}>C: {meal.carbs}g</span>
-                      <span style={{ color: '#FF8A80' }}>F: {meal.fat}g</span>
+                      <span className="p">P {meal.protein}g</span>
+                      <span className="c">C {meal.carbs}g</span>
+                      <span className="f">F {meal.fat}g</span>
                     </div>
                   </div>
-                  <motion.button
-                    whileTap={{ scale: 0.85 }}
-                    onClick={() => handleDeleteMeal(meal.id)}
-                    style={{
-                      ...buttonBase, background: 'transparent',
-                      color: '#666', border: 'none', padding: 8, fontSize: 16,
-                    }}
-                  >
-                    ✕
-                  </motion.button>
+                  <button className="rd-iconbtn danger" onClick={() => handleDeleteMeal(meal.id)} style={{ flexShrink: 0 }}><Trash2 size={15} /></button>
                 </motion.div>
               ))}
             </AnimatePresence>
 
             <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveTab('database')}
-                style={{
-                  ...buttonBase,
-                  background: colors.neon, color: colors.bg,
-                  padding: '14px 0', fontSize: 14, flex: 1,
-                }}
-              >
-                + Add Food
-              </motion.button>
+              <button className="rd-btn-primary" onClick={() => setActiveTab('database')} style={{ flex: 1, width: '100%' }}>
+                <Plus size={15} /> Add Food
+              </button>
             </div>
           </motion.div>
         )}
 
         {activeTab === 'database' && (
-          <motion.div
-            key="database"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div style={{ position: 'relative', marginBottom: 20 }}>
-              <input
-                type="text"
-                placeholder="Search food..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  width: '100%', background: colors.surface,
-                  border: '1px solid #333', borderRadius: 12,
-                  color: colors.white, padding: '14px 16px 14px 42px',
-                  fontSize: 14, outline: 'none', boxSizing: 'border-box',
-                  transition: 'border-color 0.2s',
-                }}
-                onFocus={(e) => { e.target.style.borderColor = colors.neon; }}
-                onBlur={(e) => { e.target.style.borderColor = '#333'; }}
-              />
-              <svg
-                style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}
-                width="18" height="18" viewBox="0 0 24 24" fill="none"
-                stroke={colors.secondary} strokeWidth="2" strokeLinecap="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              {search && (
-                <button
-                  onClick={() => { setSearch(''); setUsdaResults([]); }}
-                  style={{
-                    position: 'absolute', right: 12, top: '50%',
-                    transform: 'translateY(-50%)', background: 'none',
-                    border: 'none', color: colors.secondary, cursor: 'pointer',
-                    fontSize: 16,
-                  }}
-                >
-                  ✕
-                </button>
-              )}
+          <motion.div key="database" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            <div className="rd-card" style={{ padding: 18, marginBottom: 16 }}>
+              <div className="rd-search">
+                <Search size={15} />
+                <input
+                  type="text"
+                  placeholder="Search food..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                {search && (
+                  <button className="rd-iconbtn" onClick={() => { setSearch(''); setUsdaResults([]); }} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)' }}><X size={15} /></button>
+                )}
+              </div>
             </div>
 
             {search.trim().length >= 2 && usdaResults.length > 0 && (
               <div style={{ marginBottom: 20 }}>
-                <div style={{
-                  fontSize: 11, color: colors.neon, fontWeight: 600,
-                  textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10,
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}>
-                  <span style={{
-                    background: colors.neon, color: colors.bg,
-                    padding: '2px 6px', borderRadius: 4, fontSize: 9,
-                  }}>
-                    USDA
-                  </span>
-                  API Results
+                <div className="rd-legend" style={{ marginBottom: 10 }}>
+                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: '#C8FF00' }} /> USDA API Results</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {usdaResults.map((food) => (
-                    <FoodCard key={food.id} food={food} onAdd={setModalFood} compact />
-                  ))}
-                </div>
+                {usdaResults.map((food) => (
+                  <FoodCard key={food.id} food={food} onAdd={setModalFood} compact />
+                ))}
               </div>
             )}
 
             {loadingUsda && (
-              <div style={{ textAlign: 'center', padding: 16, color: colors.secondary, fontSize: 12 }}>
-                Searching USDA database...
-              </div>
+              <div style={{ textAlign: 'center', padding: 16, color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>Searching USDA database...</div>
             )}
 
-            <div style={{
-              fontSize: 11, color: colors.secondary, fontWeight: 600,
-              textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10,
-            }}>
-              Built-in Database ({filteredDb.length})
+            <div className="rd-legend" style={{ marginBottom: 10 }}>
+              <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: '#4D9FFF' }} /> Built-in Database ({filteredDb.length})</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {filteredDb.map((food) => (
-                <FoodCard key={food.id} food={food} onAdd={setModalFood} />
-              ))}
-            </div>
+            {filteredDb.map((food) => (
+              <FoodCard key={food.id} food={food} onAdd={setModalFood} />
+            ))}
             {filteredDb.length === 0 && search.trim() && (
-              <div style={{
-                textAlign: 'center', padding: 30, color: colors.secondary, fontSize: 13,
-              }}>
+              <div className="rd-card rd-empty" style={{ padding: 30 }}>
                 No foods match "{search}"
               </div>
             )}
@@ -795,89 +528,36 @@ export default function SmartNutrition({ state, dispatch }) {
         )}
 
         {activeTab === 'favorites' && (
-          <motion.div
-            key="favorites"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-          >
+          <motion.div key="favorites" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
             {showSaveFav && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                style={{
-                  background: colors.surface, borderRadius: 16, padding: 20,
-                  marginBottom: 16, border: `1px solid ${colors.neon}`,
-                }}
-              >
-                <div style={{ fontSize: 13, fontWeight: 600, color: colors.white, marginBottom: 10 }}>
-                  Save Today's Meals as Favorite
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="rd-card" style={{ marginBottom: 16, border: '1px solid rgba(200,255,0,0.25)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF', marginBottom: 10 }}>Save Today's Meals as Favorite</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     placeholder="Favorite name..."
                     value={favName}
                     onChange={(e) => setFavName(e.target.value)}
-                    style={{
-                      flex: 1, background: colors.card, border: '1px solid #333',
-                      borderRadius: 8, color: colors.white, padding: '10px 14px',
-                      fontSize: 13, outline: 'none',
-                    }}
+                    className="rd-input"
+                    style={{ flex: 1, minWidth: 140 }}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleSaveFavorite(); }}
                   />
-                  <button
-                    onClick={handleSaveFavorite}
-                    disabled={!favName.trim()}
-                    style={{
-                      ...buttonBase, background: colors.neon, color: colors.bg,
-                      padding: '10px 18px', fontSize: 12, opacity: favName.trim() ? 1 : 0.5,
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => { setShowSaveFav(false); setFavName(''); }}
-                    style={{
-                      ...buttonBase, background: colors.card, color: colors.secondary,
-                      border: '1px solid #333', padding: '10px 14px', fontSize: 12,
-                    }}
-                  >
-                    Cancel
-                  </button>
+                  <button className="rd-btn-primary" onClick={handleSaveFavorite} disabled={!favName.trim()} style={{ padding: '10px 18px', fontSize: 12, opacity: favName.trim() ? 1 : 0.5 }}><Check size={14} /> Save</button>
+                  <button className="rd-btn-secondary" onClick={() => { setShowSaveFav(false); setFavName(''); }} style={{ padding: '10px 14px', fontSize: 12 }}>Cancel</button>
                 </div>
               </motion.div>
             )}
 
             {favorites.length === 0 ? (
-              <div style={{
-                background: colors.surface, borderRadius: 20, padding: 40,
-                textAlign: 'center', border: '1px solid #222',
-              }}>
-                <div style={{ color: colors.secondary, fontSize: 14, marginBottom: 6 }}>No favorites yet</div>
-                <div style={{ color: '#555', fontSize: 12, marginBottom: 16 }}>
-                  Log meals today, then save them as a favorite
-                </div>
-                <button
-                  onClick={() => { setActiveTab('today'); }}
-                  style={{
-                    ...buttonBase, background: 'transparent',
-                    color: colors.neon, border: `1px solid ${colors.neon}`,
-                    padding: '10px 20px', fontSize: 12,
-                  }}
-                >
-                  Go to Today
-                </button>
+              <div className="rd-card rd-empty" style={{ padding: 40 }}>
+                <div className="rd-card-title-ico purple" style={{ width: 48, height: 48, borderRadius: 14, margin: '0 auto 12px' }}><Heart size={22} /></div>
+                <div className="rd-empty-title">No favorites yet</div>
+                <div className="rd-empty-sub">Log meals today, then save them as a favorite</div>
+                <button className="rd-btn-primary" onClick={() => { setActiveTab('today'); }} style={{ marginTop: 12 }}>Go to Today</button>
               </div>
             ) : (
               favorites.map((fav) => (
-                <FavoriteCard
-                  key={fav.id}
-                  fav={fav}
-                  onAdd={handleQuickAddFav}
-                  onRemove={handleRemoveFavorite}
-                />
+                <FavoriteCard key={fav.id} fav={fav} onAdd={handleQuickAddFav} onRemove={handleRemoveFavorite} />
               ))
             )}
           </motion.div>
@@ -886,11 +566,7 @@ export default function SmartNutrition({ state, dispatch }) {
 
       <AnimatePresence>
         {modalFood && (
-          <AddMealModal
-            food={modalFood}
-            onSave={handleAddFood}
-            onClose={() => setModalFood(null)}
-          />
+          <AddMealModal food={modalFood} onSave={handleAddFood} onClose={() => setModalFood(null)} />
         )}
       </AnimatePresence>
     </div>

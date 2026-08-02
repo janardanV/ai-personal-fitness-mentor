@@ -1,36 +1,58 @@
 ﻿import { useState, useEffect, useRef, useMemo } from "react";
 import React from "react";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { fmt, today, COLORS, useAICoach, usdaDebouncedSearch, showToast, showConfirm } from "../utils/helpers";
+import { fmt, today, useAICoach, usdaDebouncedSearch, showToast, showConfirm } from "../utils/helpers";
+import { UtensilsCrossed, Sparkles, Flame, Droplet, Search, X, Plus, Minus, Pencil, Copy, Trash2, Check, ChevronDown, Apple, Drumstick, Wheat } from "lucide-react";
 
 const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 
-const StatCard = ({ label, value, unit, color = COLORS.primary, sub }) => (
-  <div style={{ background: "#151515", border: `1px solid ${color}18`, borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
-    <div style={{ position: "absolute", top: 0, right: 0, width: 60, height: 60, background: `radial-gradient(${color}20, transparent)`, borderRadius: "0 0 0 100%" }} />
-    <div style={{ fontSize: 11, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6, fontWeight: 500 }}>{label}</div>
-    <div style={{ fontSize: 28, fontWeight: 800, color, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.02em" }}>{value}<span style={{ fontSize: 13, fontWeight: 400, marginLeft: 4, color: "#A0A0A0" }}>{unit}</span></div>
-    {sub && <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 4 }}>{sub}</div>}
+const MACRO_COLORS = { calories: "#C8FF00", protein: "#4D9FFF", carbs: "#FF9F43", fat: "#A78BFA" };
+
+const StatCard = ({ label, value, unit, color = "#C8FF00", sub, icon: Icon }) => (
+  <div className={`rd-nut-stat ${color}`}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span className="l">{label}</span>
+      {Icon && <Icon size={15} style={{ color: "rgba(255,255,255,0.28)" }} />}
+    </div>
+    <div className="v">{value}<span>{unit}</span></div>
+    {sub && <div className="s">{sub}</div>}
   </div>
 );
 
 const Card = ({ children, style, className = "" }) => (
-  <div className={`glass ${className}`} style={{ padding: "20px", ...style }}>{children}</div>
+  <div className={`rd-card ${className}`} style={style}>{children}</div>
 );
 
-const ProgressRing = ({ value, max, size = 80, color = COLORS.primary, label }) => {
+const CardHead = ({ icon, iconCls, kicker, title, right }) => (
+  <div className="rd-card-head">
+    <div className="rd-card-title">
+      <div className={`rd-card-title-ico ${iconCls || ""}`}>{icon}</div>
+      <div>
+        {kicker && <div className="rd-card-kicker">{kicker}</div>}
+        <div className="rd-card-name">{title}</div>
+      </div>
+    </div>
+    {right}
+  </div>
+);
+
+const Ring = ({ value, max, size = 84, color = "#C8FF00", label }) => {
   const r = (size - 8) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (value / max) * circ;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-      <svg width={size} height={size}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={7} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={7}
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`} />
-        <text x={size / 2} y={size / 2 + 1} textAnchor="middle" dominantBaseline="middle" fill={color} fontSize={13} fontWeight={700} fontFamily="'JetBrains Mono',monospace">{fmt(value)}</text>
-      </svg>
-      <span style={{ fontSize: 11, color: "#A0A0A0" }}>{label}</span>
+      <div className="rd-ring" style={{ width: size, height: size }}>
+        <svg width={size} height={size}>
+          <circle cx={size / 2} cy={size / 2} r={r} className="rd-ring-bg" strokeWidth={7} />
+          <circle cx={size / 2} cy={size / 2} r={r} className="rd-ring-fg" stroke={color} strokeWidth={7}
+            strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
+        </svg>
+        <div className="rd-ring-center">
+          <span className="rd-ring-value" style={{ fontSize: Math.max(15, size * 0.16) }}>{fmt(value)}</span>
+        </div>
+      </div>
+      <span className="rd-ring-label">{label}</span>
     </div>
   );
 };
@@ -171,15 +193,15 @@ const Nutrition = ({ state, dispatch }) => {
   }, [nutrition]);
 
   const macroPieData = useMemo(() => [
-    { name: "Protein", value: totals.protein * 4, color: COLORS.primary },
-    { name: "Carbs", value: totals.carbs * 4, color: COLORS.cyan },
-    { name: "Fat", value: totals.fat * 9, color: COLORS.amber },
+    { name: "Protein", value: totals.protein * 4, color: MACRO_COLORS.protein },
+    { name: "Carbs", value: totals.carbs * 4, color: MACRO_COLORS.carbs },
+    { name: "Fat", value: totals.fat * 9, color: MACRO_COLORS.fat },
   ], [totals]);
 
   const macroData = useMemo(() => [
-    { name: "Protein", value: totals.protein, target: profile.protein, color: COLORS.primary },
-    { name: "Carbs", value: totals.carbs, target: Math.round((profile.calories * 0.45) / 4), color: COLORS.cyan },
-    { name: "Fat", value: totals.fat, target: Math.round((profile.calories * 0.25) / 9), color: COLORS.amber },
+    { name: "Protein", value: totals.protein, target: profile.protein, color: MACRO_COLORS.protein },
+    { name: "Carbs", value: totals.carbs, target: Math.round((profile.calories * 0.45) / 4), color: MACRO_COLORS.carbs },
+    { name: "Fat", value: totals.fat, target: Math.round((profile.calories * 0.25) / 9), color: MACRO_COLORS.fat },
   ], [totals, profile]);
 
   const scaledPreview = useMemo(() => {
@@ -211,86 +233,108 @@ const Nutrition = ({ state, dispatch }) => {
     return opts;
   }, [selectedFood]);
 
-  const inputStyle = { fontSize: 12, padding: "6px 8px" };
+  const tooltipStyle = { background: "rgba(16,16,16,0.98)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#FFFFFF", fontSize: 12 };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700 }}>Nutrition Tracker</h2>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        <StatCard label="Calories" value={totals.calories} unit={`/ ${profile.calories}`} color={totals.calories > profile.calories ? COLORS.red : COLORS.green} sub={`${Math.max(0, profile.calories - totals.calories)} remaining`} />
-        {macroData.map(m => <StatCard key={m.name} label={m.name} value={totals[m.name.toLowerCase()]} unit={`g / ${m.target}g`} color={m.color} sub={`${Math.max(0, Math.round(m.target - m.value))}g left`} />)}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        <StatCard label="Fiber" value={totals.fiber} unit="g" color={COLORS.green} sub="Target: 30g" />
-        <StatCard label="Sugar" value={totals.sugar} unit="g" color={COLORS.amber} sub="Limit: 50g" />
-        <StatCard label="Sodium" value={totals.sodium} unit="mg" color={totals.sodium > 2300 ? COLORS.red : COLORS.green} sub="Limit: 2300mg" />
-        <StatCard label="Water" value={waterIntake} unit="ml" color={COLORS.cyan} sub="Target: 3000ml" />
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><UtensilsCrossed size={13} /> Nutrition</span>
+          <h1 className="rd-title">Fuel Your Gains</h1>
+          <p className="rd-sub">Track macros, log meals, and hit your hydration goals.</p>
+        </div>
+        <button className="rd-btn-primary" onClick={getNutritionAdvice} disabled={aiLoading} style={{ alignSelf: "center" }}>
+          <Sparkles size={16} /> {aiLoading ? "Analyzing..." : "AI Nutrition Advice"}
+        </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <Card>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Weekly Calories</div>
+      <div className="rd-nut-stats">
+        <StatCard label="Calories" value={totals.calories} unit={` / ${profile.calories}`} color={totals.calories > profile.calories ? "red" : "lime"} icon={Flame} sub={<>Remaining: <b>{Math.max(0, profile.calories - totals.calories)} kcal</b></>} />
+        <StatCard label="Protein" value={totals.protein} unit={`g / ${profile.protein}g`} color="blue" icon={Drumstick} sub={<>Remaining: <b>{Math.max(0, Math.round(profile.protein - totals.protein))}g</b></>} />
+        <StatCard label="Carbs" value={totals.carbs} unit={`g / ${macroData[1].target}g`} color="orange" icon={Wheat} sub={<>Remaining: <b>{Math.max(0, Math.round(macroData[1].target - totals.carbs))}g</b></>} />
+        <StatCard label="Fat" value={totals.fat} unit={`g / ${macroData[2].target}g`} color="purple" icon={Apple} sub={<>Remaining: <b>{Math.max(0, Math.round(macroData[2].target - totals.fat))}g</b></>} />
+      </div>
+
+      <div className="rd-nut-stats">
+        <StatCard label="Fiber" value={totals.fiber} unit="g" color="green" sub="Target: 30g" />
+        <StatCard label="Sugar" value={totals.sugar} unit="g" color="orange" sub="Limit: 50g" />
+        <StatCard label="Sodium" value={totals.sodium} unit="mg" color={totals.sodium > 2300 ? "red" : "green"} sub="Limit: 2300mg" />
+        <StatCard label="Water" value={waterIntake} unit="ml" color="blue" icon={Droplet} sub="Target: 3000ml" />
+      </div>
+
+      <div className="rd-grid">
+        <Card className="rd-span-3">
+          <CardHead icon={<Flame size={15} />} iconCls="lime" title="Weekly Calories" />
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={weekData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
-              <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
+              <Tooltip contentStyle={tooltipStyle} />
               <Bar dataKey="calories" fill="#C8FF00" radius={[4, 4, 0, 0]} name="Calories" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
-        <Card>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Weekly Protein</div>
+        <Card className="rd-span-3">
+          <CardHead icon={<Drumstick size={15} />} iconCls="blue" title="Weekly Protein" />
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={weekData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
               <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
-              <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-              <Bar dataKey="protein" fill="#A5E600" radius={[4, 4, 0, 0]} name="Protein (g)" />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey="protein" fill="#4D9FFF" radius={[4, 4, 0, 0]} name="Protein (g)" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
-      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <Card>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Macro Distribution</div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {totals.calories > 0 ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                <ResponsiveContainer width={140} height={140}>
-                  <PieChart>
-                    <Pie data={macroPieData} cx="50%" cy="50%" innerRadius={35} outerRadius={60} paddingAngle={3} dataKey="value">
-                      {macroPieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 11 }} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {macroPieData.map(m => (
-                    <div key={m.name} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
-                      <div style={{ width: 10, height: 10, borderRadius: "50%", background: m.color }} />
-                      <span style={{ color: "#A0A0A0" }}>{m.name}</span>
-                      <span style={{ fontWeight: 600 }}>{m.value} kcal</span>
-                    </div>
-                  ))}
-                </div>
+        <Card className="rd-span-3">
+          <CardHead icon={<Apple size={15} />} iconCls="orange" title="Macro Distribution" />
+          {totals.calories > 0 ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 24 }}>
+              <ResponsiveContainer width={140} height={140}>
+                <PieChart>
+                  <Pie data={macroPieData} cx="50%" cy="50%" innerRadius={35} outerRadius={60} paddingAngle={3} dataKey="value">
+                    {macroPieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                  </Pie>
+                  <Tooltip contentStyle={tooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="rd-legend" style={{ flexDirection: "column", alignItems: "flex-start", gap: 10 }}>
+                {macroPieData.map(m => (
+                  <div key={m.name} className="rd-legend-item" style={{ gap: 8, fontSize: 12 }}>
+                    <span className="rd-legend-dot" style={{ background: m.color }} />
+                    <span style={{ color: "rgba(255,255,255,0.6)" }}>{m.name}</span>
+                    <span style={{ fontFamily: "'JetBrains Mono',monospace", color: "#FFFFFF", fontWeight: 700 }}>{fmt(m.value)} kcal</span>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <p style={{ color: "#A0A0A0", fontSize: 13, padding: 20 }}>No food logged today</p>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="rd-empty" style={{ minHeight: 140 }}>
+              <div className="rd-empty-title">No food logged today</div>
+              <div className="rd-empty-sub">Search and log a food to see your macro split.</div>
+            </div>
+          )}
         </Card>
-        <Card>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Water Intake</div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            <ProgressRing value={Math.min(waterIntake, 3000)} max={3000} size={100} color={COLORS.cyan} label={`${waterIntake} ml`} />
-            <div style={{ display: "flex", gap: 8 }}>
+
+        <Card className="rd-span-3">
+          <CardHead icon={<Droplet size={15} />} iconCls="blue" title="Water Intake" />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+            <div style={{ width: "100%" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                <span className="rd-metric-label">Daily target</span>
+                <span className="rd-big-metric" style={{ fontSize: 22 }}>{waterIntake}<span> / 3000 ml</span></span>
+              </div>
+              <div className="rd-water-track">
+                <div className="rd-water-fill" style={{ width: `${Math.min((waterIntake / 3000) * 100, 100)}%` }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
               {[-250, -100, 100, 250, 500].map(amt => (
-                <button key={amt} className="ghost-btn" onClick={() => changeWater(amt)} style={{ fontSize: 11, padding: "5px 10px" }}>{amt > 0 ? "+" : ""}{amt}ml</button>
+                <button key={amt} className="rd-water-btn" onClick={() => changeWater(amt)} style={{ fontSize: 11, padding: "8px 12px" }}>
+                  {amt > 0 ? <Plus size={12} /> : <Minus size={12} />} {Math.abs(amt)} ml
+                </button>
               ))}
             </div>
           </div>
@@ -298,44 +342,57 @@ const Nutrition = ({ state, dispatch }) => {
       </div>
 
       <Card>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Macro Progress</div>
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
-          {macroData.map(m => <ProgressRing key={m.name} value={Math.min(m.value, m.target)} max={m.target} size={90} color={m.color} label={m.name} />)}
+        <CardHead icon={<Flame size={15} />} iconCls="lime" title="Macro Progress" />
+        <div>
+          {macroData.map(m => {
+            const pct = m.target > 0 ? Math.min((m.value / m.target) * 100, 100) : 0;
+            return (
+              <div key={m.name} className="rd-macro">
+                <div className="rd-macro-head">
+                  <span className="rd-macro-label">{m.name}</span>
+                  <span className="rd-macro-val"><b>{fmt(m.value)}</b> / {m.target}g</span>
+                </div>
+                <div className="rd-macro-track">
+                  <div className="rd-macro-fill" style={{ width: `${pct}%`, background: m.color, boxShadow: `0 0 10px ${m.color}55` }} />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
 
       <Card>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Log Food from USDA Database</div>
+        <CardHead icon={<Search size={15} />} iconCls="lime" title="Log Food from USDA Database" />
         <div style={{ position: "relative", marginBottom: 14 }}>
           <div ref={searchRef} style={{ position: "relative" }}>
-            <input
-              value={searchQuery}
-              onChange={e => { handleSearch(e.target.value); setSelectedFood(null); }}
-              onFocus={() => { if (searchResults.length > 0 || searchLoading) setShowDropdown(true); }}
-              placeholder="Search foods (e.g., chicken breast, rice, banana)..."
-              style={{ fontSize: 14, padding: "10px 14px" }}
-            />
-            {searchLoading && <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "#A0A0A0" }}>Searching...</div>}
+            <div className="rd-search">
+              <Search size={15} />
+              <input
+                value={searchQuery}
+                onChange={e => { handleSearch(e.target.value); setSelectedFood(null); }}
+                onFocus={() => { if (searchResults.length > 0 || searchLoading) setShowDropdown(true); }}
+                placeholder="Search foods (e.g., chicken breast, rice, banana)..."
+              />
+            </div>
+            {searchLoading && <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Searching...</div>}
           </div>
           {showDropdown && !selectedFood && (
-            <div ref={dropdownRef} style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100, background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, maxHeight: 280, overflowY: "auto", marginTop: 4 }}>
+            <div ref={dropdownRef} className="rd-search-dropdown">
               {searchError && (
-                <div style={{ padding: 14, textAlign: "center" }}>
-                  <p style={{ fontSize: 13, color: COLORS.red, marginBottom: 8 }}>API Error: {searchError}</p>
-                  <button className="ghost-btn" onClick={() => handleSearch(searchQuery)} style={{ fontSize: 12 }}>Retry</button>
+                <div style={{ padding: 16, textAlign: "center" }}>
+                  <p style={{ fontSize: 13, color: "#FF4757", marginBottom: 8 }}>API Error: {searchError}</p>
+                  <button className="rd-btn-secondary" onClick={() => handleSearch(searchQuery)} style={{ padding: "8px 14px", fontSize: 12 }}>Retry</button>
                 </div>
               )}
               {!searchLoading && !searchError && searchResults.length === 0 && searchQuery.length >= 2 && (
-                <div style={{ padding: 14, textAlign: "center", color: "#A0A0A0", fontSize: 13 }}>No foods found for "{searchQuery}"</div>
+                <div style={{ padding: 16, textAlign: "center", color: "rgba(255,255,255,0.45)", fontSize: 13 }}>No foods found for "{searchQuery}"</div>
               )}
               {searchResults.map((food, i) => (
-                <div key={i} onClick={() => selectFood(food)} style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)", transition: "background 0.15s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(200,255,0,0.1)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <div style={{ fontSize: 13, fontWeight: 500 }}>{food.name}</div>
-                  <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 2 }}>
+                <div key={i} className="rd-search-item" onClick={() => selectFood(food)}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{food.name}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
                     {food.brand && <span>{food.brand} · </span>}
-                    {food.calories} kcal · P: {food.protein}g · C: {food.carbs}g · F: {food.fat}g per {food.servingSize}{food.servingUnit}
+                    {food.calories} kcal · <span style={{ color: "#4D9FFF" }}>P {food.protein}g</span> · <span style={{ color: "#FF9F43" }}>C {food.carbs}g</span> · <span style={{ color: "#A78BFA" }}>F {food.fat}g</span> per {food.servingSize}{food.servingUnit}
                   </div>
                 </div>
               ))}
@@ -344,90 +401,96 @@ const Nutrition = ({ state, dispatch }) => {
         </div>
 
         {selectedFood && scaledPreview && (
-          <div style={{ background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.2)", borderRadius: 10, padding: 16, marginBottom: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div className="rd-food-preview">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
               <div>
-                <div style={{ fontSize: 16, fontWeight: 600 }}>{selectedFood.name}</div>
-                {selectedFood.brand && <div style={{ fontSize: 12, color: "#A0A0A0" }}>{selectedFood.brand}</div>}
+                <div className="rd-food-name">{selectedFood.name}</div>
+                {selectedFood.brand && <div className="rd-food-brand">{selectedFood.brand}</div>}
               </div>
-              <button onClick={() => { setSelectedFood(null); setSearchQuery(""); }} style={{ background: "none", color: "#FF4757", fontSize: 16, cursor: "pointer", border: "none" }}>×</button>
+              <button className="rd-iconbtn danger" onClick={() => { setSelectedFood(null); setSearchQuery(""); }}><X size={16} /></button>
             </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
-              <span style={{ fontSize: 12, color: "#A0A0A0" }}>Serving:</span>
-              <input type="number" value={servingQty} onChange={e => setServingQty(Math.max(1, +e.target.value))} style={{ width: 70, fontSize: 12, padding: "4px 8px", textAlign: "center" }} />
-              <span style={{ fontSize: 12, color: "#A0A0A0" }}>{selectedFood.servingUnit || "g"}</span>
+            <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>Serving:</span>
+              <input className="rd-input" type="number" value={servingQty} onChange={e => setServingQty(Math.max(1, +e.target.value))} style={{ width: 74, height: 34, textAlign: "center", padding: 0, fontSize: 13 }} />
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>{selectedFood.servingUnit || "g"}</span>
               {servingOptions.length > 0 && servingOptions.slice(0, 4).map(opt => (
-                <button key={opt.value} onClick={() => setServingQty(opt.value)} style={{ padding: "3px 8px", borderRadius: 4, fontSize: 11, background: servingQty === opt.value ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.05)", border: `1px solid ${servingQty === opt.value ? "rgba(200,255,0,0.4)" : "rgba(255,255,255,0.08)"}`, color: servingQty === opt.value ? "#C8FF00" : "#A0A0A0", cursor: "pointer" }}>{opt.label}</button>
+                <button key={opt.value} className={`rd-chip ${servingQty === opt.value ? "active" : ""}`} style={{ padding: "6px 12px", fontSize: 11 }} onClick={() => setServingQty(opt.value)}>{opt.label}</button>
               ))}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 16 }}>
               {[["Calories", scaledPreview.calories, "kcal"], ["Protein", scaledPreview.protein, "g"], ["Carbs", scaledPreview.carbs, "g"], ["Fat", scaledPreview.fat, "g"], ["Sat. Fat", scaledPreview.saturatedFat, "g"], ["Fiber", scaledPreview.fiber, "g"], ["Sugar", scaledPreview.sugar, "g"], ["Sodium", scaledPreview.sodium, "mg"], ["Potassium", scaledPreview.potassium, "mg"], ["Cholesterol", scaledPreview.cholesterol, "mg"]].map(([label, val, unit]) => (
-                <div key={label} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 6, padding: "6px 8px", textAlign: "center" }}>
-                  <div style={{ fontSize: 10, color: "#A0A0A0" }}>{label}</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{val}<span style={{ fontSize: 10, fontWeight: 400, color: "#A0A0A0" }}>{unit}</span></div>
+                <div key={label} className="rd-macro-mini">
+                  <div className="l">{label}</div>
+                  <div className="v">{val}<span>{unit}</span></div>
                 </div>
               ))}
             </div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <span style={{ fontSize: 12, color: "#A0A0A0" }}>Meal:</span>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>Meal:</span>
               {MEAL_TYPES.map(m => (
-                <button key={m} onClick={() => setMealType(m)} style={{ padding: "5px 12px", borderRadius: 6, fontSize: 12, background: mealType === m ? "rgba(200,255,0,0.2)" : "rgba(255,255,255,0.04)", border: `1px solid ${mealType === m ? "rgba(200,255,0,0.4)" : "rgba(255,255,255,0.08)"}`, color: mealType === m ? "#C8FF00" : "#A0A0A0", cursor: "pointer" }}>{m}</button>
+                <button key={m} className={`rd-chip ${mealType === m ? "active" : ""}`} style={{ padding: "6px 12px", fontSize: 11 }} onClick={() => setMealType(m)}>{m}</button>
               ))}
               <div style={{ flex: 1 }} />
-              <button className="neon-btn" onClick={logFood} style={{ fontSize: 13 }}>Log Food Entry</button>
+              <button className="rd-btn-primary" onClick={logFood} style={{ padding: "10px 20px", fontSize: 13 }}><Check size={15} /> Log Food Entry</button>
             </div>
           </div>
         )}
       </Card>
 
       <Card>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Today's Food Log</div>
+        <CardHead icon={<UtensilsCrossed size={15} />} iconCls="blue" title="Today's Food Log" right={todayLog.length > 0 && <span className="rd-count">{todayLog.length} items</span>} />
         {todayLog.length === 0 ? (
-          <p style={{ color: "#A0A0A0", fontSize: 13 }}>No food logged yet today. Search for a food above to get started.</p>
+          <div className="rd-empty" style={{ padding: 20 }}>
+            <div className="rd-empty-title">No food logged yet</div>
+            <div className="rd-empty-sub">Search for a food above to get started.</div>
+          </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+            <table className="rd-table">
               <thead>
-                <tr style={{ color: "#A0A0A0", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                  {["Food", "Meal", "Serving", "Calories", "Protein", "Carbs", "Fat", "Time", ""].map(h => <th key={h} style={{ padding: "8px 6px", textAlign: "left", fontWeight: 500 }}>{h}</th>)}
+                <tr>
+                  <th>Food</th><th>Meal</th><th>Serving</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Time</th><th></th>
                 </tr>
               </thead>
               <tbody>
                 {todayLog.map((n) => (
-                  <tr key={n.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    <td style={{ padding: "8px 6px" }}>
-                      <div style={{ fontWeight: 500 }}>{n.food}</div>
-                      {n.brand && <div style={{ fontSize: 10, color: "#A0A0A0" }}>{n.brand}</div>}
+                  <tr key={n.id}>
+                    <td>
+                      <div className="food-name">{n.food}</div>
+                      {n.brand && <div className="food-brand">{n.brand}</div>}
                     </td>
-                    <td style={{ padding: "8px 6px" }}>
+                    <td>
                       {editingId === n.id ? (
-                        <select value={editMealType} onChange={e => setEditMealType(e.target.value)} style={{ fontSize: 11, padding: "2px 4px" }}>
-                          {MEAL_TYPES.map(m => <option key={m} value={m}>{m}</option>)}
-                        </select>
-                      ) : <span style={{ color: "#A0A0A0" }}>{n.meal}</span>}
+                        <div className="rd-select-wrap">
+                          <select className="rd-input" value={editMealType} onChange={e => setEditMealType(e.target.value)} style={{ height: 30, padding: "0 28px 0 10px", fontSize: 11 }}>
+                            {MEAL_TYPES.map(m => <option key={m} value={m}>{m}</option>)}
+                          </select>
+                          <ChevronDown size={14} />
+                        </div>
+                      ) : <span style={{ color: "rgba(255,255,255,0.5)" }}>{n.meal}</span>}
                     </td>
-                    <td style={{ padding: "8px 6px", fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}>
+                    <td className="num">
                       {editingId === n.id ? (
-                        <input type="number" value={editServing} onChange={e => setEditServing(+e.target.value)} style={{ width: 60, fontSize: 11, padding: "2px 4px" }} />
+                        <input className="rd-input" type="number" value={editServing} onChange={e => setEditServing(+e.target.value)} style={{ width: 64, height: 30, padding: 0, textAlign: "center", fontSize: 11 }} />
                       ) : `${n.servingQty || "?"} ${n.servingUnit || "g"}`}
                     </td>
-                    <td style={{ padding: "8px 6px", fontWeight: 600 }}>{n.calories}</td>
-                    <td style={{ padding: "8px 6px", color: "#A0A0A0" }}>{n.protein}g</td>
-                    <td style={{ padding: "8px 6px", color: "#A0A0A0" }}>{n.carbs}g</td>
-                    <td style={{ padding: "8px 6px", color: "#A0A0A0" }}>{n.fat}g</td>
-                    <td style={{ padding: "8px 6px", color: "#A0A0A0" }}>{n.time}</td>
-                    <td style={{ padding: "8px 6px" }}>
-                      <div style={{ display: "flex", gap: 4 }}>
+                    <td className="num cal">{n.calories}</td>
+                    <td className="num" style={{ color: "#4D9FFF" }}>{n.protein}g</td>
+                    <td className="num" style={{ color: "#FF9F43" }}>{n.carbs}g</td>
+                    <td className="num" style={{ color: "#A78BFA" }}>{n.fat}g</td>
+                    <td className="num" style={{ color: "rgba(255,255,255,0.4)" }}>{n.time}</td>
+                    <td>
+                      <div style={{ display: "flex", gap: 2 }}>
                         {editingId === n.id ? (
                           <>
-                            <button onClick={saveEdit} style={{ background: "none", color: "#C8FF00", fontSize: 12, cursor: "pointer", border: "none" }}>Save</button>
-                            <button onClick={() => setEditingId(null)} style={{ background: "none", color: "#A0A0A0", fontSize: 12, cursor: "pointer", border: "none" }}>Cancel</button>
+                            <button className="rd-iconbtn lime" onClick={saveEdit} title="Save"><Check size={15} /></button>
+                            <button className="rd-iconbtn" onClick={() => setEditingId(null)} title="Cancel"><X size={15} /></button>
                           </>
                         ) : (
                           <>
-                            <button onClick={() => { setEditingId(n.id); setEditMealType(n.meal); setEditServing(n.servingQty || 100); }} style={{ background: "none", color: "#C8FF00", fontSize: 12, cursor: "pointer", border: "none" }}>Edit</button>
-                            <button onClick={() => duplicateFood(n)} style={{ background: "none", color: "#A5E600", fontSize: 12, cursor: "pointer", border: "none" }}>Dupe</button>
-                            <button onClick={() => deleteFood(n.id)} style={{ background: "none", color: "#FF4757", fontSize: 12, cursor: "pointer", border: "none" }}>Del</button>
+                            <button className="rd-iconbtn lime" onClick={() => { setEditingId(n.id); setEditMealType(n.meal); setEditServing(n.servingQty || 100); }} title="Edit"><Pencil size={15} /></button>
+                            <button className="rd-iconbtn orange" onClick={() => duplicateFood(n)} title="Duplicate"><Copy size={15} /></button>
+                            <button className="rd-iconbtn danger" onClick={() => deleteFood(n.id)} title="Delete"><Trash2 size={15} /></button>
                           </>
                         )}
                       </div>
@@ -440,31 +503,27 @@ const Nutrition = ({ state, dispatch }) => {
         )}
       </Card>
 
-      <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF00, #A5E600)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🥗</div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>AI Nutrition Coach</div>
-              <div style={{ fontSize: 12, color: "#A0A0A0" }}>Personalized analysis of your daily intake</div>
-            </div>
-          </div>
-          <button className="neon-btn" onClick={getNutritionAdvice} disabled={aiLoading} style={{ fontSize: 12, padding: "8px 16px" }}>{aiLoading ? "Analyzing..." : "Get Advice ⚡"}</button>
-        </div>
+      <Card className="rd-ai-card">
+        <CardHead icon={<Sparkles size={15} />} iconCls="lime" title="AI Nutrition Coach" kicker="PERSONALIZED ADVICE"
+          right={
+            <button className="rd-btn-primary" onClick={getNutritionAdvice} disabled={aiLoading} style={{ padding: "9px 16px", fontSize: 12 }}>
+              <Sparkles size={14} /> {aiLoading ? "Analyzing..." : "Get Advice"}
+            </button>
+          } />
         {aiRec ? (
-          <div style={{ background: "rgba(200,255,0,0.06)", borderRadius: 10, padding: "14px 16px" }}>
-            <p style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.7 }}>{aiRec}</p>
-          </div>
+          <div className="rd-nut-advice">{aiRec}</div>
         ) : (
-          <div style={{ background: "rgba(200,255,0,0.06)", borderRadius: 10, padding: "14px 16px", minHeight: 50 }}>
-            <p style={{ fontSize: 13, color: "#A0A0A0" }}>Click "Get Advice" to receive AI-powered nutrition recommendations based on your logged food today.</p>
+          <div>
+            <div className="rd-nut-advice" style={{ color: "rgba(255,255,255,0.55)" }}>
+              Click "Get Advice" to receive AI-powered nutrition recommendations based on your logged food today.
+            </div>
             {totals.calories > 0 && (
-              <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {totals.protein < profile.protein * 0.7 && <span style={{ fontSize: 11, background: "rgba(255,71,87,0.15)", color: COLORS.red, padding: "3px 8px", borderRadius: 4 }}>Low protein: {Math.round(profile.protein - totals.protein)}g remaining</span>}
-                {totals.sodium > 2000 && <span style={{ fontSize: 11, background: "rgba(255,184,0,0.15)", color: COLORS.amber, padding: "3px 8px", borderRadius: 4 }}>Sodium high: {totals.sodium}mg</span>}
-                {totals.fiber < 15 && totals.calories > 500 && <span style={{ fontSize: 11, background: "rgba(255,184,0,0.15)", color: COLORS.amber, padding: "3px 8px", borderRadius: 4 }}>Fiber low: {totals.fiber}g</span>}
-                {totals.calories >= profile.calories * 0.9 && totals.calories <= profile.calories && <span style={{ fontSize: 11, background: "rgba(200,255,0,0.15)", color: COLORS.primary, padding: "3px 8px", borderRadius: 4 }}>Calorie target on track</span>}
-                {waterIntake < 1500 && totals.calories > 300 && <span style={{ fontSize: 11, background: "rgba(255,184,0,0.15)", color: COLORS.amber, padding: "3px 8px", borderRadius: 4 }}>Drink more water</span>}
+              <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {totals.protein < profile.protein * 0.7 && <span className="rd-chip" style={{ background: "rgba(255,71,87,0.12)", borderColor: "rgba(255,71,87,0.3)", color: "#FF4757", fontSize: 11 }}>Low protein: {Math.round(profile.protein - totals.protein)}g remaining</span>}
+                {totals.sodium > 2000 && <span className="rd-chip" style={{ background: "rgba(255,159,67,0.12)", borderColor: "rgba(255,159,67,0.3)", color: "#FF9F43", fontSize: 11 }}>Sodium high: {totals.sodium}mg</span>}
+                {totals.fiber < 15 && totals.calories > 500 && <span className="rd-chip" style={{ background: "rgba(255,159,67,0.12)", borderColor: "rgba(255,159,67,0.3)", color: "#FF9F43", fontSize: 11 }}>Fiber low: {totals.fiber}g</span>}
+                {totals.calories >= profile.calories * 0.9 && totals.calories <= profile.calories && <span className="rd-chip" style={{ background: "rgba(200,255,0,0.12)", borderColor: "rgba(200,255,0,0.3)", color: "#C8FF00", fontSize: 11 }}>Calorie target on track</span>}
+                {waterIntake < 1500 && totals.calories > 300 && <span className="rd-chip" style={{ background: "rgba(77,159,255,0.12)", borderColor: "rgba(77,159,255,0.3)", color: "#4D9FFF", fontSize: 11 }}>Drink more water</span>}
               </div>
             )}
           </div>

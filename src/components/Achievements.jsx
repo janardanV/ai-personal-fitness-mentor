@@ -1,16 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
-
-const COLORS = {
-  bg: '#0B0B0B',
-  surface: '#151515',
-  accent: '#C8FF00',
-  secondary: '#A0A0A0',
-  text: '#FFFFFF',
-  border: '#252525',
-  locked: '#1A1A1A',
-  accentDim: 'rgba(200, 255, 0, 0.15)',
-};
+import { Trophy, Zap, Medal, Flame, Dumbbell, Lock, Check } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Workout', 'Nutrition', 'Running', 'Social', 'Special'];
 
@@ -271,144 +261,79 @@ export default function Achievements({ state, dispatch }) {
   const xpPercent = xpToNext > 0 ? Math.max(0, Math.min((xpInLevel / xpToNext) * 100, 100)) : 0;
 
   const statCards = [
-    { label: 'Badges Earned', value: `${totalEarned} / ${achievementsWithStatus.length}`, icon: '🏅' },
-    { label: 'Current Streak', value: `${streaks.current} days`, icon: '🔥' },
-    { label: 'Longest Streak', value: `${streaks.longest} days`, icon: '⚡' },
-    { label: 'Total Workouts', value: workouts.length.toString(), icon: '💪' },
+    { label: 'Badges Earned', value: `${totalEarned}`, unit: ` / ${achievementsWithStatus.length}`, sub: 'Collection progress', color: 'lime', Icon: Medal },
+    { label: 'Current Streak', value: `${streaks.current}`, unit: ' days', sub: 'Active streak', color: 'orange', Icon: Flame },
+    { label: 'Longest Streak', value: `${streaks.longest}`, unit: ' days', sub: 'Best run', color: 'purple', Icon: Zap },
+    { label: 'Total Workouts', value: workouts.length.toString(), unit: ' sessions', sub: 'All-time', color: 'blue', Icon: Dumbbell },
   ];
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: COLORS.bg,
-      padding: '24px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      color: COLORS.text,
-    }}>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          backgroundColor: COLORS.surface,
-          borderRadius: '16px',
-          padding: '24px',
-          marginBottom: '20px',
-          border: `1px solid ${COLORS.border}`,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${COLORS.accent}, #9ACD32)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '24px',
-              fontWeight: 'bold',
-              color: COLORS.bg,
-              boxShadow: `0 0 20px rgba(200, 255, 0, 0.3)`,
-              flexShrink: 0,
-            }}
-          >
-            {level}
-          </motion.div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '4px' }}>
-              Level {level}
-            </div>
-            <div style={{ color: COLORS.secondary, fontSize: '14px' }}>
-              {xpInLevel.toLocaleString()} / {xpToNext.toLocaleString()} XP to next level
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><Trophy size={13} /> Achievements</span>
+          <h1 className="rd-title">Badge Collection</h1>
+          <p className="rd-sub">Earn badges for workouts, nutrition, running and consistency milestones.</p>
+        </div>
+      </div>
+
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico lime"><Zap size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Level {level}</div>
+              <div className="rd-card-name">{xpInLevel.toLocaleString()} / {xpToNext.toLocaleString()} XP to next level</div>
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ color: COLORS.accent, fontSize: '24px', fontWeight: 'bold' }}>
-              {totalXP.toLocaleString()}
+          <div style={{ textAlign: "right", flexShrink: 0 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#C8FF00", fontFamily: "'JetBrains Mono',monospace", letterSpacing: "-0.02em", lineHeight: 1 }}>
+              {totalXP.toLocaleString()}<span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 500, fontFamily: "'Inter',sans-serif" }}> XP</span>
             </div>
-            <div style={{ color: COLORS.secondary, fontSize: '12px' }}>Total XP</div>
+            <div className="rd-metric-label">Total Earned</div>
           </div>
         </div>
-
-        <div style={{
-          height: '8px',
-          backgroundColor: '#252525',
-          borderRadius: '4px',
-          overflow: 'hidden',
-        }}>
+        <div className="rd-macro-track" style={{ height: 8 }}>
           <motion.div
+            className="rd-macro-fill"
             initial={{ width: 0 }}
             animate={{ width: `${xpPercent}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            style={{
-              height: '100%',
-              background: `linear-gradient(90deg, ${COLORS.accent}, #9ACD32)`,
-              borderRadius: '4px',
-            }}
+            style={{ width: `${xpPercent}%`, background: 'linear-gradient(90deg, #A5E600, #C8FF00)', boxShadow: '0 0 10px rgba(200,255,0,0.3)' }}
           />
         </div>
-      </motion.div>
+      </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: '12px',
-        marginBottom: '20px',
-      }}>
-        {statCards.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 * i }}
-            style={{
-              backgroundColor: COLORS.surface,
-              borderRadius: '12px',
-              padding: '16px',
-              border: `1px solid ${COLORS.border}`,
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '20px', marginBottom: '4px' }}>{stat.icon}</div>
-            <div style={{ color: COLORS.accent, fontSize: '20px', fontWeight: 'bold' }}>{stat.value}</div>
-            <div style={{ color: COLORS.secondary, fontSize: '12px', marginTop: '2px' }}>{stat.label}</div>
-          </motion.div>
+      <div className="rd-nut-stats">
+        {statCards.map((s) => (
+          <div key={s.label} className={`rd-nut-stat ${s.color}`}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="l">{s.label}</span>
+              <s.Icon size={15} style={{ color: "rgba(255,255,255,0.28)" }} />
+            </div>
+            <div className="v">{s.value}{s.unit && <span>{s.unit}</span>}</div>
+            <div className="s">{s.sub}</div>
+          </div>
         ))}
       </div>
 
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '20px',
-        overflowX: 'auto',
-        paddingBottom: '4px',
-      }}>
-        {CATEGORIES.map(cat => (
-          <motion.button
-            key={cat}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveCategory(cat)}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: `1px solid ${activeCategory === cat ? COLORS.accent : COLORS.border}`,
-              backgroundColor: activeCategory === cat ? COLORS.accentDim : 'transparent',
-              color: activeCategory === cat ? COLORS.accent : COLORS.secondary,
-              fontSize: '14px',
-              fontWeight: activeCategory === cat ? '600' : '400',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              outline: 'none',
-            }}
-          >
-            {cat}
-          </motion.button>
-        ))}
+      <div className="rd-card" style={{ padding: "14px 18px" }}>
+        <div className="rd-filter-row">
+          <span className="rd-filter-label">Category</span>
+          {CATEGORIES.map(cat => (
+            <motion.button
+              key={cat}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveCategory(cat)}
+              className={`rd-chip ${activeCategory === cat ? "active" : ""}`}
+            >
+              {cat}
+            </motion.button>
+          ))}
+        </div>
       </div>
+
+      <div className="rd-count"><b>{filtered.length}</b> badge{filtered.length !== 1 ? "s" : ""}</div>
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -417,30 +342,21 @@ export default function Achievements({ state, dispatch }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '12px',
-          }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px' }}
         >
-          {filtered.length === 0 && (
+          {filtered.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              style={{
-                gridColumn: '1 / -1',
-                textAlign: 'center',
-                padding: '48px 24px',
-                color: COLORS.secondary,
-              }}
+              style={{ gridColumn: '1 / -1' }}
             >
-              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🔒</div>
-              <div style={{ fontSize: '16px', marginBottom: '4px' }}>No achievements here yet</div>
-              <div style={{ fontSize: '13px' }}>Keep pushing to unlock badges in this category</div>
+              <div className="rd-card rd-empty" style={{ padding: '48px 20px' }}>
+                <Lock size={30} style={{ opacity: 0.3 }} />
+                <div className="rd-empty-title">No achievements here yet</div>
+                <div className="rd-empty-sub">Keep pushing to unlock badges in this category</div>
+              </div>
             </motion.div>
-          )}
-
-          {filtered.map((achievement, index) => (
+          ) : filtered.map((achievement, index) => (
             <motion.div
               key={achievement.id}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -449,143 +365,116 @@ export default function Achievements({ state, dispatch }) {
               whileHover={{
                 scale: 1.02,
                 boxShadow: achievement.isEarned
-                  ? '0 0 20px rgba(200, 255, 0, 0.1)'
-                  : 'none',
+                  ? '0 0 24px rgba(200, 255, 0, 0.12)'
+                  : '0 8px 24px rgba(0, 0, 0, 0.22)',
               }}
+              className="rd-card"
               style={{
-                backgroundColor: achievement.isEarned ? COLORS.surface : COLORS.locked,
-                borderRadius: '12px',
                 padding: '16px',
-                border: `1px solid ${achievement.isEarned ? 'rgba(200, 255, 0, 0.25)' : COLORS.border}`,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                background: achievement.isEarned
+                  ? 'linear-gradient(180deg, rgba(200,255,0,0.05) 0%, rgba(19,19,19,0.6) 100%)'
+                  : undefined,
+                border: achievement.isEarned ? '1px solid rgba(200,255,0,0.25)' : undefined,
                 opacity: achievement.isEarned ? 1 : 0.65,
-                position: 'relative',
-                overflow: 'hidden',
               }}
             >
+              {achievement.isEarned && (
+                <span style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #C8FF00, transparent)', opacity: 0.5 }} />
+              )}
+
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{
-                  fontSize: '28px',
-                  width: '48px',
-                  height: '48px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: achievement.isEarned ? COLORS.accentDim : '#252525',
-                  borderRadius: '12px',
-                  flexShrink: 0,
-                  filter: achievement.isEarned ? 'none' : 'grayscale(1) brightness(0.6)',
-                }}>
-                  {achievement.isEarned ? achievement.icon : '🔒'}
+                <div
+                  className="rd-ex-tile"
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    flexShrink: 0,
+                    background: achievement.isEarned ? 'rgba(200,255,0,0.12)' : 'rgba(255,255,255,0.04)',
+                    borderColor: achievement.isEarned ? 'rgba(200,255,0,0.25)' : 'rgba(255,255,255,0.07)',
+                    color: achievement.isEarned ? '#C8FF00' : 'rgba(255,255,255,0.35)',
+                    filter: achievement.isEarned ? 'none' : 'grayscale(1) brightness(0.6)',
+                  }}
+                >
+                  {achievement.isEarned ? achievement.icon : <Lock size={20} />}
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{
-                      color: achievement.isEarned ? COLORS.text : COLORS.secondary,
-                      fontSize: '15px',
-                      fontWeight: '600',
+                      color: achievement.isEarned ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      lineHeight: '1.25',
                     }}>
                       {achievement.title}
                     </span>
                     {achievement.isEarned && (
-                      <span style={{
-                        backgroundColor: COLORS.accentDim,
-                        color: COLORS.accent,
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                      }}>
-                        +{achievement.xp} XP
-                      </span>
+                      <span className="rd-ex-tag">+{achievement.xp} XP</span>
                     )}
                   </div>
 
                   <div style={{
-                    color: COLORS.secondary,
-                    fontSize: '13px',
-                    marginBottom: '8px',
-                    lineHeight: '1.4',
+                    color: 'rgba(255,255,255,0.45)',
+                    fontSize: '12px',
+                    marginTop: '4px',
+                    lineHeight: '1.5',
                   }}>
                     {achievement.description}
                   </div>
-
-                  {achievement.isEarned && achievement.earnedAt && (
-                    <div style={{ color: COLORS.accent, fontSize: '11px', opacity: 0.7 }}>
-                      Earned {new Date(achievement.earnedAt).toLocaleDateString()}
-                    </div>
-                  )}
-
-                  {!achievement.isEarned && achievement.maxProgress > 1 && (
-                    <div>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginBottom: '4px',
-                      }}>
-                        <span style={{ color: COLORS.secondary, fontSize: '11px' }}>
-                          {formatProgress(achievement.progress)} / {achievement.maxProgress}
-                        </span>
-                        <span style={{ color: COLORS.secondary, fontSize: '11px' }}>
-                          {Math.round(achievement.percentage)}%
-                        </span>
-                      </div>
-                      <div style={{
-                        height: '4px',
-                        backgroundColor: '#252525',
-                        borderRadius: '2px',
-                        overflow: 'hidden',
-                      }}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${achievement.percentage}%` }}
-                          transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.04 }}
-                          style={{
-                            height: '100%',
-                            backgroundColor: COLORS.accent,
-                            borderRadius: '2px',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {!achievement.isEarned && achievement.maxProgress === 1 && (
-                    <div style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      backgroundColor: '#252525',
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      color: COLORS.secondary,
-                    }}>
-                      <span style={{ fontSize: '8px' }}>●</span>
-                      Not started
-                    </div>
-                  )}
                 </div>
               </div>
 
+              {achievement.isEarned && achievement.earnedAt && (
+                <div style={{ color: '#C8FF00', fontSize: '11px', opacity: 0.75, marginTop: '8px', fontFamily: "'JetBrains Mono',monospace" }}>
+                  Earned {new Date(achievement.earnedAt).toLocaleDateString()}
+                </div>
+              )}
+
+              {!achievement.isEarned && achievement.maxProgress > 1 && (
+                <div className="rd-macro" style={{ marginTop: '10px', marginBottom: 0 }}>
+                  <div className="rd-macro-head">
+                    <span className="rd-macro-label">{formatProgress(achievement.progress)} / {achievement.maxProgress}</span>
+                    <span className="rd-macro-val">{Math.round(achievement.percentage)}%</span>
+                  </div>
+                  <div className="rd-macro-track" style={{ height: 4 }}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${achievement.percentage}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.04 }}
+                      style={{ width: `${achievement.percentage}%`, height: '100%', borderRadius: 4, background: '#C8FF00' }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {!achievement.isEarned && achievement.maxProgress === 1 && (
+                <span className="rd-ex-tag muted" style={{ marginTop: '10px', alignSelf: 'flex-start' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.45)', display: 'inline-block' }} />
+                  Not started
+                </span>
+              )}
+
               {achievement.isEarned && (
-                <div style={{
+                <span style={{
                   position: 'absolute',
                   top: '12px',
                   right: '12px',
-                  width: '20px',
-                  height: '20px',
+                  width: '22px',
+                  height: '22px',
                   borderRadius: '50%',
-                  backgroundColor: COLORS.accent,
+                  backgroundColor: '#C8FF00',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '11px',
-                  color: COLORS.bg,
-                  fontWeight: 'bold',
+                  color: '#0B0B0B',
+                  boxShadow: '0 4px 14px rgba(200, 255, 0, 0.35)',
                 }}>
-                  ✓
-                </div>
+                  <Check size={12} strokeWidth={3} />
+                </span>
               )}
             </motion.div>
           ))}

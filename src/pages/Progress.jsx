@@ -1,20 +1,38 @@
 import { useMemo } from "react";
 import React from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { fmt, COLORS, calcStreak, calcE1RM } from "../utils/helpers";
+import { fmt, calcStreak, calcE1RM } from "../utils/helpers";
+import { TrendingUp, Flame, Activity, CalendarCheck, Trophy } from "lucide-react";
 
-const StatCard = ({ label, value, unit, color = COLORS.primary, sub }) => (
-  <div style={{ background: "#151515", border: `1px solid ${color}18`, borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
-    <div style={{ position: "absolute", top: 0, right: 0, width: 60, height: 60, background: `radial-gradient(${color}20, transparent)`, borderRadius: "0 0 0 100%" }} />
-    <div style={{ fontSize: 11, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6, fontWeight: 500 }}>{label}</div>
-    <div style={{ fontSize: 28, fontWeight: 800, color, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.02em" }}>{value}<span style={{ fontSize: 13, fontWeight: 400, marginLeft: 4, color: "#A0A0A0" }}>{unit}</span></div>
-    {sub && <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 4 }}>{sub}</div>}
+const StatCard = ({ label, value, unit, color = "lime", sub, icon: Icon }) => (
+  <div className={`rd-nut-stat ${color}`}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span className="l">{label}</span>
+      {Icon && <Icon size={15} style={{ color: "rgba(255,255,255,0.28)" }} />}
+    </div>
+    <div className="v">{value}<span>{unit}</span></div>
+    {sub && <div className="s">{sub}</div>}
   </div>
 );
 
 const Card = ({ children, style, className = "" }) => (
-  <div className={`glass ${className}`} style={{ padding: "20px", ...style }}>{children}</div>
+  <div className={`rd-card ${className}`} style={style}>{children}</div>
 );
+
+const CardHead = ({ icon, iconCls, kicker, title, right }) => (
+  <div className="rd-card-head">
+    <div className="rd-card-title">
+      <div className={`rd-card-title-ico ${iconCls || ""}`}>{icon}</div>
+      <div>
+        {kicker && <div className="rd-card-kicker">{kicker}</div>}
+        <div className="rd-card-name">{title}</div>
+      </div>
+    </div>
+    {right}
+  </div>
+);
+
+const tooltipStyle = { background: "rgba(16,16,16,0.98)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#FFFFFF", fontSize: 12 };
 
 const Progress = ({ state }) => {
   const { workouts, profile } = state;
@@ -46,55 +64,78 @@ const Progress = ({ state }) => {
     return Object.entries(byWeek).slice(-8).map(([w, v]) => ({ week: w, volume: Math.round(v) }));
   }, [workouts]);
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700 }}>Progress Tracker</h2>
+  const totalVolume = Math.round(workouts.reduce((s, w) => s + w.totalVolume, 0));
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        <StatCard label="Total Workouts" value={workouts.length} color={COLORS.primary} />
-        <StatCard label="Total Volume" value={Math.round(workouts.reduce((s, w) => s + w.totalVolume, 0))} unit="kg" color={COLORS.cyan} />
-        <StatCard label="Avg Volume/Session" value={workouts.length ? Math.round(workouts.reduce((s, w) => s + w.totalVolume, 0) / workouts.length) : 0} unit="kg" color={COLORS.green} />
-        <StatCard label="Best Streak" value={calcStreak(workouts)} unit="days" color={COLORS.amber} />
+  return (
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><TrendingUp size={13} /> Progress</span>
+          <h1 className="rd-title">Track Your Gains</h1>
+          <p className="rd-sub">Volume trends and estimated 1RM progression across your lifts.</p>
+        </div>
+      </div>
+
+      <div className="rd-nut-stats">
+        <StatCard label="Total Workouts" value={workouts.length} color="lime" icon={CalendarCheck} sub={workouts.length > 0 ? "Sessions logged" : "Start logging sessions"} />
+        <StatCard label="Total Volume" value={fmt(totalVolume)} unit=" kg" color="blue" icon={Flame} sub="All-time lifted" />
+        <StatCard label="Avg Volume / Session" value={workouts.length ? fmt(Math.round(totalVolume / workouts.length)) : 0} unit=" kg" color="orange" icon={Activity} sub={workouts.length > 0 ? "Per workout" : "No sessions yet"} />
+        <StatCard label="Best Streak" value={calcStreak(workouts)} unit=" days" color="purple" icon={Trophy} sub="Consistency bonus" />
       </div>
 
       <Card>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Weekly Volume Trend</div>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={volumeByWeek.length ? volumeByWeek : [{ week: "No data", volume: 0 }]}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-            <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
-            <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
-            <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-            <Bar dataKey="volume" fill="#C8FF00" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <CardHead icon={<TrendingUp size={15} />} iconCls="lime" title="Weekly Volume Trend" />
+        {workouts.length > 0 ? (
+          <ResponsiveContainer width="100%" height={210}>
+            <BarChart data={volumeByWeek.length ? volumeByWeek : [{ week: "No data", volume: 0 }]}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
+              <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey="volume" fill="#C8FF00" radius={[4, 4, 0, 0]} name="Volume (kg)" />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="rd-empty" style={{ minHeight: 210 }}>
+            <div className="rd-empty-title">No workout data yet</div>
+            <div className="rd-empty-sub">Complete a workout to start tracking your volume trend.</div>
+          </div>
+        )}
       </Card>
 
       {topExercises.length > 0 && (
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Estimated 1RM Progression</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
-            {topExercises.map(([name, data]) => (
-              <Card key={name} style={{ padding: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{name}</div>
-                <ResponsiveContainer width="100%" height={120}>
-                  <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                    <XAxis dataKey="date" tick={{ fontSize: 9, fill: "#A0A0A0" }} />
-                    <YAxis tick={{ fontSize: 9, fill: "#A0A0A0" }} domain={["auto", "auto"]} />
-                    <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 11 }} />
-                    <Line type="monotone" dataKey="e1rm" stroke={COLORS.cyan} strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 12, color: "#A0A0A0" }}>
-                  <span>Start: <span style={{ color: "#FFFFFF" }}>{data[0]?.e1rm}kg</span></span>
-                  <span>Current: <span style={{ color: COLORS.cyan }}>{data[data.length - 1]?.e1rm}kg</span></span>
-                  <span style={{ color: data[data.length - 1]?.e1rm > data[0]?.e1rm ? "var(--green)" : "var(--red)" }}>
-                    {data[data.length - 1]?.e1rm > data[0]?.e1rm ? "▲" : "▼"} {fmt(Math.abs(data[data.length - 1]?.e1rm - data[0]?.e1rm), 1)}kg
-                  </span>
-                </div>
-              </Card>
-            ))}
+          <div className="rd-legend" style={{ marginBottom: 12 }}>
+            <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#4D9FFF" }} /> Estimated 1RM Progression</span>
+          </div>
+          <div className="rd-chart-grid">
+            {topExercises.map(([name, data]) => {
+              const start = data[0]?.e1rm || 0;
+              const current = data[data.length - 1]?.e1rm || 0;
+              const diff = current - start;
+              const improved = diff >= 0;
+              return (
+                <Card key={name} style={{ padding: 18 }}>
+                  <CardHead icon={<Trophy size={15} />} iconCls="blue" title={name} />
+                  <ResponsiveContainer width="100%" height={120}>
+                    <LineChart data={data}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                      <XAxis dataKey="date" tick={{ fontSize: 9, fill: "#A0A0A0" }} />
+                      <YAxis tick={{ fontSize: 9, fill: "#A0A0A0" }} domain={["auto", "auto"]} />
+                      <Tooltip contentStyle={tooltipStyle} />
+                      <Line type="monotone" dataKey="e1rm" stroke="#4D9FFF" strokeWidth={2.5} dot={{ r: 3, fill: "#4D9FFF", strokeWidth: 0 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 12, gap: 8 }}>
+                    <span style={{ color: "rgba(255,255,255,0.45)" }}>Start: <b style={{ color: "#FFFFFF" }}>{start}kg</b></span>
+                    <span style={{ color: "rgba(255,255,255,0.45)" }}>Current: <b style={{ color: "#4D9FFF" }}>{current}kg</b></span>
+                    <span className="rd-trend" style={{ color: improved ? "#C8FF00" : "#FF4757", fontWeight: 700 }}>
+                      {improved ? "▲" : "▼"} {fmt(Math.abs(diff), 1)}kg
+                    </span>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}

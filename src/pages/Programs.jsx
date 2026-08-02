@@ -1,10 +1,6 @@
-import { useState, useMemo } from "react";
-import React from "react";
-import { COLORS, showToast, showConfirm } from "../utils/helpers";
-
-const Card = ({ children, style, className = "" }) => (
-  <div className={`glass ${className}`} style={{ padding: "20px", ...style }}>{children}</div>
-);
+import { useState } from "react";
+import { showToast } from "../utils/helpers";
+import { ClipboardList, Dumbbell, Layers, Play } from "lucide-react";
 
 const PROGRAM_DB = {
   "PPL": {
@@ -211,49 +207,74 @@ const Programs = ({ state, dispatch }) => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700 }}>Training Programs</h2>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><ClipboardList size={13} /> Programs</span>
+          <h1 className="rd-title">Training Programs</h1>
+          <p className="rd-sub">Pick a proven split and start a session straight from the day breakdown.</p>
+        </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div className="rd-tabbar">
         {Object.entries(PROGRAM_DB).map(([id, p]) => (
-          <button key={id} className={active === id ? "neon-btn" : "ghost-btn"} onClick={() => toggle(id)} style={{ padding: "8px 16px", fontSize: 13 }}>{p.name}</button>
+          <button key={id} className={`rd-tab ${active === id ? "active" : ""}`} onClick={() => toggle(id)}>
+            {p.name}
+          </button>
         ))}
       </div>
 
       {activeProg && (
-        <Card>
-          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{activeProg.name}</div>
-          <p style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 16, lineHeight: 1.6 }}>{activeProg.desc}</p>
+        <div className="rd-card" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="rd-card-head">
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico lime"><Layers size={16} /></div>
+              <div>
+                <div className="rd-card-kicker">Program</div>
+                <div className="rd-card-name">{activeProg.name}</div>
+              </div>
+            </div>
+            <div className="rd-count" style={{ whiteSpace: "nowrap" }}><b>{activeProg.days.length}</b> days</div>
+          </div>
 
-          <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>{activeProg.desc}</p>
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             {activeProg.days.map((_, i) => (
-              <button key={i} className={dayIdx === i ? "neon-btn" : "ghost-btn"} onClick={() => setDayIdx(i)} style={{ fontSize: 12, padding: "6px 14px" }}>Day {i + 1}</button>
+              <button key={i} className={`rd-chip ${dayIdx === i ? "active" : ""}`} onClick={() => setDayIdx(i)}>Day {i + 1}</button>
             ))}
-            <button className="neon-btn" style={{ marginLeft: "auto", fontSize: 12, padding: "6px 14px" }} onClick={() => startWorkout(activeProg.days[dayIdx])}>Start Workout</button>
+            <button className="rd-btn-primary rd-btn-sm" style={{ marginLeft: "auto" }} onClick={() => startWorkout(activeProg.days[dayIdx])}>
+              <Play size={14} /> Start Workout
+            </button>
           </div>
 
           <div>
-            <div style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>Day {dayIdx + 1} — {activeProg.days[dayIdx].length} exercises</div>
-            {activeProg.days[dayIdx].map((ex, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", borderRadius: 8, marginBottom: 4 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: 6, background: "rgba(200,255,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: COLORS.primary, fontFamily: "'JetBrains Mono',monospace" }}>{i + 1}</span>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 500 }}>{ex.name}</div>
-                    <div style={{ fontSize: 12, color: "#A0A0A0" }}>{ex.sets} × {ex.reps} {ex.weightMod !== "working" ? `· ${ex.weightMod}` : ""}</div>
+            <div className="rd-count" style={{ marginBottom: 10 }}>
+              <b>Day {dayIdx + 1}</b> — {activeProg.days[dayIdx].length} exercises
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {activeProg.days[dayIdx].map((ex, i) => (
+                <div key={i} className="rd-ex-row" style={{ cursor: "default" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                    <span style={{ width: 22, height: 22, borderRadius: 7, background: "rgba(200,255,0,0.08)", border: "1px solid rgba(200,255,0,0.14)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#C8FF00", fontFamily: "'JetBrains Mono',monospace", flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", minWidth: 0 }}>{ex.name}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                    <span className="rd-ex-tag muted">{ex.sets} × {ex.reps}</span>
+                    {ex.weightMod !== "working" && <span className="rd-ex-tag orange">{ex.weightMod}</span>}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </Card>
+        </div>
       )}
 
       {!active && (
-        <div style={{ textAlign: "center", padding: "40px 0" }}>
-          <div style={{ fontSize: 14, color: "#A0A0A0" }}>Select a program above to view details</div>
+        <div className="rd-card rd-empty" style={{ padding: "52px 16px" }}>
+          <Dumbbell size={30} style={{ color: "rgba(200,255,0,0.3)", marginBottom: 4 }} />
+          <div className="rd-empty-title">No program selected</div>
+          <div className="rd-empty-sub">Select a program above to view details</div>
         </div>
       )}
     </div>

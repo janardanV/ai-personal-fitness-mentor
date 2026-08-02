@@ -1,18 +1,13 @@
 import { useState } from "react";
-import React from "react";
-import { COLORS, GOAL_LABELS, showConfirm, showToast } from "../utils/helpers";
+import { User, UserCog, Pencil, Check, Trash2 } from "lucide-react";
+import { GOAL_LABELS, showConfirm, showToast } from "../utils/helpers";
 
-const StatCard = ({ label, value, unit, color = COLORS.primary, sub }) => (
-  <div style={{ background: "#151515", border: `1px solid ${color}18`, borderRadius: 16, padding: "18px 16px", position: "relative", overflow: "hidden" }}>
-    <div style={{ position: "absolute", top: 0, right: 0, width: 60, height: 60, background: `radial-gradient(${color}20, transparent)`, borderRadius: "0 0 0 100%" }} />
-    <div style={{ fontSize: 11, color: "#A0A0A0", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6, fontWeight: 500 }}>{label}</div>
-    <div style={{ fontSize: 28, fontWeight: 800, color, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "-0.02em" }}>{value}<span style={{ fontSize: 13, fontWeight: 400, marginLeft: 4, color: "#A0A0A0" }}>{unit}</span></div>
-    {sub && <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 4 }}>{sub}</div>}
+const StatCard = ({ label, value, unit, color = "lime", sub }) => (
+  <div className={`rd-nut-stat ${color}`}>
+    <div className="l">{label}</div>
+    <div className="v">{value}{unit && <span> {unit}</span>}</div>
+    {sub && <div className="s">{sub}</div>}
   </div>
-);
-
-const Card = ({ children, style, className = "" }) => (
-  <div className={`glass ${className}`} style={{ padding: "20px", ...style }}>{children}</div>
 );
 
 const ProfilePage = ({ state, dispatch }) => {
@@ -26,48 +21,90 @@ const ProfilePage = ({ state, dispatch }) => {
     showToast("Profile updated!");
   };
 
+  const fields = [["name", "Name", "text"], ["age", "Age", "number"], ["weight", "Weight (kg)", "number"], ["height", "Height (cm)", "number"], ["bodyFat", "Body Fat (%)", "number"]];
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700 }}>Profile</h2>
-        <button className={editing ? "neon-btn" : "ghost-btn"} onClick={editing ? handleSave : () => setEditing(true)}>{editing ? "Save Changes" : "Edit Profile"}</button>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><User size={13} /> Profile</span>
+          <h1 className="rd-title">My Profile</h1>
+          <p className="rd-sub">Manage your personal details, goals, and daily targets.</p>
+        </div>
+        <button className={editing ? "rd-btn-primary" : "rd-btn-secondary"} onClick={editing ? handleSave : () => setEditing(true)} style={{ alignSelf: "center" }}>
+          {editing ? <><Check size={16} /> Save Changes</> : <><Pencil size={16} /> Edit Profile</>}
+        </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 20 }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF00, #C8FF00)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, fontWeight: 700, marginBottom: 12 }}>
+      <div className="rd-2col">
+        <div className="rd-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, textAlign: "center" }}>
+          <div className="rd-card-head" style={{ width: "100%", justifyContent: "center", marginBottom: 4 }}>
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico lime"><User size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Identity</div>
+                <div className="rd-card-name">Overview</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ width: 96, height: 96, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF00, #A5E600)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'JetBrains Mono', monospace", fontSize: 40, fontWeight: 800, color: "#0B0B0B", boxShadow: "0 10px 32px rgba(200,255,0,0.22)" }}>
             {profile.name?.[0]?.toUpperCase() || "?"}
           </div>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>{profile.name}</div>
-          <div style={{ fontSize: 12, color: "#A0A0A0" }}>Level {state.level} · {state.xp} XP</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>{profile.name}</div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
+            Level <span style={{ color: "#C8FF00", fontWeight: 700 }}>{state.level}</span> · <span style={{ color: "#C8FF00", fontWeight: 700 }}>{state.xp}</span> XP
+          </div>
         </div>
 
-        <Card>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
-            {[["name", "Name", "text"], ["age", "Age", "number"], ["weight", "Weight (kg)", "number"], ["height", "Height (cm)", "number"], ["bodyFat", "Body Fat (%)", "number"]].map(([k, l, t]) => (
-              <div key={k}>
-                <label style={{ fontSize: 11, color: "#A0A0A0", display: "block", marginBottom: 4 }}>{l}</label>
-                {editing
-                  ? <input type={t} value={form[k]} onChange={e => setForm(p => ({ ...p, [k]: t === "number" ? +e.target.value : e.target.value }))} />
-                  : <div style={{ fontSize: 15, fontWeight: 500 }}>{profile[k]}</div>}
+        <div className="rd-card">
+          <div className="rd-card-head">
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico blue"><UserCog size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Details</div>
+                <div className="rd-card-name">Personal Details</div>
               </div>
-            ))}
+            </div>
           </div>
-        </Card>
+          <div className="rd-form">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(170px,1fr))", gap: 14 }}>
+              {fields.map(([k, l, t]) => (
+                <div className="rd-field" key={k}>
+                  <label>{l}</label>
+                  {editing
+                    ? <input className="rd-input" type={t} value={form[k]} onChange={e => setForm(p => ({ ...p, [k]: t === "number" ? +e.target.value : e.target.value }))} />
+                    : <div style={{ fontSize: 15, fontWeight: 600, color: "#FFFFFF", padding: "10px 0" }}>{profile[k]}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        <StatCard label="TDEE" value={profile.tdee} unit="kcal" color={COLORS.amber} />
-        <StatCard label="Target Calories" value={profile.calories} unit="kcal" color="var(--green)" />
-        <StatCard label="Protein Target" value={profile.protein} unit="g" color={COLORS.primary} />
-        <StatCard label="Goal" value={GOAL_LABELS[profile.goal]} color={COLORS.cyan} />
+      <div className="rd-nut-stats">
+        <StatCard label="TDEE" value={profile.tdee} unit="kcal" color="orange" />
+        <StatCard label="Target Calories" value={profile.calories} unit="kcal" color="green" />
+        <StatCard label="Protein Target" value={profile.protein} unit="g" color="lime" />
+        <StatCard label="Goal" value={GOAL_LABELS[profile.goal]} color="purple" />
       </div>
 
-      <Card>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Reset All Data</div>
-        <p style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 12 }}>This will permanently delete all your workouts, nutrition logs, and progress data.</p>
-        <button style={{ background: "rgba(255,71,87,0.1)", border: "1px solid rgba(255,71,87,0.3)", color: COLORS.red, borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer" }} onClick={async () => { if (await showConfirm("Are you sure? This will permanently delete all your workouts, nutrition logs, and progress data. This cannot be undone.")) dispatch({ type: "RESET" }); }}>Reset All Data</button>
-      </Card>
+      <div className="rd-card" style={{ borderColor: "rgba(255,71,87,0.14)" }}>
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico" style={{ background: "rgba(255,71,87,0.1)", borderColor: "rgba(255,71,87,0.2)", color: "#FF4757" }}><Trash2 size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Danger zone</div>
+              <div className="rd-card-name">Reset All Data</div>
+            </div>
+          </div>
+        </div>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 16, lineHeight: 1.6, maxWidth: 560 }}>
+          This will permanently delete all your workouts, nutrition logs, and progress data.
+        </p>
+        <button className="rd-btn-sm danger" onClick={async () => { if (await showConfirm("Are you sure? This will permanently delete all your workouts, nutrition logs, and progress data. This cannot be undone.")) dispatch({ type: "RESET" }); }}>
+          <Trash2 size={14} /> Reset All Data
+        </button>
+      </div>
     </div>
   );
 };

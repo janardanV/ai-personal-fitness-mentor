@@ -1,55 +1,19 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Users, Activity, TrendingUp, BarChart3, PieChart as PieIcon, Timer, Flame, Trophy, Zap, History } from 'lucide-react';
 
 const ACCENT = '#C8FF00';
-const BG = '#0B0B0B';
-const SURFACE = '#151515';
-const SURFACE_LIGHT = '#1E1E1E';
 const SECONDARY = '#A0A0A0';
-const BORDER = '#2A2A2A';
 
-const cardStyle = {
-  background: SURFACE,
-  border: `1px solid ${BORDER}`,
-  borderRadius: 12,
-  padding: '20px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 8,
+const tooltipStyle = {
+  background: 'rgba(15,15,15,0.95)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: 8,
+  fontSize: 12,
 };
 
-const cardLabel = {
-  fontSize: 13,
-  color: SECONDARY,
-  fontWeight: 500,
-  letterSpacing: '0.5px',
-  textTransform: 'uppercase',
-};
-
-const cardValue = {
-  fontSize: 28,
-  fontWeight: 700,
-  color: '#FFFFFF',
-};
-
-const cardAccent = {
-  fontSize: 28,
-  fontWeight: 700,
-  color: ACCENT,
-};
-
-const chartTitle = {
-  fontSize: 16,
-  fontWeight: 600,
-  color: '#FFFFFF',
-  marginBottom: 12,
-};
-
-const chartBox = {
-  ...cardStyle,
-  minHeight: 320,
-};
+const axisTick = { fontSize: 11, fill: '#A0A0A0' };
 
 function getWeekLabel(d) {
   const start = new Date(d);
@@ -310,32 +274,37 @@ export default function AdminDashboard({ state, dispatch }) {
   const typeColors = { Workout: ACCENT, Run: '#00D4FF', Meal: '#FF6B6B' };
 
   return (
-    <div style={{ background: BG, minHeight: '100vh', padding: '24px 32px', color: '#FFFFFF', fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      <motion.h1
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-        style={{ fontSize: 28, fontWeight: 700, marginBottom: 4, color: '#FFFFFF' }}
-      >
-        Analytics Dashboard
-      </motion.h1>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        style={{ color: SECONDARY, marginBottom: 32, fontSize: 14 }}
-      >
-        Your fitness overview and performance metrics
-      </motion.p>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><BarChart3 size={13} /> Admin</span>
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="rd-title"
+          >
+            Analytics Dashboard
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="rd-sub"
+          >
+            Your fitness overview and performance metrics
+          </motion.p>
+        </div>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="rd-nut-stats">
         {[
-          { label: 'Total Workouts', value: stats.totalWorkouts, accent: false },
-          { label: 'Running Sessions', value: stats.totalRuns, accent: false },
-          { label: 'Nutrition Entries', value: stats.totalNutrition, accent: false },
-          { label: 'Member Since', value: stats.memberSince ? stats.memberSince.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A', accent: false },
-          { label: 'Current Level', value: `Lv.${stats.level}`, accent: true, sub: `${stats.xp.toLocaleString()} XP` },
-          { label: 'Current Streak', value: `${stats.streak}d`, accent: stats.streak > 0 },
+          { label: 'Total Workouts', value: stats.totalWorkouts, cls: 'lime' },
+          { label: 'Running Sessions', value: stats.totalRuns, cls: 'blue' },
+          { label: 'Nutrition Entries', value: stats.totalNutrition, cls: 'orange' },
+          { label: 'Member Since', value: stats.memberSince ? stats.memberSince.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A', cls: 'purple' },
+          { label: 'Current Level', value: `Lv.${stats.level}`, sub: `${stats.xp.toLocaleString()} XP`, cls: 'lime' },
+          { label: 'Current Streak', value: `${stats.streak}d`, cls: stats.streak > 0 ? 'green' : '' },
         ].map((card, i) => (
           <motion.div
             key={card.label}
@@ -343,49 +312,68 @@ export default function AdminDashboard({ state, dispatch }) {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            style={cardStyle}
+            className={`rd-nut-stat ${card.cls}`}
           >
-            <span style={cardLabel}>{card.label}</span>
-            <span style={card.accent ? cardAccent : cardValue}>{card.value}</span>
-            {card.sub && <span style={{ fontSize: 12, color: SECONDARY }}>{card.sub}</span>}
+            <div className="l">{card.label}</div>
+            <div className="v">{card.value}</div>
+            {card.sub && <div className="s">{card.sub}</div>}
           </motion.div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 24 }}>
-        <motion.div custom={6} initial="hidden" animate="visible" variants={fadeUp} style={chartBox}>
-          <span style={chartTitle}>Workout Frequency (Last 12 Weeks)</span>
+      <div className="rd-grid">
+        <motion.div custom={6} initial="hidden" animate="visible" variants={fadeUp} className="rd-span-3 rd-card" style={{ padding: 20 }}>
+          <div className="rd-card-head" style={{ marginBottom: 12 }}>
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico lime"><BarChart3 size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Charts</div>
+                <div className="rd-card-name">Workout Frequency (Last 12 Weeks)</div>
+              </div>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={stats.weeklyData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
-              <XAxis dataKey="label" tick={{ fill: SECONDARY, fontSize: 10 }} interval={1} angle={-30} textAnchor="end" height={50} />
-              <YAxis tick={{ fill: SECONDARY, fontSize: 11 }} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{ background: SURFACE_LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, color: '#FFF' }}
-                cursor={{ fill: 'rgba(200,255,0,0.05)' }}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="label" tick={axisTick} interval={1} angle={-30} textAnchor="end" height={50} axisLine={false} tickLine={false} />
+              <YAxis tick={axisTick} allowDecimals={false} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(200,255,0,0.05)' }} />
               <Bar dataKey="count" name="Workouts" fill={ACCENT} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div custom={7} initial="hidden" animate="visible" variants={fadeUp} style={chartBox}>
-          <span style={chartTitle}>Running Distance (Last 6 Months)</span>
+        <motion.div custom={7} initial="hidden" animate="visible" variants={fadeUp} className="rd-span-3 rd-card" style={{ padding: 20 }}>
+          <div className="rd-card-head" style={{ marginBottom: 12 }}>
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico blue"><Activity size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Charts</div>
+                <div className="rd-card-name">Running Distance (Last 6 Months)</div>
+              </div>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={stats.monthlyRunData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
-              <XAxis dataKey="label" tick={{ fill: SECONDARY, fontSize: 11 }} />
-              <YAxis tick={{ fill: SECONDARY, fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ background: SURFACE_LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, color: '#FFF' }}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="label" tick={axisTick} axisLine={false} tickLine={false} />
+              <YAxis tick={axisTick} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={tooltipStyle} />
               <Line type="monotone" dataKey="distance" name="Distance (km)" stroke="#00D4FF" strokeWidth={2} dot={{ fill: '#00D4FF', r: 4 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div custom={8} initial="hidden" animate="visible" variants={fadeUp} style={chartBox}>
-          <span style={chartTitle}>Nutrition Adherence</span>
+        <motion.div custom={8} initial="hidden" animate="visible" variants={fadeUp} className="rd-span-3 rd-card" style={{ padding: 20 }}>
+          <div className="rd-card-head" style={{ marginBottom: 12 }}>
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico orange"><PieIcon size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Charts</div>
+                <div className="rd-card-name">Nutrition Adherence</div>
+              </div>
+            </div>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 260, gap: 24 }}>
             <ResponsiveContainer width={200} height={200}>
               <PieChart>
@@ -402,16 +390,14 @@ export default function AdminDashboard({ state, dispatch }) {
                     <Cell key={idx} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{ background: SURFACE_LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, color: '#FFF' }}
-                />
+                <Tooltip contentStyle={tooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {stats.pieData.map((entry) => (
                 <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ width: 12, height: 12, borderRadius: 3, background: entry.color }} />
-                  <span style={{ fontSize: 13, color: SECONDARY }}>{entry.name}: <span style={{ color: '#FFF', fontWeight: 600 }}>{entry.value}d</span></span>
+                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>{entry.name}: <span style={{ color: '#FFFFFF', fontWeight: 600 }}>{entry.value}d</span></span>
                 </div>
               ))}
               {stats.pieData[0] && (
@@ -425,23 +411,29 @@ export default function AdminDashboard({ state, dispatch }) {
           </div>
         </motion.div>
 
-        <motion.div custom={9} initial="hidden" animate="visible" variants={fadeUp} style={chartBox}>
-          <span style={chartTitle}>Workout Volume Trend (Last 30 Days)</span>
+        <motion.div custom={9} initial="hidden" animate="visible" variants={fadeUp} className="rd-span-3 rd-card" style={{ padding: 20 }}>
+          <div className="rd-card-head" style={{ marginBottom: 12 }}>
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico lime"><TrendingUp size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Charts</div>
+                <div className="rd-card-name">Workout Volume Trend (Last 30 Days)</div>
+              </div>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={stats.volumeTrend} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
-              <XAxis dataKey="date" tick={{ fill: SECONDARY, fontSize: 10 }} interval={4} angle={-30} textAnchor="end" height={50} />
-              <YAxis tick={{ fill: SECONDARY, fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ background: SURFACE_LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, color: '#FFF' }}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="date" tick={axisTick} interval={4} angle={-30} textAnchor="end" height={50} axisLine={false} tickLine={false} />
+              <YAxis tick={axisTick} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={tooltipStyle} />
               <Line type="monotone" dataKey="volume" name="Volume (kg×reps)" stroke={ACCENT} strokeWidth={2} dot={false} activeDot={{ r: 5, fill: ACCENT }} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="rd-nut-stats">
         {[
           { label: 'Avg Workout Duration', value: `${stats.avgWorkoutDuration} min` },
           { label: 'Most Trained Group', value: stats.mostTrained },
@@ -456,15 +448,15 @@ export default function AdminDashboard({ state, dispatch }) {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            style={cardStyle}
+            className="rd-nut-stat lime"
           >
-            <span style={cardLabel}>{card.label}</span>
-            <span style={{ fontSize: 22, fontWeight: 700, color: ACCENT }}>{card.value}</span>
+            <div className="l">{card.label}</div>
+            <div className="v">{card.value}</div>
           </motion.div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="rd-nut-stats">
         {[
           { label: 'Best Workout Volume', value: stats.bestVolume.toLocaleString(), unit: 'kg' },
           { label: 'Longest Run', value: stats.longestRun, unit: 'km' },
@@ -477,13 +469,11 @@ export default function AdminDashboard({ state, dispatch }) {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            style={{ ...cardStyle, borderLeft: `3px solid ${ACCENT}` }}
+            className="rd-nut-stat"
+            style={{ borderLeft: `3px solid ${ACCENT}` }}
           >
-            <span style={cardLabel}>{card.label}</span>
-            <span style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <span style={{ fontSize: 26, fontWeight: 700, color: '#FFFFFF' }}>{card.value}</span>
-              <span style={{ fontSize: 13, color: SECONDARY }}>{card.unit}</span>
-            </span>
+            <div className="l">{card.label}</div>
+            <div className="v">{card.value}<span> {card.unit}</span></div>
           </motion.div>
         ))}
       </div>
@@ -493,50 +483,54 @@ export default function AdminDashboard({ state, dispatch }) {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        style={{ ...cardStyle, marginBottom: 32 }}
+        className="rd-card"
       >
-        <span style={{ ...chartTitle, marginBottom: 4 }}>Recent Activity</span>
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico purple"><History size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Activity</div>
+              <div className="rd-card-name">Recent Activity</div>
+            </div>
+          </div>
+          {recentActivity.length > 0 && <span className="rd-count"><b>{recentActivity.length}</b> recent</span>}
+        </div>
         {recentActivity.length === 0 ? (
-          <span style={{ color: SECONDARY, fontSize: 14, padding: 20 }}>No activity recorded yet.</span>
+          <div className="rd-empty" style={{ padding: 28 }}>
+            <Activity size={26} style={{ color: 'rgba(255,255,255,0.25)', marginBottom: 2 }} />
+            <div className="rd-empty-title">No activity recorded yet</div>
+            <div className="rd-empty-sub">Complete workouts, runs, or log meals to see activity here.</div>
+          </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div>
             {recentActivity.map((item, i) => (
               <div
                 key={i}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 16,
-                  padding: '12px 16px',
-                  borderRadius: 8,
-                  background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+                  gap: 14,
+                  padding: '11px 0',
+                  borderBottom: i < recentActivity.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                 }}
               >
-                <div style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  background: typeColors[item.type] || SECONDARY,
-                  flexShrink: 0,
-                }} />
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#FFF' }}>{item.title}</span>
-                  <span style={{ fontSize: 12, color: SECONDARY, marginLeft: 10 }}>{item.detail}</span>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: typeColors[item.type] || SECONDARY, flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>{item.title}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{item.detail}</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                  <span style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: typeColors[item.type] || SECONDARY,
-                    background: `${typeColors[item.type] || SECONDARY}15`,
-                    padding: '3px 8px',
-                    borderRadius: 4,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}>
+                  <span
+                    className="rd-ex-tag"
+                    style={{
+                      background: `${typeColors[item.type] || SECONDARY}1a`,
+                      color: typeColors[item.type] || SECONDARY,
+                      borderColor: `${typeColors[item.type] || SECONDARY}33`,
+                    }}
+                  >
                     {item.type}
                   </span>
-                  <span style={{ fontSize: 12, color: SECONDARY, minWidth: 70, textAlign: 'right' }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', minWidth: 70, textAlign: 'right' }}>
                     {item.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                 </div>

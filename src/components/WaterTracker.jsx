@@ -1,18 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-
-const COLORS = {
-  bg: "#0B0B0B",
-  surface: "#151515",
-  surfaceHover: "#1C1C1C",
-  accent: "#C8FF00",
-  accentDim: "rgba(200,255,0,0.15)",
-  text: "#FFFFFF",
-  secondary: "#A0A0A0",
-  danger: "#FF4D4D",
-  surfaceElevated: "#1A1A1A",
-};
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Droplets, Plus, Bell, Settings2, CalendarDays } from "lucide-react";
 
 const TODAY = () => new Date().toISOString().split("T")[0];
 
@@ -51,7 +40,7 @@ const getBarData = (water) => {
   return days;
 };
 
-const ProgressRing = ({ progress, size = 240, stroke = 12 }) => {
+const ProgressRing = ({ progress, size = 220, stroke = 12 }) => {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(progress, 1) * circumference);
@@ -63,7 +52,7 @@ const ProgressRing = ({ progress, size = 240, stroke = 12 }) => {
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke={COLORS.surface}
+        stroke="rgba(255,255,255,0.05)"
         strokeWidth={stroke}
       />
       <motion.circle
@@ -71,14 +60,14 @@ const ProgressRing = ({ progress, size = 240, stroke = 12 }) => {
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke={progress >= 1 ? COLORS.accent : COLORS.accent}
+        stroke="#C8FF00"
         strokeWidth={stroke}
         strokeLinecap="round"
         strokeDasharray={circumference}
         initial={{ strokeDashoffset: circumference }}
         animate={{ strokeDashoffset: offset }}
         transition={{ duration: 1, ease: "easeOut" }}
-        style={{ filter: progress > 0 ? `drop-shadow(0 0 8px ${COLORS.accent})` : "none" }}
+        style={{ filter: progress > 0 ? "drop-shadow(0 0 8px rgba(200,255,0,0.55))" : "none" }}
       />
     </svg>
   );
@@ -88,12 +77,15 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div style={{
-        background: COLORS.surfaceElevated,
-        border: `1px solid ${COLORS.accent}33`,
-        borderRadius: 8,
-        padding: "6px 10px",
+        background: "rgba(15,15,15,0.98)",
+        border: "1px solid rgba(200,255,0,0.3)",
+        borderRadius: 10,
+        padding: "8px 12px",
         fontSize: 12,
-        color: COLORS.text,
+        color: "#FFFFFF",
+        fontFamily: "'JetBrains Mono',monospace",
+        fontWeight: 600,
+        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
       }}>
         {payload[0].value} ml
       </div>
@@ -194,311 +186,203 @@ export default function WaterTracker({ state, dispatch }) {
   const sortedEntries = [...todayEntries].reverse();
 
   return (
-    <div style={{
-      background: COLORS.bg,
-      minHeight: "100vh",
-      padding: "24px 16px",
-      fontFamily: "'Inter', -apple-system, sans-serif",
-      color: COLORS.text,
-      maxWidth: 600,
-      margin: "0 auto",
-    }}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <h1 style={{
-          fontSize: 24,
-          fontWeight: 700,
-          marginBottom: 24,
-          color: COLORS.text,
-          letterSpacing: "-0.5px",
-        }}>
-          Water Tracker
-        </h1>
+    <div className="rd-page" style={{ maxWidth: 680, width: "100%", margin: "0 auto" }}>
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><Droplets size={13} /> Health</span>
+          <h1 className="rd-title">Water Tracker</h1>
+          <p className="rd-sub">Stay hydrated — log your intake throughout the day.</p>
+        </div>
+      </div>
 
-        <div style={{
-          background: COLORS.surface,
-          borderRadius: 20,
-          padding: "32px 24px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginBottom: 16,
-        }}>
-          <div style={{ position: "relative", width: 240, height: 240, marginBottom: 16 }}>
-            <ProgressRing progress={progress} />
-            <div style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <span style={{ fontSize: 36, fontWeight: 700, color: COLORS.text }}>
-                {todayTotal}
-              </span>
-              <span style={{ fontSize: 14, color: COLORS.secondary, marginTop: 2 }}>
-                / {goal} ml
-              </span>
-              <span style={{ fontSize: 12, color: COLORS.accent, marginTop: 8, fontWeight: 500 }}>
-                {Math.round(progress * 100)}%
-              </span>
-            </div>
-          </div>
-
-          <p style={{
-            fontSize: 13,
-            color: progress >= 1 ? COLORS.accent : COLORS.secondary,
-            textAlign: "center",
-            marginBottom: 4,
-            fontWeight: 500,
+      <div className="rd-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 24px" }}>
+        <div style={{ position: "relative", width: 220, height: 220, marginBottom: 16 }}>
+          <ProgressRing progress={progress} />
+          <div style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}>
-            {motivationalMessages(progress * 100)}
-          </p>
+            <span style={{ fontSize: 36, fontWeight: 800, color: "#FFFFFF", fontFamily: "'JetBrains Mono',monospace", letterSpacing: "-0.03em", lineHeight: 1 }}>
+              {todayTotal}
+            </span>
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>
+              / {goal} ml
+            </span>
+            <span style={{ fontSize: 12, color: "#C8FF00", marginTop: 8, fontWeight: 700 }}>
+              {Math.round(progress * 100)}%
+            </span>
+          </div>
         </div>
 
-        <div style={{
-          display: "flex",
-          gap: 10,
-          marginBottom: 16,
+        <p style={{
+          fontSize: 13,
+          color: progress >= 1 ? "#C8FF00" : "rgba(255,255,255,0.45)",
+          textAlign: "center",
+          marginBottom: 4,
+          fontWeight: 500,
         }}>
-          {[
-            { label: "+250 ml", amount: 250 },
-            { label: "+500 ml", amount: 500 },
-          ].map((btn) => (
-            <motion.button
-              key={btn.amount}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => logWater(btn.amount)}
-              style={{
-                flex: 1,
-                background: COLORS.accent,
-                color: COLORS.bg,
-                border: "none",
-                borderRadius: 14,
-                padding: "14px 0",
-                fontSize: 15,
-                fontWeight: 700,
-                cursor: "pointer",
-                letterSpacing: "-0.3px",
-              }}
-            >
-              {btn.label}
-            </motion.button>
-          ))}
+          {motivationalMessages(progress * 100)}
+        </p>
+      </div>
+
+      <div style={{ display: "flex", gap: 10 }}>
+        {[
+          { label: "+250 ml", amount: 250 },
+          { label: "+500 ml", amount: 500 },
+        ].map((btn) => (
           <motion.button
+            key={btn.amount}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setShowCustom(true)}
-            style={{
-              flex: 1,
-              background: COLORS.surfaceHover,
-              color: COLORS.text,
-              border: `1px solid ${COLORS.accent}33`,
-              borderRadius: 14,
-              padding: "14px 0",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            onClick={() => logWater(btn.amount)}
+            className="rd-btn-primary"
+            style={{ flex: 1 }}
           >
-            Custom
+            <Plus size={15} /> {btn.label}
           </motion.button>
-        </div>
+        ))}
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowCustom(true)}
+          className="rd-btn-secondary"
+          style={{ flex: 1 }}
+        >
+          Custom
+        </motion.button>
+      </div>
 
-        <AnimatePresence>
-          {showCustom && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ overflow: "hidden", marginBottom: 16 }}
-            >
-              <div style={{
-                background: COLORS.surface,
-                borderRadius: 14,
-                padding: 16,
-                display: "flex",
-                gap: 10,
-                alignItems: "center",
-              }}>
-                <input
-                  type="number"
-                  placeholder="Amount in ml"
-                  value={customAmount}
-                  onChange={(e) => setCustomAmount(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
-                  style={{
-                    flex: 1,
-                    background: COLORS.bg,
-                    border: `1px solid ${COLORS.accent}33`,
-                    borderRadius: 10,
-                    padding: "10px 12px",
-                    color: COLORS.text,
-                    fontSize: 14,
-                    outline: "none",
-                  }}
-                />
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleCustomAdd}
-                  style={{
-                    background: COLORS.accent,
-                    color: COLORS.bg,
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "10px 18px",
-                    fontSize: 14,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  Add
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => { setShowCustom(false); setCustomAmount(""); }}
-                  style={{
-                    background: "transparent",
-                    color: COLORS.secondary,
-                    border: "none",
-                    padding: "10px 8px",
-                    fontSize: 14,
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </motion.button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div style={{
-          background: COLORS.surface,
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 16,
-        }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 12,
-          }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.text }}>
-              Today's Log
-            </span>
-            <span style={{ fontSize: 12, color: COLORS.secondary }}>
-              {todayEntries.length} entries
-            </span>
-          </div>
-
-          {sortedEntries.length === 0 ? (
-            <p style={{ fontSize: 13, color: COLORS.secondary, textAlign: "center", padding: "12px 0" }}>
-              No entries yet today. Start hydrating!
-            </p>
-          ) : (
-            <div style={{ maxHeight: 160, overflowY: "auto" }}>
-              {sortedEntries.map((entry, i) => (
-                <motion.div
-                  key={`${entry.time}-${i}`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "8px 0",
-                    borderBottom: i < sortedEntries.length - 1 ? `1px solid ${COLORS.surfaceHover}` : "none",
-                  }}
-                >
-                  <span style={{ fontSize: 13, color: COLORS.secondary }}>
-                    {entry.time}
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.accent }}>
-                    +{entry.amount} ml
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div style={{
-          background: COLORS.surface,
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 16,
-        }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 14,
-          }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.text }}>
-              Daily Goal
-            </span>
-            {!showGoalEdit ? (
+      <AnimatePresence>
+        {showCustom && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="rd-card" style={{ padding: 14, display: "flex", gap: 10, alignItems: "center" }}>
+              <input
+                className="rd-input"
+                type="number"
+                placeholder="Amount in ml"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
+                style={{ flex: 1 }}
+              />
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={() => { setShowGoalEdit(true); setGoalInput(String(goal)); }}
+                onClick={handleCustomAdd}
+                className="rd-btn-primary"
+              >
+                Add
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { setShowCustom(false); setCustomAmount(""); }}
                 style={{
-                  background: COLORS.surfaceHover,
-                  color: COLORS.accent,
-                  border: `1px solid ${COLORS.accent}33`,
-                  borderRadius: 8,
-                  padding: "6px 12px",
-                  fontSize: 13,
-                  fontWeight: 600,
+                  background: "transparent",
+                  color: "rgba(255,255,255,0.45)",
+                  border: "none",
+                  padding: "10px 8px",
+                  fontSize: 14,
                   cursor: "pointer",
                 }}
               >
-                {goal} ml
+                Cancel
               </motion.button>
-            ) : (
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input
-                  type="number"
-                  value={goalInput}
-                  onChange={(e) => setGoalInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && saveGoal()}
-                  style={{
-                    width: 80,
-                    background: COLORS.bg,
-                    border: `1px solid ${COLORS.accent}33`,
-                    borderRadius: 8,
-                    padding: "6px 8px",
-                    color: COLORS.text,
-                    fontSize: 13,
-                    outline: "none",
-                    textAlign: "right",
-                  }}
-                />
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={saveGoal}
-                  style={{
-                    background: COLORS.accent,
-                    color: COLORS.bg,
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "6px 10px",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  Save
-                </motion.button>
-              </div>
-            )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico blue"><Droplets size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Intake</div>
+              <div className="rd-card-name">Today's Log</div>
+            </div>
           </div>
+          <span className="rd-count"><b>{todayEntries.length}</b> entries</span>
+        </div>
+
+        {sortedEntries.length === 0 ? (
+          <div className="rd-empty">
+            <div className="rd-empty-title">No entries yet today</div>
+            <div className="rd-empty-sub">Start hydrating!</div>
+          </div>
+        ) : (
+          <div style={{ maxHeight: 160, overflowY: "auto" }}>
+            {sortedEntries.map((entry, i) => (
+              <motion.div
+                key={`${entry.time}-${i}`}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "9px 0",
+                  borderBottom: i < sortedEntries.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                }}
+              >
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
+                  {entry.time}
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#C8FF00", fontFamily: "'JetBrains Mono',monospace" }}>
+                  +{entry.amount} ml
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico lime"><Settings2 size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Target</div>
+              <div className="rd-card-name">Daily Goal</div>
+            </div>
+          </div>
+          {!showGoalEdit ? (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => { setShowGoalEdit(true); setGoalInput(String(goal)); }}
+              className="rd-chip active"
+            >
+              {goal} ml
+            </motion.button>
+          ) : (
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                className="rd-input"
+                type="number"
+                value={goalInput}
+                onChange={(e) => setGoalInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && saveGoal()}
+                style={{ width: 90, textAlign: "right" }}
+              />
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={saveGoal}
+                className="rd-btn-primary"
+                style={{ padding: "9px 14px", fontSize: 12 }}
+              >
+                Save
+              </motion.button>
+            </div>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {[1500, 2000, 2500, 3000, 3500].map((g) => (
             <motion.button
               key={g}
@@ -507,109 +391,98 @@ export default function WaterTracker({ state, dispatch }) {
                 setGoal(g);
                 localStorage.setItem("water_goal", String(g));
               }}
-              style={{
-                background: goal === g ? COLORS.accentDim : "transparent",
-                color: goal === g ? COLORS.accent : COLORS.secondary,
-                border: goal === g ? `1px solid ${COLORS.accent}44` : `1px solid transparent`,
-                borderRadius: 10,
-                padding: "10px 14px",
-                fontSize: 13,
-                fontWeight: goal === g ? 700 : 500,
-                cursor: "pointer",
-                marginRight: 8,
-                marginBottom: 8,
-                display: "inline-block",
-              }}
+              className={`rd-chip ${goal === g ? "active" : ""}`}
             >
               {g} ml
             </motion.button>
           ))}
         </div>
+      </div>
 
-        <div style={{
-          background: COLORS.surface,
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 16,
-        }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.text, display: "block", marginBottom: 12 }}>
-            Past 7 Days
-          </span>
-          <div style={{ width: "100%", height: 160 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData} barCategoryGap="20%">
-                <XAxis
-                  dataKey="day"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: COLORS.secondary, fontSize: 11 }}
-                />
-                <YAxis hide />
-                <Tooltip content={<CustomTooltip />} cursor={false} />
-                <Bar
-                  dataKey="amount"
-                  fill={COLORS.accent}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={36}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico blue"><CalendarDays size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Trend</div>
+              <div className="rd-card-name">Past 7 Days</div>
+            </div>
           </div>
         </div>
-
-        <div style={{
-          background: COLORS.surface,
-          borderRadius: 16,
-          padding: 16,
-        }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 12,
-          }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.text }}>
-              Reminders
-            </span>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={toggleReminder}
-              style={{
-                width: 48,
-                height: 26,
-                borderRadius: 13,
-                border: "none",
-                cursor: "pointer",
-                position: "relative",
-                background: reminderEnabled ? COLORS.accent : COLORS.surfaceHover,
-                transition: "background 0.2s",
-              }}
-            >
-              <motion.div
-                animate={{ x: reminderEnabled ? 22 : 2 }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: "50%",
-                  background: reminderEnabled ? COLORS.bg : COLORS.secondary,
-                  position: "absolute",
-                  top: 2,
-                }}
+        <div style={{ width: "100%", height: 170 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={barData} barCategoryGap="20%">
+              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+              <XAxis
+                dataKey="day"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#A0A0A0", fontSize: 11 }}
               />
-            </motion.button>
-          </div>
+              <YAxis hide />
+              <Tooltip content={<CustomTooltip />} cursor={false} />
+              <Bar
+                dataKey="amount"
+                fill="#C8FF00"
+                radius={[5, 5, 0, 0]}
+                maxBarSize={36}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico purple"><Bell size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Notifications</div>
+              <div className="rd-card-name">Reminders</div>
+            </div>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleReminder}
+            style={{
+              width: 48,
+              height: 26,
+              borderRadius: 13,
+              border: "none",
+              cursor: "pointer",
+              position: "relative",
+              flexShrink: 0,
+              background: reminderEnabled ? "#C8FF00" : "rgba(255,255,255,0.08)",
+              transition: "background 0.2s",
+            }}
+          >
+            <motion.div
+              animate={{ x: reminderEnabled ? 22 : 2 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: "50%",
+                background: reminderEnabled ? "#0B0B0B" : "#FFFFFF",
+                position: "absolute",
+                top: 2,
+              }}
+            />
+          </motion.button>
+        </div>
+
+        <AnimatePresence>
           {reminderEnabled && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
               style={{ overflow: "hidden" }}
             >
-              <p style={{ fontSize: 12, color: COLORS.secondary, marginBottom: 10 }}>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 10 }}>
                 Remind every:
               </p>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {[
                   { label: "30 min", value: 30 },
                   { label: "1 hr", value: 60 },
@@ -619,16 +492,7 @@ export default function WaterTracker({ state, dispatch }) {
                     key={opt.value}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setReminderInterval(opt.value)}
-                    style={{
-                      background: reminderInterval === opt.value ? COLORS.accentDim : COLORS.bg,
-                      color: reminderInterval === opt.value ? COLORS.accent : COLORS.secondary,
-                      border: reminderInterval === opt.value ? `1px solid ${COLORS.accent}44` : `1px solid ${COLORS.surfaceHover}`,
-                      borderRadius: 10,
-                      padding: "8px 16px",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
+                    className={`rd-chip ${reminderInterval === opt.value ? "active" : ""}`}
                   >
                     {opt.label}
                   </motion.button>
@@ -636,8 +500,8 @@ export default function WaterTracker({ state, dispatch }) {
               </div>
             </motion.div>
           )}
-        </div>
-      </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,7 @@
 ﻿import { useState } from "react";
-import React from "react";
 import { motion } from "framer-motion";
-import { EXERCISE_DB, showToast } from "../utils/helpers";
-
-const Card = ({ children, style, className = "" }) => (
-    <div className={glass} style={{ padding: "20px", ...style }}>{children}</div>
-);
+import { ClipboardList, ListChecks, Pencil, Play, Plus, Search, Timer, Trash2, X } from "lucide-react";
+import { EXERCISE_DB, showConfirm, showToast } from "../utils/helpers";
 
 const WorkoutTemplates = ({ state, dispatch }) => {
   const [showCreate, setShowCreate] = useState(false);
@@ -15,6 +11,8 @@ const WorkoutTemplates = ({ state, dispatch }) => {
   const [tmplExercises, setTmplExercises] = useState([]);
   const [addExSearch, setAddExSearch] = useState("");
   const [addExOpen, setAddExOpen] = useState(false);
+
+  const templates = state.workoutTemplates || [];
 
   const openCreate = (template = null) => {
     if (template) {
@@ -48,7 +46,8 @@ const WorkoutTemplates = ({ state, dispatch }) => {
     if (state.activeSession) { showToast("Finish your current workout first"); return; }
     const session = {
       id: Date.now(), date: new Date().toISOString().split("T")[0], startTime: new Date().toISOString(),
-      name: template.name, exercises: template.exercises.map(e => {
+      name: template.name,
+      exercises: template.exercises.map(e => {
         const exDef = EXERCISE_DB.find(d => d.id === e.exerciseId) || {};
         return {
           exerciseId: e.exerciseId, exerciseName: e.exerciseName || exDef.name || "Unknown", notes: "",
@@ -69,43 +68,60 @@ const WorkoutTemplates = ({ state, dispatch }) => {
     setAddExSearch("");
   };
 
+  const deleteTemplate = async (t) => {
+    if (await showConfirm(`Delete "${t.name}"? This can't be undone.`)) {
+      dispatch({ type: "DELETE_TEMPLATE", payload: t.id });
+      showToast("Template deleted");
+    }
+  };
+
   const allExercises = [...EXERCISE_DB, ...(state.customExercises || [])];
-  const searchResults = allExercises.filter(ex => addExSearch ? ex.name.toLowerCase().includes(addExSearch.toLowerCase()) || ex.primary.toLowerCase().includes(addExSearch.toLowerCase()) : false).slice(0, 10);
+  const searchResults = allExercises.filter(ex =>
+    addExSearch ? ex.name.toLowerCase().includes(addExSearch.toLowerCase()) || ex.primary.toLowerCase().includes(addExSearch.toLowerCase()) : false
+  ).slice(0, 10);
+
+  const totalSets = (t) => t.exercises?.reduce((s, e) => s + (e.sets || 3), 0) || 0;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div className="wm-page-header">
-        <h2>Workout Templates</h2>
-        <button className="neon-btn" onClick={() => openCreate()} style={{ fontSize: 13 }}>+ Create Template</button>
+    <div className="rd-stack">
+      <div className="rd-tab-head">
+        <div className="rd-count"><ClipboardList size={13} /> <b>{templates.length}</b> template{templates.length !== 1 ? "s" : ""}</div>
+        <button className="rd-btn-primary rd-btn-sm" onClick={() => openCreate()}>
+          <Plus size={15} /> Create Template
+        </button>
       </div>
 
-      {(state.workoutTemplates || []).length === 0 && !showCreate ? (
-        <div className="wm-empty">
-          <div className="wm-empty-icon">📋</div>
-          <div className="wm-empty-title">No Templates Yet</div>
-          <div className="wm-empty-desc">Create reusable workout templates to start sessions quickly.</div>
-          <button className="neon-btn" onClick={() => openCreate()}>Create Your First Template</button>
+      {templates.length === 0 && !showCreate ? (
+        <div className="rd-empty" style={{ padding: "44px 16px" }}>
+          <ClipboardList size={30} style={{ color: "rgba(255,255,255,0.2)", marginBottom: 4 }} />
+          <div className="rd-empty-title">No Templates Yet</div>
+          <div className="rd-empty-sub">Create reusable workout templates to start sessions quickly.</div>
+          <button className="rd-btn-primary rd-btn-sm" onClick={() => openCreate()} style={{ marginTop: 10 }}>
+            <Plus size={15} /> Create Your First Template
+          </button>
         </div>
       ) : !showCreate && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
-          {(state.workoutTemplates || []).map(t => (
-            <motion.div key={t.id} className="wm-template-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#FFFFFF", marginBottom: 4 }}>{t.name}</div>
-              {t.description && <div style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 8 }}>{t.description}</div>}
-              <div style={{ fontSize: 12, color: "rgba(160,160,160,0.5)", marginBottom: 12 }}>
-                {t.exercises?.length || 0} exercise{t.exercises?.length !== 1 ? "s" : ""} · {t.exercises?.reduce((s, e) => s + (e.sets || 3), 0) || 0} sets
+        <div className="rd-tmpl-grid">
+          {templates.map(t => (
+            <motion.div key={t.id} className="rd-tmpl-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="rd-tmpl-name">{t.name}</div>
+              {t.description && <div className="rd-tmpl-desc">{t.description}</div>}
+              <div className="rd-tmpl-meta">
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><ListChecks size={12} /> {t.exercises?.length || 0} exercises</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><Timer size={12} /> {totalSets(t)} sets</span>
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
+              <div className="rd-tmpl-chips">
                 {t.exercises?.slice(0, 5).map((e, i) => (
-                  <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "rgba(200,255,0,0.08)", color: "#C8FF00" }}>{e.exerciseName}</span>
+                  <span key={i} className="rd-ex-tag">{e.exerciseName}</span>
                 ))}
-                {(t.exercises?.length || 0) > 5 && <span style={{ fontSize: 10, color: "#A0A0A0" }}>+{t.exercises.length - 5} more</span>}
+                {(t.exercises?.length || 0) > 5 && <span className="rd-ex-tag muted">+{t.exercises.length - 5} more</span>}
               </div>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button className="neon-btn" onClick={() => startFromTemplate(t)} style={{ flex: 1, fontSize: 12, padding: "8px 0" }}>Start Workout</button>
-                <button className="ghost-btn" onClick={() => openCreate(t)} style={{ fontSize: 12, padding: "8px 12px" }}>Edit</button>
-                <button className="ghost-btn" onClick={() => { if (confirm('Delete "' + t.name + '"?')) dispatch({ type: "DELETE_TEMPLATE", payload: t.id }); }}
-                  style={{ fontSize: 12, padding: "8px 10px", color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}>✕</button>
+              <div className="rd-tmpl-actions">
+                <button className="rd-btn-sm primary" onClick={() => startFromTemplate(t)} style={{ flex: 1 }}>
+                  <Play size={14} /> Start Workout
+                </button>
+                <button className="rd-btn-sm ghost" onClick={() => openCreate(t)}><Pencil size={13} /> Edit</button>
+                <button className="rd-btn-sm danger" onClick={() => deleteTemplate(t)} aria-label="Delete template"><Trash2 size={13} /></button>
               </div>
             </motion.div>
           ))}
@@ -113,54 +129,77 @@ const WorkoutTemplates = ({ state, dispatch }) => {
       )}
 
       {showCreate && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>{editTemplate ? "Edit Template" : "Create Template"}</h3>
-              <button className="ghost-btn" onClick={() => setShowCreate(false)}>Cancel</button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-              <input placeholder="Template name (e.g., Push Day A)" value={tmplName} onChange={e => setTmplName(e.target.value)} autoFocus />
-              <input placeholder="Description (optional)" value={tmplDesc} onChange={e => setTmplDesc(e.target.value)} />
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF", marginBottom: 10 }}>Exercises ({tmplExercises.length})</div>
-            {tmplExercises.map((ex, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 12, color: "#A0A0A0", width: 20, textAlign: "center" }}>{i + 1}.</span>
-                <span style={{ fontSize: 13, color: "#FFFFFF", flex: 1 }}>{ex.exerciseName}</span>
-                <input className="wm-set-input" type="number" value={ex.sets} style={{ width: 50 }} placeholder="Sets"
-                  onChange={e => setTmplExercises(p => p.map((x, j) => j === i ? { ...x, sets: +e.target.value } : x))} />
-                <span style={{ fontSize: 11, color: "#A0A0A0" }}>× </span>
-                <input className="wm-set-input" type="number" value={ex.defaultReps} style={{ width: 50 }} placeholder="Reps"
-                  onChange={e => setTmplExercises(p => p.map((x, j) => j === i ? { ...x, defaultReps: +e.target.value } : x))} />
-                <button onClick={() => setTmplExercises(p => p.filter((_, j) => j !== i))} style={{ background: "none", color: "#FF4757", fontSize: 16, padding: 4 }}>×</button>
+        <div className="rd-modal-overlay" onClick={() => setShowCreate(false)}>
+          <motion.div className="rd-modal rd-modal-lg" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} onClick={e => e.stopPropagation()}>
+            <button className="rd-modal-close" onClick={() => setShowCreate(false)}><X size={16} /></button>
+            <div className="rd-modal-title" style={{ marginBottom: 18 }}>{editTemplate ? "Edit Template" : "Create Template"}</div>
+
+            <div className="rd-form">
+              <div className="rd-field">
+                <label>Template name</label>
+                <input className="rd-input" placeholder="Push Day A" value={tmplName} onChange={e => setTmplName(e.target.value)} autoFocus />
               </div>
-            ))}
-            <div style={{ position: "relative", marginTop: 8 }}>
-              <button className="ghost-btn" onClick={() => setAddExOpen(!addExOpen)} style={{ width: "100%", padding: 10, borderStyle: "dashed", fontSize: 13 }}>+ Add Exercise</button>
+              <div className="rd-field">
+                <label>Description (optional)</label>
+                <input className="rd-input" placeholder="Chest, shoulders & triceps" value={tmplDesc} onChange={e => setTmplDesc(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="rd-section-label" style={{ margin: "18px 0 10px" }}>Exercises ({tmplExercises.length})</div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {tmplExercises.map((ex, i) => (
+                <div key={i} className="rd-ex-edit">
+                  <span className="num">{i + 1}</span>
+                  <span className="n">{ex.exerciseName}</span>
+                  <div className="sets-cell">
+                    <label>Sets</label>
+                    <input className="rd-set-input" type="number" min={1} value={ex.sets || 3}
+                      onChange={e => setTmplExercises(p => p.map((x, j) => j === i ? { ...x, sets: Math.max(1, +e.target.value || 1) } : x))} />
+                  </div>
+                  <div className="sets-cell">
+                    <label>Reps</label>
+                    <input className="rd-set-input" type="number" min={1} value={ex.defaultReps || 10}
+                      onChange={e => setTmplExercises(p => p.map((x, j) => j === i ? { ...x, defaultReps: Math.max(1, +e.target.value || 1) } : x))} />
+                  </div>
+                  <button className="rd-iconbtn danger" onClick={() => setTmplExercises(p => p.filter((_, j) => j !== i))} aria-label="Remove exercise"><X size={15} /></button>
+                </div>
+              ))}
+              {tmplExercises.length === 0 && (
+                <div style={{ textAlign: "center", padding: 16, fontSize: 12, color: "rgba(255,255,255,0.35)" }}>No exercises yet — add one below.</div>
+              )}
+            </div>
+
+            <div style={{ position: "relative", marginTop: 10 }}>
+              <button className="rd-add-dashed" onClick={() => setAddExOpen(!addExOpen)}>
+                <Plus size={15} /> Add Exercise
+              </button>
               {addExOpen && (
-                <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: 8, zIndex: 10, maxHeight: 250, overflowY: "auto" }}>
-                  <input placeholder="Search..." value={addExSearch} onChange={e => setAddExSearch(e.target.value)} autoFocus style={{ marginBottom: 6 }} />
+                <div className="rd-search-dropdown">
+                  <div className="rd-search" style={{ padding: 8 }}>
+                    <Search size={14} />
+                    <input placeholder="Search exercises..." value={addExSearch} onChange={e => setAddExSearch(e.target.value)} autoFocus style={{ height: 40 }} />
+                  </div>
                   {searchResults.map(ex => (
-                    <div key={ex.id} style={{ padding: "8px 10px", borderRadius: 6, cursor: "pointer", fontSize: 13, color: "#FFFFFF", transition: "background 0.15s" }}
-                      className="wm-exercise-card" onClick={() => addExerciseToTemplate(ex)}>
-                      {ex.name} <span style={{ fontSize: 11, color: "#A0A0A0" }}>({ex.primary})</span>
+                    <div key={ex.id} className="rd-search-item" onClick={() => addExerciseToTemplate(ex)}>
+                      {ex.name} <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>({ex.primary})</span>
                     </div>
                   ))}
                   {addExSearch && searchResults.length === 0 && (
-                    <div style={{ padding: 12, textAlign: "center", fontSize: 12, color: "#A0A0A0" }}>No results</div>
+                    <div style={{ padding: 12, textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.35)" }}>No results</div>
                   )}
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-              <button className="ghost-btn" onClick={() => setShowCreate(false)} style={{ flex: 1, padding: 12 }}>Cancel</button>
-              <button className="neon-btn" onClick={saveTemplate} disabled={!tmplName.trim() || tmplExercises.length === 0} style={{ flex: 2, padding: 12 }}>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+              <button className="rd-btn-secondary" onClick={() => setShowCreate(false)} style={{ flex: 1 }}>Cancel</button>
+              <button className="rd-btn-primary" onClick={saveTemplate} disabled={!tmplName.trim() || tmplExercises.length === 0} style={{ flex: 2 }}>
                 {editTemplate ? "Update Template" : "Save Template"}
               </button>
             </div>
-          </Card>
-        </motion.div>
+          </motion.div>
+        </div>
       )}
     </div>
   );

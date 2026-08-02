@@ -1,11 +1,14 @@
 import { useState, useMemo } from "react";
-import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { today, COLORS, useAICoach, calcWeeklyVolume, showToast } from "../utils/helpers";
+import { BatteryCharging, Brain, Dumbbell, HeartPulse, Moon, Sparkles } from "lucide-react";
+import { today, useAICoach, calcWeeklyVolume, showToast } from "../utils/helpers";
 
-const Card = ({ children, style, className = "" }) => (
-  <div className={`glass ${className}`} style={{ padding: "20px", ...style }}>{children}</div>
-);
+const FIELDS = [
+  { key: "sleep", label: "Sleep Duration", suffix: "h", min: 0, max: 12, step: 0.5, color: "#4D9FFF" },
+  { key: "quality", label: "Sleep Quality", suffix: "/10", min: 1, max: 10, step: 1, color: "#C8FF00" },
+  { key: "stress", label: "Stress Level", suffix: "/10", min: 1, max: 10, step: 1, color: "#FF9F43" },
+  { key: "heartRate", label: "Resting Heart Rate", suffix: " bpm", min: 40, max: 120, step: 1, color: "#A78BFA" },
+];
 
 const Recovery = ({ state, dispatch }) => {
   const [form, setForm] = useState({ sleep: 7, quality: 7, stress: 3, heartRate: 60 });
@@ -35,56 +38,109 @@ const Recovery = ({ state, dispatch }) => {
     [state.recovery]
   );
 
+  const scoreColor = score === null ? "rgba(255,255,255,0.35)" : score >= 7 ? "#C8FF00" : score >= 5 ? "#FF9F43" : "#FF4757";
+  const scoreText = score === null
+    ? "Not logged yet"
+    : score >= 7 ? "High readiness — Train hard"
+    : score >= 5 ? "Moderate — Normal training"
+    : "Low — Consider deload";
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700 }}>Recovery & Sleep</h2>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <Card>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Log Today's Recovery</div>
-          {[["sleep", "Sleep Duration (hrs)", 0, 12, 0.5], ["quality", "Sleep Quality (1-10)", 1, 10, 1], ["stress", "Stress Level (1-10)", 1, 10, 1], ["heartRate", "Resting Heart Rate", 40, 120, 1]].map(([k, l, min, max, step]) => (
-            <div key={k} style={{ marginBottom: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                <label style={{ fontSize: 12, color: "#A0A0A0" }}>{l}</label>
-                <span style={{ fontSize: 12, color: COLORS.cyan, fontFamily: "'JetBrains Mono',monospace" }}>{form[k]}{k === "sleep" ? "h" : k === "heartRate" ? " bpm" : ""}</span>
-              </div>
-              <input type="range" min={min} max={max} step={step} value={form[k]} onChange={e => setForm(p => ({ ...p, [k]: +e.target.value }))} />
-            </div>
-          ))}
-          <button className="neon-btn" onClick={logRecovery} style={{ width: "100%", marginTop: 4 }}>Log Recovery</button>
-        </Card>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <Card style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 8 }}>Today's Recovery Score</div>
-            <div style={{ fontSize: 56, fontWeight: 700, color: score !== null ? (score >= 7 ? "var(--green)" : score >= 5 ? "var(--amber)" : "var(--red)") : "#A0A0A0", fontFamily: "'JetBrains Mono',monospace" }}>
-              {score !== null ? score.toFixed(1) : "—"}
-            </div>
-            <div style={{ fontSize: 12, color: "#A0A0A0", marginTop: 4 }}>{score !== null ? (score >= 7 ? "High readiness — Train hard" : score >= 5 ? "Moderate — Normal training" : "Low — Consider deload") : "Not logged yet"}</div>
-          </Card>
-          <Card>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>AI Recovery Coach</span>
-              <button className="ghost-btn" onClick={getRecAdvice} disabled={loading} style={{ fontSize: 12 }}>{loading ? "..." : "Advise ⚡"}</button>
-            </div>
-            {aiRec ? <p style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.6 }}>{aiRec}</p> : <p style={{ fontSize: 13, color: "#A0A0A0" }}>Get AI-powered recovery recommendations.</p>}
-          </Card>
+    <div className="rd-page">
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><BatteryCharging size={13} /> Recovery</span>
+          <h1 className="rd-title">Recover Smarter</h1>
+          <p className="rd-sub">Log sleep, stress and heart rate to stay ahead of fatigue.</p>
         </div>
       </div>
 
-      <Card>
-        <div style={{ fontSize: 13, color: "#A0A0A0", marginBottom: 12 }}>Recovery score & sleep (14 days)</div>
+      <div className="rd-2col">
+        <div className="rd-card">
+          <div className="rd-card-head">
+            <div className="rd-card-title">
+              <div className="rd-card-title-ico blue"><Moon size={15} /></div>
+              <div>
+                <div className="rd-card-kicker">Daily check-in</div>
+                <div className="rd-card-name">Log Today's Recovery</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 18 }}>
+            {FIELDS.map(({ key, label, suffix, min, max, step, color }) => (
+              <div key={key} className="rd-slider-row">
+                <div className="rd-slider-head">
+                  <label className="rd-slider-label">{label}</label>
+                  <span className="rd-slider-val" style={{ color }}>{form[key]}<span>{suffix}</span></span>
+                </div>
+                <input className="rd-range" type="range" min={min} max={max} step={step} value={form[key]}
+                  onChange={e => setForm(p => ({ ...p, [key]: +e.target.value }))} />
+              </div>
+            ))}
+          </div>
+
+          <button className="rd-btn-primary" onClick={logRecovery} style={{ width: "100%" }}>
+            <HeartPulse size={16} /> Log Recovery
+          </button>
+        </div>
+
+        <div className="rd-stack">
+          <div className="rd-card rd-score-center">
+            <div className="rd-metric-label">Today's Recovery Score</div>
+            <div className="rd-big-metric" style={{ fontSize: 56, color: scoreColor }}>
+              {score !== null ? score.toFixed(1) : "—"}
+            </div>
+            <div style={{ fontSize: 12, color: score === null ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.55)", fontWeight: 500 }}>{scoreText}</div>
+          </div>
+
+          <div className="rd-card">
+            <div className="rd-card-head">
+              <div className="rd-card-title">
+                <div className="rd-card-title-ico purple"><Brain size={15} /></div>
+                <div className="rd-card-name">AI Recovery Coach</div>
+              </div>
+              <button className="rd-btn-secondary" onClick={getRecAdvice} disabled={loading} style={{ padding: "8px 14px", fontSize: 12 }}>
+                <Sparkles size={13} /> {loading ? "Thinking..." : "Advise"}
+              </button>
+            </div>
+            {aiRec ? (
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>{aiRec}</p>
+            ) : (
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Get AI-powered recovery recommendations based on your sleep, stress and training volume.</p>
+            )}
+          </div>
+
+          <div className="rd-card" style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px" }}>
+            <Dumbbell size={15} style={{ color: "rgba(200,255,0,0.7)" }} />
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+              Recent training volume: <b style={{ color: "#FFFFFF", fontFamily: "'JetBrains Mono',monospace" }}>{Math.round(calcWeeklyVolume(state.workouts))} kg</b>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico lime"><BatteryCharging size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Trend</div>
+              <div className="rd-card-name">Recovery Score & Sleep (14 days)</div>
+            </div>
+          </div>
+        </div>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={recData.length ? recData : [{ date: today().slice(5), score: 0, sleep: 0 }]}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#A0A0A0" }} />
-            <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} />
-            <Tooltip contentStyle={{ background: "#1D1D1D", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#FFFFFF", fontSize: 12 }} />
-            <Line type="monotone" dataKey="score" stroke="var(--green)" strokeWidth={2} dot={false} name="Recovery" />
-            <Line type="monotone" dataKey="sleep" stroke={COLORS.cyan} strokeWidth={2} dot={false} name="Sleep hrs" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#A0A0A0" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} axisLine={false} tickLine={false} width={34} />
+            <Tooltip contentStyle={{ background: "rgba(15,15,15,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 12 }} />
+            <Line type="monotone" dataKey="score" stroke="#C8FF00" strokeWidth={2} dot={false} name="Recovery" />
+            <Line type="monotone" dataKey="sleep" stroke="#4D9FFF" strokeWidth={2} dot={false} name="Sleep hrs" />
           </LineChart>
         </ResponsiveContainer>
-      </Card>
+      </div>
     </div>
   );
 };

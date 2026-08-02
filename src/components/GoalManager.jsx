@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2, Pencil, Plus, Target, Trash2, Trophy, X } from "lucide-react";
 
 const GOAL_TYPES = [
   { type: "Lose Weight", icon: "⚖️", color: "#FF6B6B" },
@@ -56,6 +57,9 @@ export default function GoalManager({ state, dispatch }) {
   const goals = (state && state.goals) || [];
   const activeGoals = goals.filter(g => !g.completed);
   const archivedGoals = goals.filter(g => g.completed);
+  const avgPct = activeGoals.length > 0
+    ? Math.round(activeGoals.reduce((acc, g) => acc + getProgressPercent(g.currentValue, g.targetValue), 0) / activeGoals.length)
+    : 0;
 
   function resetForm() {
     setForm({ type: "", title: "", description: "", targetValue: "", currentValue: "", targetDate: "" });
@@ -98,172 +102,106 @@ export default function GoalManager({ state, dispatch }) {
     dispatch({ type: "DELETE_GOAL", payload: id });
   }
 
-  const s = {
-    page: { padding: "0 0 24px" },
-    header: { marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 },
-    title: { fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 4 },
-    sub: { fontSize: 13, color: "#A0A0A0" },
-    statsRow: { display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" },
-    statCard: { flex: "1 1 120px", background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 16, textAlign: "center" },
-    statValue: { fontSize: 28, fontWeight: 800, color: "#C8FF00" },
-    statLabel: { fontSize: 11, color: "#A0A0A0", marginTop: 4 },
-    grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 12 },
-    card: { background: "#151515", border: "1px solid rgba(200,255,0,0.06)", borderRadius: 14, padding: 18, position: "relative" },
-    cardHeader: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 },
-    iconWrap: { width: 40, height: 40, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 },
-    cardTitle: { fontSize: 15, fontWeight: 700, color: "#FFFFFF", flex: 1 },
-    cardType: { fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 6, background: "rgba(200,255,0,0.08)", color: "#C8FF00" },
-    cardDesc: { fontSize: 12, color: "#A0A0A0", marginBottom: 10, lineHeight: 1.5 },
-    progressSection: { marginBottom: 10 },
-    progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
-    progressLabel: { fontSize: 11, color: "#A0A0A0" },
-    progressValue: { fontSize: 13, fontWeight: 700, color: "#C8FF00" },
-    progressBarBg: { width: "100%", height: 8, background: "#1D1D1D", borderRadius: 4, overflow: "hidden", position: "relative" },
-    progressBarFill: { height: "100%", borderRadius: 4, transition: "width 0.5s ease" },
-    milestones: { display: "flex", justifyContent: "space-between", marginTop: 4, position: "relative" },
-    milestoneTick: { width: 1, height: 8, background: "rgba(200,255,0,0.15)" },
-    milestoneReached: { background: "rgba(200,255,0,0.5)" },
-    milestoneText: { fontSize: 9, color: "#A0A0A0", marginTop: 2, textAlign: "center", flex: 1 },
-    milestoneActive: { color: "#C8FF00", fontWeight: 700 },
-    dateRow: { display: "flex", justifyContent: "space-between", marginTop: 8 },
-    dateText: { fontSize: 11, color: "#A0A0A0" },
-    daysLeft: { fontSize: 11, fontWeight: 600 },
-    cardActions: { display: "flex", gap: 8, marginTop: 12 },
-    btnSmall: { padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, border: "1px solid rgba(200,255,0,0.15)", background: "rgba(200,255,0,0.06)", color: "#C8FF00", cursor: "pointer", transition: "all 0.2s" },
-    btnDanger: { padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, border: "1px solid rgba(255,71,87,0.15)", background: "rgba(255,71,87,0.06)", color: "#FF4757", cursor: "pointer", transition: "all 0.2s" },
-    addBtn: { padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 700, background: "#C8FF00", color: "#0B0B0B", border: "none", cursor: "pointer", transition: "all 0.2s" },
-    overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20, overflowY: "auto" },
-    modal: { width: "100%", maxWidth: 500, background: "rgba(15,15,15,0.98)", border: "1px solid rgba(200,255,0,0.12)", borderRadius: 20, padding: 28, maxHeight: "90vh", overflowY: "auto" },
-    modalTitle: { fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 20 },
-    closeBtn: { position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#A0A0A0", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 14 },
-    label: { fontSize: 12, fontWeight: 600, color: "#A0A0A0", marginBottom: 6, display: "block" },
-    input: { width: "100%", padding: "10px 14px", background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 10, color: "#FFFFFF", fontSize: 14, outline: "none", boxSizing: "border-box" },
-    textarea: { width: "100%", padding: "10px 14px", background: "#1D1D1D", border: "1px solid rgba(200,255,0,0.1)", borderRadius: 10, color: "#FFFFFF", fontSize: 14, outline: "none", resize: "vertical", minHeight: 60, boxSizing: "border-box", fontFamily: "inherit" },
-    typeGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 },
-    typeBtn: { padding: "10px 6px", borderRadius: 10, border: "1px solid rgba(200,255,0,0.08)", background: "#1D1D1D", cursor: "pointer", textAlign: "center", transition: "all 0.2s", color: "#A0A0A0" },
-    typeBtnActive: { borderColor: "rgba(200,255,0,0.35)", background: "rgba(200,255,0,0.08)", color: "#C8FF00" },
-    typeIcon: { fontSize: 22, display: "block", marginBottom: 4 },
-    typeName: { fontSize: 10, fontWeight: 600 },
-    row: { display: "flex", gap: 10 },
-    rowField: { flex: 1 },
-    celebrateOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1100 },
-    celebrateCard: { background: "#151515", border: "1px solid rgba(200,255,0,0.2)", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 380, width: "90%" },
-    celebrateIcon: { fontSize: 64, marginBottom: 16 },
-    celebrateTitle: { fontSize: 24, fontWeight: 800, color: "#C8FF00", marginBottom: 8 },
-    celebrateSub: { fontSize: 14, color: "#A0A0A0", marginBottom: 24 },
-    archiveToggle: { fontSize: 12, color: "#A0A0A0", cursor: "pointer", background: "none", border: "1px solid rgba(160,160,160,0.15)", padding: "6px 14px", borderRadius: 8, transition: "all 0.2s" },
-    archiveCard: { background: "#151515", border: "1px solid rgba(200,255,0,0.04)", borderRadius: 12, padding: 14, opacity: 0.7 },
-    emptyState: { textAlign: "center", padding: "48px 0", color: "#A0A0A0" },
-    emptyIcon: { fontSize: 48, marginBottom: 12, opacity: 0.4 },
-    emptyText: { fontSize: 14, marginBottom: 4 },
-    emptySub: { fontSize: 12, color: "#666" },
-    sectionLabel: { fontSize: 13, fontWeight: 700, color: "#A0A0A0", marginBottom: 12, marginTop: 8 },
-  };
-
   return (
-    <div style={s.page}>
-      <div style={s.header}>
+    <div className="rd-page">
+      <div className="rd-page-head">
         <div>
-          <h2 style={s.title}>Goal Manager</h2>
-          <p style={s.sub}>Set targets, track progress, and celebrate milestones</p>
+          <span className="rd-kicker"><Target size={13} /> Goals</span>
+          <h1 className="rd-title">Goal Manager</h1>
+          <p className="rd-sub">Set targets, track progress, and celebrate milestones</p>
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div className="rd-top-right">
           {archivedGoals.length > 0 && (
-            <button
-              style={s.archiveToggle}
-              onClick={() => setShowArchive(!showArchive)}
-            >
+            <button className="rd-btn-secondary rd-btn-sm" onClick={() => setShowArchive(!showArchive)}>
               {showArchive ? "Hide" : "Completed"} ({archivedGoals.length})
             </button>
           )}
-          <motion.button
-            style={s.addBtn}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setShowCreate(true)}
-          >
-            + New Goal
+          <motion.button className="rd-btn-primary rd-btn-sm" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={() => setShowCreate(true)}>
+            <Plus size={15} /> New Goal
           </motion.button>
         </div>
       </div>
 
-      <div style={s.statsRow}>
-        <div style={s.statCard}>
-          <div style={s.statValue}>{activeGoals.length}</div>
-          <div style={s.statLabel}>Active Goals</div>
+      <div className="rd-nut-stats" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+        <div className="rd-nut-stat lime">
+          <div className="l">Active Goals</div>
+          <div className="v">{activeGoals.length}</div>
+          <div className="s">In progress right now</div>
         </div>
-        <div style={s.statCard}>
-          <div style={s.statValue}>{archivedGoals.length}</div>
-          <div style={s.statLabel}>Completed</div>
+        <div className="rd-nut-stat green">
+          <div className="l">Completed</div>
+          <div className="v">{archivedGoals.length}</div>
+          <div className="s">Targets reached</div>
         </div>
-        <div style={s.statCard}>
-          <div style={s.statValue}>
-            {activeGoals.length > 0
-              ? Math.round(activeGoals.reduce((acc, g) => acc + getProgressPercent(g.currentValue, g.targetValue), 0) / activeGoals.length)
-              : 0}%
-          </div>
-          <div style={s.statLabel}>Avg Progress</div>
+        <div className="rd-nut-stat blue">
+          <div className="l">Avg Progress</div>
+          <div className="v">{avgPct}<span>%</span></div>
+          <div className="s">Across active goals</div>
         </div>
       </div>
 
       {activeGoals.length === 0 && archivedGoals.length === 0 && (
-        <motion.div style={s.emptyState} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <div style={s.emptyIcon}>🎯</div>
-          <div style={s.emptyText}>No goals yet</div>
-          <div style={s.emptySub}>Create your first goal to start tracking progress</div>
+        <motion.div className="rd-card rd-empty" style={{ padding: "48px 16px" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <Target size={30} style={{ color: "rgba(200,255,0,0.3)", marginBottom: 4 }} />
+          <div className="rd-empty-title">No goals yet</div>
+          <div className="rd-empty-sub">Create your first goal to start tracking progress</div>
         </motion.div>
       )}
 
       {activeGoals.length > 0 && (
-        <div style={s.grid}>
+        <div className="rd-tmpl-grid">
           <AnimatePresence>
             {activeGoals.map((goal) => {
               const percent = getProgressPercent(goal.currentValue, goal.targetValue);
               const color = getGoalColor(goal.type);
               const days = daysRemaining(goal.targetDate);
+              const daysColor = days !== null && days < 0 ? "red" : days !== null && days < 7 ? "orange" : "muted";
               return (
                 <motion.div
                   key={goal.id}
-                  style={s.card}
+                  className="rd-tmpl-card"
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <div style={s.cardHeader}>
-                    <div style={{ ...s.iconWrap, background: `${color}15` }}>
-                      {getGoalIcon(goal.type)}
+                  <div className="rd-card-head" style={{ marginBottom: 0, flexWrap: "wrap" }}>
+                    <div className="rd-card-title" style={{ minWidth: 0, flex: 1 }}>
+                      <div className="rd-card-title-ico" style={{ background: `${color}15`, color, borderColor: `${color}30` }}>
+                        {getGoalIcon(goal.type)}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div className="rd-card-name" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{goal.title}</div>
+                      </div>
                     </div>
-                    <div style={s.cardTitle}>{goal.title}</div>
-                    <span style={{ ...s.cardType, color, background: `${color}12` }}>{goal.type}</span>
+                    <span className="rd-ex-tag" style={{ color, background: `${color}12`, borderColor: `${color}25` }}>{goal.type}</span>
                   </div>
 
                   {goal.description && (
-                    <div style={s.cardDesc}>{goal.description}</div>
+                    <div className="rd-tmpl-desc" style={{ lineHeight: 1.55 }}>{goal.description}</div>
                   )}
 
-                  <div style={s.progressSection}>
-                    <div style={s.progressHeader}>
-                      <span style={s.progressLabel}>{goal.currentValue} / {goal.targetValue}</span>
-                      <span style={s.progressValue}>{percent}%</span>
+                  <div>
+                    <div className="rd-macro-head">
+                      <span className="rd-macro-label">{goal.currentValue} / {goal.targetValue}</span>
+                      <span className="rd-macro-val"><b>{percent}%</b></span>
                     </div>
-                    <div style={s.progressBarBg}>
+                    <div className="rd-macro-track">
                       <motion.div
-                        style={{ ...s.progressBarFill, background: color }}
+                        className="rd-macro-fill"
+                        style={{ background: color }}
                         initial={{ width: 0 }}
                         animate={{ width: `${percent}%` }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
                       />
                     </div>
-                    <div style={s.milestones}>
+                    <div className="rd-tmpl-chips" style={{ marginTop: 8 }}>
                       {MILESTONES.map(m => (
                         <span
                           key={m}
-                          style={{
-                            ...s.milestoneText,
-                            ...(percent >= m ? s.milestoneActive : {}),
-                          }}
+                          className={`rd-ex-tag ${percent >= m ? "" : "muted"}`}
+                          style={percent >= m ? { color, background: `${color}10`, borderColor: `${color}30` } : {}}
                         >
                           {m === 100 ? "✓" : `${m}%`}
                         </span>
@@ -271,29 +209,21 @@ export default function GoalManager({ state, dispatch }) {
                     </div>
                   </div>
 
-                  <div style={s.dateRow}>
-                    <span style={s.dateText}>Started {formatDate(goal.startDate)}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                    <span className="rd-count" style={{ whiteSpace: "nowrap" }}>Started {formatDate(goal.startDate)}</span>
                     {goal.targetDate && (
-                      <span style={{ ...s.daysLeft, color: days !== null && days < 0 ? "#FF4757" : days !== null && days < 7 ? "#FFA500" : "#A0A0A0" }}>
+                      <span className={`rd-ex-tag ${daysColor}`}>
                         {days !== null && days < 0 ? `${Math.abs(days)}d overdue` : days !== null ? `${days}d left` : ""}
                       </span>
                     )}
                   </div>
 
-                  <div style={s.cardActions}>
-                    <button
-                      style={s.btnSmall}
-                      onClick={() => {
-                        setEditingGoal(goal);
-                      }}
-                    >
-                      Update
+                  <div className="rd-tmpl-actions">
+                    <button className="rd-btn-sm ghost" style={{ flex: 1 }} onClick={() => { setEditingGoal(goal); }}>
+                      <Pencil size={13} /> Update
                     </button>
-                    <button
-                      style={s.btnDanger}
-                      onClick={() => handleDelete(goal.id)}
-                    >
-                      Delete
+                    <button className="rd-btn-sm danger" style={{ flex: 1 }} onClick={() => handleDelete(goal.id)}>
+                      <Trash2 size={13} /> Delete
                     </button>
                   </div>
                 </motion.div>
@@ -305,28 +235,32 @@ export default function GoalManager({ state, dispatch }) {
 
       {showArchive && archivedGoals.length > 0 && (
         <>
-          <div style={{ ...s.sectionLabel, marginTop: 20 }}>Completed Goals</div>
-          <div style={s.grid}>
+          <div className="rd-section-label" style={{ marginTop: 4 }}>Completed Goals</div>
+          <div className="rd-tmpl-grid">
             <AnimatePresence>
               {archivedGoals.map((goal) => (
                 <motion.div
                   key={goal.id}
-                  style={s.archiveCard}
+                  className="rd-tmpl-card"
                   layout
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 0.7 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                 >
-                  <div style={s.cardHeader}>
-                    <div style={{ ...s.iconWrap, background: "rgba(0,200,83,0.1)" }}>✅</div>
-                    <div style={{ ...s.cardTitle, color: "#A0A0A0" }}>{goal.title}</div>
-                    <span style={{ ...s.cardType, color: "#00C853", background: "rgba(0,200,83,0.1)" }}>Done</span>
+                  <div className="rd-card-head" style={{ marginBottom: 0 }}>
+                    <div className="rd-card-title" style={{ minWidth: 0, flex: 1 }}>
+                      <div className="rd-card-title-ico green">
+                        <CheckCircle2 size={16} />
+                      </div>
+                      <div className="rd-card-name" style={{ color: "rgba(255,255,255,0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{goal.title}</div>
+                    </div>
+                    <span className="rd-ex-tag green">Done</span>
                   </div>
-                  <div style={{ fontSize: 11, color: "#666" }}>
-                    Completed {formatDate(goal.completedAt)}
-                  </div>
-                  <div style={{ ...s.cardActions, marginTop: 8 }}>
-                    <button style={s.btnDanger} onClick={() => handleDelete(goal.id)}>Remove</button>
+                  <div className="rd-count">Completed {formatDate(goal.completedAt)}</div>
+                  <div className="rd-tmpl-actions">
+                    <button className="rd-btn-sm danger" style={{ width: "100%" }} onClick={() => handleDelete(goal.id)}>
+                      <Trash2 size={13} /> Remove
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -336,76 +270,92 @@ export default function GoalManager({ state, dispatch }) {
       )}
 
       {showCreate && (
-        <div style={s.overlay} onClick={() => { setShowCreate(false); resetForm(); }}>
+        <div className="rd-modal-overlay" onClick={() => { setShowCreate(false); resetForm(); }}>
           <motion.div
-            style={{ ...s.modal, position: "relative" }}
+            className="rd-modal"
             onClick={e => e.stopPropagation()}
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <button style={s.closeBtn} onClick={() => { setShowCreate(false); resetForm(); }}>✕</button>
-            <div style={s.modalTitle}>Create New Goal</div>
+            <button className="rd-modal-close" onClick={() => { setShowCreate(false); resetForm(); }}><X size={15} /></button>
+            <div className="rd-modal-title" style={{ marginBottom: 18 }}>Create New Goal</div>
 
-            <div style={s.label}>Goal Type</div>
-            <div style={s.typeGrid}>
-              {GOAL_TYPES.map(g => (
-                <motion.button
-                  key={g.type}
-                  style={{ ...s.typeBtn, ...(form.type === g.type ? s.typeBtnActive : {}) }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => setForm({ ...form, type: g.type })}
-                >
-                  <span style={s.typeIcon}>{g.icon}</span>
-                  <span style={s.typeName}>{g.type}</span>
-                </motion.button>
-              ))}
-            </div>
+            <div className="rd-form">
+              <div className="rd-field">
+                <label>Goal Type</label>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                  {GOAL_TYPES.map(g => {
+                    const isActive = form.type === g.type;
+                    return (
+                      <motion.button
+                        key={g.type}
+                        type="button"
+                        className="rd-btn-sm ghost"
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => setForm({ ...form, type: g.type })}
+                        style={{
+                          display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "12px 8px", borderRadius: 12, lineHeight: 1,
+                          ...(isActive ? { background: "rgba(200,255,0,0.1)", borderColor: "rgba(200,255,0,0.3)", color: "#C8FF00" } : {}),
+                        }}
+                      >
+                        <span style={{ fontSize: 20 }}>{g.icon}</span>
+                        <span style={{ fontSize: 10, fontWeight: 600, lineHeight: 1.25 }}>{g.type}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
 
-            <div style={s.label}>Title</div>
-            <input
-              style={s.input}
-              placeholder="e.g. Lose 5kg by December"
-              value={form.title}
-              onChange={e => setForm({ ...form, title: e.target.value })}
-            />
-
-            <div style={{ ...s.label, marginTop: 12 }}>Description (optional)</div>
-            <textarea
-              style={s.textarea}
-              placeholder="Describe your goal..."
-              value={form.description}
-              onChange={e => setForm({ ...form, description: e.target.value })}
-            />
-
-            <div style={{ ...s.row, marginTop: 12 }}>
-              <div style={s.rowField}>
-                <div style={s.label}>Target Value</div>
+              <div className="rd-field">
+                <label>Title</label>
                 <input
-                  style={s.input}
-                  type="number"
-                  placeholder="100"
-                  value={form.targetValue}
-                  onChange={e => setForm({ ...form, targetValue: e.target.value })}
+                  className="rd-input"
+                  placeholder="e.g. Lose 5kg by December"
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
                 />
               </div>
-              <div style={s.rowField}>
-                <div style={s.label}>Current Value</div>
-                <input
-                  style={s.input}
-                  type="number"
-                  placeholder="0"
-                  value={form.currentValue}
-                  onChange={e => setForm({ ...form, currentValue: e.target.value })}
+
+              <div className="rd-field">
+                <label>Description (optional)</label>
+                <textarea
+                  className="rd-notes"
+                  style={{ minHeight: 70 }}
+                  placeholder="Describe your goal..."
+                  value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })}
                 />
               </div>
-            </div>
 
-            <div style={{ ...s.row, marginTop: 12 }}>
-              <div style={s.rowField}>
-                <div style={s.label}>Target Date</div>
+              <div className="rd-2col">
+                <div className="rd-field">
+                  <label>Target Value</label>
+                  <input
+                    className="rd-input"
+                    type="number"
+                    placeholder="100"
+                    value={form.targetValue}
+                    onChange={e => setForm({ ...form, targetValue: e.target.value })}
+                  />
+                </div>
+                <div className="rd-field">
+                  <label>Current Value</label>
+                  <input
+                    className="rd-input"
+                    type="number"
+                    placeholder="0"
+                    value={form.currentValue}
+                    onChange={e => setForm({ ...form, currentValue: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="rd-field">
+                <label>Target Date</label>
                 <input
-                  style={{ ...s.input, colorScheme: "dark" }}
+                  className="rd-input"
+                  style={{ colorScheme: "dark" }}
                   type="date"
                   value={form.targetDate}
                   onChange={e => setForm({ ...form, targetDate: e.target.value })}
@@ -413,15 +363,18 @@ export default function GoalManager({ state, dispatch }) {
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+            <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button
-                style={{ ...s.btnSmall, flex: 1, padding: "10px 0", background: "rgba(200,255,0,0.08)", fontSize: 13 }}
+                type="button"
+                className="rd-btn-secondary"
+                style={{ flex: 1 }}
                 onClick={() => { setShowCreate(false); resetForm(); }}
               >
                 Cancel
               </button>
               <motion.button
-                className="neon-btn"
+                type="button"
+                className="rd-btn-primary"
                 style={{ flex: 1 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -435,58 +388,63 @@ export default function GoalManager({ state, dispatch }) {
       )}
 
       {editingGoal && (
-        <div style={s.overlay} onClick={() => setEditingGoal(null)}>
+        <div className="rd-modal-overlay" onClick={() => setEditingGoal(null)}>
           <motion.div
-            style={{ ...s.modal, position: "relative" }}
+            className="rd-modal"
             onClick={e => e.stopPropagation()}
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <button style={s.closeBtn} onClick={() => setEditingGoal(null)}>✕</button>
-            <div style={s.cardHeader}>
-              <div style={{ ...s.iconWrap, background: `${getGoalColor(editingGoal.type)}15` }}>
-                {getGoalIcon(editingGoal.type)}
-              </div>
-              <div>
-                <div style={s.cardTitle}>{editingGoal.title}</div>
-                <div style={{ fontSize: 11, color: "#A0A0A0" }}>{editingGoal.type}</div>
+            <button className="rd-modal-close" onClick={() => setEditingGoal(null)}><X size={15} /></button>
+
+            <div className="rd-card-head" style={{ marginBottom: 18 }}>
+              <div className="rd-card-title" style={{ minWidth: 0 }}>
+                <div className="rd-card-title-ico" style={{ width: 40, height: 40, borderRadius: 12, background: `${getGoalColor(editingGoal.type)}15`, color: getGoalColor(editingGoal.type), borderColor: `${getGoalColor(editingGoal.type)}30` }}>
+                  {getGoalIcon(editingGoal.type)}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="rd-card-name">{editingGoal.title}</div>
+                  <div className="rd-card-kicker">{editingGoal.type}</div>
+                </div>
               </div>
             </div>
 
-            <div style={{ marginTop: 20 }}>
-              <div style={s.progressHeader}>
-                <span style={s.progressLabel}>Progress</span>
-                <span style={s.progressValue}>
-                  {getProgressPercent(editingGoal.currentValue, editingGoal.targetValue)}%
+            <div style={{ marginBottom: 18 }}>
+              <div className="rd-macro-head">
+                <span className="rd-macro-label">Progress</span>
+                <span className="rd-macro-val">
+                  <b>{getProgressPercent(editingGoal.currentValue, editingGoal.targetValue)}%</b>
                 </span>
               </div>
-              <div style={{ ...s.progressBarBg, height: 12 }}>
+              <div className="rd-macro-track" style={{ height: 10, borderRadius: 5 }}>
                 <motion.div
-                  style={{ ...s.progressBarFill, background: getGoalColor(editingGoal.type), height: 12 }}
+                  className="rd-macro-fill"
+                  style={{ background: getGoalColor(editingGoal.type), height: 10, borderRadius: 5 }}
                   animate={{ width: `${getProgressPercent(editingGoal.currentValue, editingGoal.targetValue)}%` }}
                   transition={{ duration: 0.5 }}
                 />
               </div>
-              <div style={s.milestones}>
-                {MILESTONES.map(m => (
-                  <span
-                    key={m}
-                    style={{
-                      ...s.milestoneText,
-                      ...(getProgressPercent(editingGoal.currentValue, editingGoal.targetValue) >= m ? s.milestoneActive : {}),
-                    }}
-                  >
-                    {m === 100 ? "✓" : `${m}%`}
-                  </span>
-                ))}
+              <div className="rd-tmpl-chips" style={{ marginTop: 8 }}>
+                {MILESTONES.map(m => {
+                  const reached = getProgressPercent(editingGoal.currentValue, editingGoal.targetValue) >= m;
+                  return (
+                    <span
+                      key={m}
+                      className={`rd-ex-tag ${reached ? "" : "muted"}`}
+                      style={reached ? { color: getGoalColor(editingGoal.type), background: `${getGoalColor(editingGoal.type)}10`, borderColor: `${getGoalColor(editingGoal.type)}30` } : {}}
+                    >
+                      {m === 100 ? "✓" : `${m}%`}
+                    </span>
+                  );
+                })}
               </div>
             </div>
 
-            <div style={{ ...s.row, marginTop: 20 }}>
-              <div style={s.rowField}>
-                <div style={s.label}>Current Value</div>
+            <div className="rd-2col" style={{ marginBottom: 18 }}>
+              <div className="rd-field">
+                <label>Current Value</label>
                 <input
-                  style={s.input}
+                  className="rd-input"
                   type="number"
                   value={editingGoal.currentValue}
                   onChange={e => {
@@ -495,10 +453,10 @@ export default function GoalManager({ state, dispatch }) {
                   }}
                 />
               </div>
-              <div style={s.rowField}>
-                <div style={s.label}>Target Value</div>
+              <div className="rd-field">
+                <label>Target Value</label>
                 <input
-                  style={s.input}
+                  className="rd-input"
                   type="number"
                   value={editingGoal.targetValue}
                   onChange={e => {
@@ -509,15 +467,13 @@ export default function GoalManager({ state, dispatch }) {
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button
-                style={{ ...s.btnSmall, flex: 1, padding: "10px 0", background: "rgba(200,255,0,0.08)", fontSize: 13 }}
-                onClick={() => setEditingGoal(null)}
-              >
+            <div style={{ display: "flex", gap: 10 }}>
+              <button type="button" className="rd-btn-secondary" style={{ flex: 1 }} onClick={() => setEditingGoal(null)}>
                 Cancel
               </button>
               <motion.button
-                className="neon-btn"
+                type="button"
+                className="rd-btn-primary"
                 style={{ flex: 1 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -540,35 +496,37 @@ export default function GoalManager({ state, dispatch }) {
       <AnimatePresence>
         {completedGoal && (
           <motion.div
-            style={s.celebrateOverlay}
+            className="rd-modal-overlay"
+            style={{ zIndex: 1100 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              style={s.celebrateCard}
+              className="rd-modal"
+              style={{ maxWidth: 380, textAlign: "center" }}
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <motion.div
-                style={s.celebrateIcon}
+                style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}
                 animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
                 transition={{ duration: 0.6 }}
               >
-                🏆
+                <Trophy size={64} style={{ color: "#C8FF00" }} />
               </motion.div>
-              <div style={s.celebrateTitle}>Goal Completed!</div>
-              <div style={s.celebrateSub}>{completedGoal.title} — amazing work!</div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#C8FF00" }}>Goal Completed!</div>
+              <div className="rd-tmpl-desc" style={{ margin: "8px 0 20px" }}>{completedGoal.title} — amazing work!</div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                 {MILESTONES.map(m => (
                   <motion.span
                     key={m}
+                    className="rd-ex-tag"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: m * 0.005 }}
-                    style={{ fontSize: 11, color: "#C8FF00", background: "rgba(200,255,0,0.1)", padding: "4px 10px", borderRadius: 6 }}
                   >
                     {m}%
                   </motion.span>

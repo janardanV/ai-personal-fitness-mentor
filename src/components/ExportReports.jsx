@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { FileDown, FileText, Download, X, Dumbbell, UtensilsCrossed, TrendingUp, Footprints } from "lucide-react";
 
 const COLORS = {
   bg: "#0B0B0B",
@@ -15,10 +16,10 @@ const COLORS = {
 };
 
 const EXPORT_TYPES = [
-  { id: "workouts", label: "Workout History", icon: "🏋️" },
-  { id: "nutrition", label: "Nutrition", icon: "🥗" },
-  { id: "progress", label: "Progress", icon: "📈" },
-  { id: "running", label: "Running", icon: "🏃" },
+  { id: "workouts", label: "Workout History", icon: Dumbbell },
+  { id: "nutrition", label: "Nutrition", icon: UtensilsCrossed },
+  { id: "progress", label: "Progress", icon: TrendingUp },
+  { id: "running", label: "Running", icon: Footprints },
 ];
 
 const FORMAT_OPTIONS = [
@@ -462,218 +463,153 @@ export default function ExportReports({ state, dispatch }) {
     }, 300);
   };
 
+  const previewColors = ["lime", "blue", "orange"];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      style={{ padding: "0 0 40px", maxWidth: 800, margin: "0 auto" }}
+      className="rd-page"
+      style={{ maxWidth: 800, width: "100%", margin: "0 auto" }}
     >
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: COLORS.text, marginBottom: 6 }}>
-          Export Reports
-        </h1>
-        <p style={{ fontSize: 13, color: COLORS.secondary }}>
-          Export your fitness data as PDF or CSV
-        </p>
+      <div className="rd-page-head">
+        <div>
+          <span className="rd-kicker"><FileDown size={13} /> Reports</span>
+          <h1 className="rd-title">Export Reports</h1>
+          <p className="rd-sub">Export your fitness data as PDF or CSV</p>
+        </div>
       </div>
 
-      <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.secondary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10, display: "block" }}>
-            Data Type
-          </label>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-            {EXPORT_TYPES.map((t) => (
-              <motion.button
-                key={t.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setExportType(t.id)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "14px 16px",
-                  borderRadius: 12,
-                  background: exportType === t.id ? COLORS.accentDim : COLORS.bg,
-                  border: `1px solid ${exportType === t.id ? COLORS.accent : COLORS.border}`,
-                  color: exportType === t.id ? COLORS.accent : COLORS.secondary,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-              >
-                <span style={{ fontSize: 18 }}>{t.icon}</span>
-                {t.label}
-              </motion.button>
-            ))}
+      <div className="rd-card">
+        <div className="rd-card-head">
+          <div className="rd-card-title">
+            <div className="rd-card-title-ico lime"><FileDown size={15} /></div>
+            <div>
+              <div className="rd-card-kicker">Export</div>
+              <div className="rd-card-name">Generate Report</div>
+            </div>
           </div>
         </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.secondary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10, display: "block" }}>
-            Date Range
-          </label>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <div style={{ flex: 1 }}>
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  borderRadius: 12,
-                  background: COLORS.bg,
-                  border: `1px solid ${COLORS.border}`,
-                  color: COLORS.text,
-                  fontSize: 13,
-                  outline: "none",
-                }}
-              />
-              <span style={{ fontSize: 11, color: COLORS.secondary, marginTop: 4, display: "block" }}>From</span>
+        <div className="rd-form">
+          <div className="rd-field">
+            <label>Data Type</label>
+            <div className="rd-tabbar">
+              {EXPORT_TYPES.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <motion.button
+                    key={t.id}
+                    whileTap={{ scale: 0.97 }}
+                    className={`rd-tab ${exportType === t.id ? "active" : ""}`}
+                    onClick={() => setExportType(t.id)}
+                  >
+                    <Icon size={15} /> {t.label}
+                  </motion.button>
+                );
+              })}
             </div>
-            <span style={{ color: COLORS.secondary, fontSize: 13, marginTop: 14 }}>to</span>
-            <div style={{ flex: 1 }}>
-              <input
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  borderRadius: 12,
-                  background: COLORS.bg,
-                  border: `1px solid ${COLORS.border}`,
-                  color: COLORS.text,
-                  fontSize: 13,
-                  outline: "none",
-                }}
-              />
-              <span style={{ fontSize: 11, color: COLORS.secondary, marginTop: 4, display: "block" }}>To</span>
+          </div>
+
+          <div className="rd-field">
+            <label>Date Range</label>
+            <div className="rd-2col" style={{ alignItems: "end", gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>From</div>
+                <input
+                  type="date"
+                  className="rd-input"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>To</div>
+                <input
+                  type="date"
+                  className="rd-input"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                />
+              </div>
             </div>
             {(from || to) && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 whileTap={{ scale: 0.95 }}
+                className="rd-mini-btn"
                 onClick={() => { setFrom(""); setTo(""); }}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  background: COLORS.bg,
-                  border: `1px solid ${COLORS.border}`,
-                  color: COLORS.secondary,
-                  fontSize: 12,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  marginTop: 14,
-                }}
+                style={{ marginTop: 10 }}
               >
-                Clear
+                <X size={13} /> Clear
               </motion.button>
             )}
           </div>
-        </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.secondary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10, display: "block" }}>
-            Format
-          </label>
-          <div style={{ display: "flex", gap: 10 }}>
-            {FORMAT_OPTIONS.map((f) => (
-              <motion.button
-                key={f.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setFormat(f.id)}
-                style={{
-                  flex: 1,
-                  padding: "12px 16px",
-                  borderRadius: 12,
-                  background: format === f.id ? COLORS.accentDim : COLORS.bg,
-                  border: `1px solid ${format === f.id ? COLORS.accent : COLORS.border}`,
-                  color: format === f.id ? COLORS.accent : COLORS.secondary,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  textAlign: "center",
-                  transition: "all 0.2s",
-                }}
-              >
-                {f.label}
-              </motion.button>
-            ))}
+          <div className="rd-field">
+            <label>Format</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {FORMAT_OPTIONS.map((f) => (
+                <motion.button
+                  key={f.id}
+                  whileTap={{ scale: 0.97 }}
+                  className={`rd-chip ${format === f.id ? "active" : ""}`}
+                  onClick={() => setFormat(f.id)}
+                  style={{ flex: 1, justifyContent: "center", padding: "11px 16px", fontSize: 13, fontWeight: 700 }}
+                >
+                  {f.id === "pdf" ? <FileText size={15} /> : <FileDown size={15} />} {f.label}
+                </motion.button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: COLORS.secondary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10, display: "block" }}>
-            Preview
-          </label>
-          <div style={{
-            background: COLORS.bg,
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: 12,
-            padding: 16,
-          }}>
+          <div className="rd-field">
+            <label>Preview</label>
             {preview.empty ? (
-              <div style={{ textAlign: "center", padding: "16px 0" }}>
-                <span style={{ fontSize: 24, display: "block", marginBottom: 8 }}>📭</span>
-                <span style={{ fontSize: 13, color: COLORS.secondary }}>No data found for the selected range</span>
+              <div className="rd-card rd-empty" style={{ padding: "36px 16px", background: "#111111" }}>
+                <FileText size={26} style={{ color: "rgba(255,255,255,0.25)", marginBottom: 2 }} />
+                <div className="rd-empty-title">No data found</div>
+                <div className="rd-empty-sub">No records match the selected range.</div>
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+              <div className="rd-nut-stats" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
                 {preview.stats.map((s, i) => (
-                  <div key={i} style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: COLORS.accent, marginBottom: 2 }}>
-                      {s.value}
-                    </div>
-                    <div style={{ fontSize: 11, color: COLORS.secondary }}>
-                      {s.label}
-                    </div>
+                  <div key={i} className={`rd-nut-stat ${previewColors[i % previewColors.length] || "lime"}`}>
+                    <div className="l">{s.label}</div>
+                    <div className="v">{s.value}</div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
 
-        <motion.button
-          whileHover={!preview.empty ? { scale: 1.02, y: -1 } : {}}
-          whileTap={!preview.empty ? { scale: 0.98 } : {}}
-          onClick={handleExport}
-          disabled={preview.empty || exporting}
-          style={{
-            width: "100%",
-            padding: "14px 24px",
-            borderRadius: 12,
-            background: preview.empty ? COLORS.surfaceHover : COLORS.accent,
-            color: preview.empty ? COLORS.secondary : COLORS.bg,
-            fontSize: 14,
-            fontWeight: 800,
-            cursor: preview.empty ? "not-allowed" : "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            transition: "all 0.2s",
-            opacity: exporting ? 0.7 : 1,
-          }}
-        >
-          {exporting ? (
-            <motion.span
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              style={{ display: "inline-block", width: 16, height: 16, border: `2px solid ${COLORS.bg}`, borderTopColor: "transparent", borderRadius: "50%" }}
-            />
-          ) : (
-            "⬇"
-          )}
-          {exporting ? "Exporting..." : `Export ${format.toUpperCase()}`}
-        </motion.button>
+          <motion.button
+            whileTap={!preview.empty ? { scale: 0.98 } : {}}
+            onClick={handleExport}
+            disabled={preview.empty || exporting}
+            className="rd-btn-primary"
+            style={{
+              width: "100%",
+              opacity: exporting ? 0.7 : 1,
+              cursor: preview.empty ? "not-allowed" : "pointer",
+              background: preview.empty ? "rgba(255,255,255,0.06)" : undefined,
+              color: preview.empty ? "rgba(255,255,255,0.4)" : undefined,
+            }}
+          >
+            {exporting ? (
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #0B0B0B", borderTopColor: "transparent", borderRadius: "50%" }}
+              />
+            ) : (
+              <Download size={16} />
+            )}
+            {exporting ? "Exporting..." : `Export ${format.toUpperCase()}`}
+          </motion.button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -682,55 +618,55 @@ export default function ExportReports({ state, dispatch }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 16, padding: 24 }}
+            className="rd-card"
           >
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: COLORS.text, marginBottom: 16 }}>
-              Recent Exports
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {exportHistory.map((e) => (
-                <div
-                  key={e.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "12px 16px",
-                    background: COLORS.bg,
-                    borderRadius: 10,
-                    border: `1px solid ${COLORS.border}`,
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <span style={{ fontSize: 16 }}>
-                      {EXPORT_TYPES.find((t) => t.id === e.type)?.icon}
-                    </span>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.text }}>
-                        {EXPORT_TYPES.find((t) => t.id === e.type)?.label}
-                      </div>
-                      <div style={{ fontSize: 11, color: COLORS.secondary }}>
-                        {e.range} · {e.count} records
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      padding: "3px 8px",
-                      borderRadius: 6,
-                      background: e.format === "PDF" ? "rgba(255, 71, 87, 0.15)" : "rgba(46, 213, 115, 0.15)",
-                      color: e.format === "PDF" ? "#FF4757" : "#2ED573",
-                    }}>
-                      {e.format}
-                    </div>
-                    <div style={{ fontSize: 11, color: COLORS.secondary, marginTop: 4 }}>
-                      {e.date}
-                    </div>
-                  </div>
+            <div className="rd-card-head">
+              <div className="rd-card-title">
+                <div className="rd-card-title-ico blue"><FileText size={15} /></div>
+                <div>
+                  <div className="rd-card-kicker">History</div>
+                  <div className="rd-card-name">Recent Exports</div>
                 </div>
-              ))}
+              </div>
+              <span className="rd-count"><b>{exportHistory.length}</b> exports</span>
+            </div>
+            <div>
+              {exportHistory.map((e, i) => {
+                const ExportIcon = EXPORT_TYPES.find((t) => t.id === e.type)?.icon || FileText;
+                return (
+                  <div
+                    key={e.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      padding: "11px 0",
+                      borderBottom: i < exportHistory.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                      <div className="rd-card-title-ico lime" style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0 }}>
+                        <ExportIcon size={14} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>
+                          {EXPORT_TYPES.find((t) => t.id === e.type)?.label}
+                        </div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+                          {e.range} · {e.count} records
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <span className={`rd-ex-tag ${e.format === "PDF" ? "red" : "green"}`}>{e.format}</span>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+                        {e.date}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         )}
