@@ -5,14 +5,14 @@ import autoTable from "jspdf-autotable";
 import { FileDown, FileText, Download, X, Dumbbell, UtensilsCrossed, TrendingUp, Footprints } from "lucide-react";
 
 const COLORS = {
-  bg: "#0B0B0B",
-  surface: "#151515",
-  accent: "#C8FF00",
-  secondary: "#A0A0A0",
+  bg: "#0B0F14",
+  surface: "#1E242E",
+  accent: "#C8FF32",
+  secondary: "#A7B1C2",
   text: "#FFFFFF",
   border: "#252525",
   surfaceHover: "#1C1C1C",
-  accentDim: "rgba(200, 255, 0, 0.15)",
+  accentDim: "rgba(198, 255, 0, 0.15)",
 };
 
 const EXPORT_TYPES = [
@@ -568,7 +568,7 @@ export default function ExportReports({ state, dispatch }) {
           <div className="rd-field">
             <label>Preview</label>
             {preview.empty ? (
-              <div className="rd-card rd-empty" style={{ padding: "36px 16px", background: "#111111" }}>
+              <div className="rd-card rd-empty" style={{ padding: "36px 16px", background: "#1E242E" }}>
                 <FileText size={26} style={{ color: "rgba(255,255,255,0.25)", marginBottom: 2 }} />
                 <div className="rd-empty-title">No data found</div>
                 <div className="rd-empty-sub">No records match the selected range.</div>
@@ -602,7 +602,7 @@ export default function ExportReports({ state, dispatch }) {
               <motion.span
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #0B0B0B", borderTopColor: "transparent", borderRadius: "50%" }}
+                style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #0B0F14", borderTopColor: "transparent", borderRadius: "50%" }}
               />
             ) : (
               <Download size={16} />

@@ -75,7 +75,7 @@ const BodyWeightLog = ({ state, dispatch }) => {
                   {fmt(latest.weight, 1)}<span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontFamily: "'Inter',sans-serif", fontWeight: 500 }}> kg</span>
                 </div>
                 {change !== null && (
-                  <div style={{ fontSize: 11, color: change < 0 ? "#A5E600" : change > 0 ? "#FF9F43" : "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: change < 0 ? "#C8FF32" : change > 0 ? "#FF9F0A" : "rgba(255,255,255,0.4)", marginTop: 2 }}>
                     {change > 0 ? "+" : ""}{fmt(change, 1)} kg
                   </div>
                 )}
@@ -86,15 +86,15 @@ const BodyWeightLog = ({ state, dispatch }) => {
             <AreaChart data={data.length ? data : [{ date: today().slice(5), weight: state.profile?.weight || 75 }]}>
               <defs>
                 <linearGradient id="bwg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#C8FF00" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#C8FF00" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#C8FF32" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#C8FF32" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#A0A0A0" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} axisLine={false} tickLine={false} width={36} domain={["auto", "auto"]} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#A7B1C2" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "#A7B1C2" }} axisLine={false} tickLine={false} width={36} domain={["auto", "auto"]} />
               <Tooltip contentStyle={{ background: "rgba(15,15,15,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 12 }} />
-              <Area type="monotone" dataKey="weight" stroke="#C8FF00" fill="url(#bwg)" strokeWidth={2} dot={{ fill: "#C8FF00", r: 3 }} />
+              <Area type="monotone" dataKey="weight" stroke="#C8FF32" fill="url(#bwg)" strokeWidth={2} dot={{ fill: "#C8FF32", r: 3 }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

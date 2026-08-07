@@ -104,7 +104,7 @@ export default function ExerciseLibrary({ state, dispatch }) {
   );
 
   const sectionTitle = (text, color) => (
-    <div style={{ fontSize: 13, fontWeight: 800, color: color || "#C8FF00", margin: "18px 0 10px" }}>{text}</div>
+    <div style={{ fontSize: 13, fontWeight: 800, color: color || "#C8FF32", margin: "18px 0 10px" }}>{text}</div>
   );
 
   return (
@@ -204,7 +204,7 @@ export default function ExerciseLibrary({ state, dispatch }) {
                   <img src={selectedExercise.gifUrl} alt={selectedExercise.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 ) : (
                   <>
-                    <Zap size={28} style={{ color: "rgba(200,255,0,0.4)" }} />
+                    <Zap size={28} style={{ color: "rgba(200,255,50,0.4)" }} />
                     <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>Animation / GIF coming soon</span>
                   </>
                 )}
@@ -215,21 +215,21 @@ export default function ExerciseLibrary({ state, dispatch }) {
               {sectionTitle("Steps")}
               {selectedExercise.steps.map((step, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 13, lineHeight: 1.6, color: "#E8E8E8" }}>
-                  <span style={{ minWidth: 22, height: 22, borderRadius: 6, background: "rgba(200,255,0,0.1)", color: "#C8FF00", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
+                  <span style={{ minWidth: 22, height: 22, borderRadius: 6, background: "rgba(200,255,50,0.1)", color: "#C8FF32", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
                   <span>{step}</span>
                 </div>
               ))}
 
-              {sectionTitle("Common Mistakes", "#FF4757")}
+              {sectionTitle("Common Mistakes", "#FF5A5F")}
               {selectedExercise.commonMistakes.map((m, i) => (
-                <div key={i} style={{ fontSize: 13, color: "#FF4757", marginBottom: 4, paddingLeft: 16, position: "relative" }}>
+                <div key={i} style={{ fontSize: 13, color: "#FF5A5F", marginBottom: 4, paddingLeft: 16, position: "relative" }}>
                   <span style={{ position: "absolute", left: 0 }}>•</span>{m}
                 </div>
               ))}
 
-              {sectionTitle("Tips", "#00C853")}
+              {sectionTitle("Tips", "#4ADE80")}
               {selectedExercise.tips.map((t, i) => (
-                <div key={i} style={{ fontSize: 13, color: "#00C853", marginBottom: 4, paddingLeft: 16, position: "relative" }}>
+                <div key={i} style={{ fontSize: 13, color: "#4ADE80", marginBottom: 4, paddingLeft: 16, position: "relative" }}>
                   <span style={{ position: "absolute", left: 0 }}>•</span>{t}
                 </div>
               ))}

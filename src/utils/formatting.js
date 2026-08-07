@@ -3,11 +3,6 @@ export const today = () => new Date().toISOString().split("T")[0];
 export const weekAgo = () => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split("T")[0]; };
 export const uid = () => Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
 
-export const formatChatTime = (ts) => {
-  const d = new Date(ts);
-  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-};
-
 export const fmtPace = (minPerKm) => {
   if (!minPerKm || !isFinite(minPerKm) || minPerKm <= 0) return "--:--";
   const min = Math.floor(minPerKm);

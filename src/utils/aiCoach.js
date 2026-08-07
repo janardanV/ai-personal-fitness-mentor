@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import React from "react";
-import { MOCK_COACHING, MOCK_DELAY, pick, fmt, today, weekAgo } from "./constants";
-import { calcStreak, calcWeeklyVolume } from "./calculations";
+import { MOCK_COACHING, MOCK_DELAY, pick } from "./constants";
 import { isUsingMock, callAnthropic } from "./aiProvider";
 
 export { isUsingMock };
@@ -99,98 +98,4 @@ export const useAICoach = () => {
   const cancel = useCallback(() => { abortRef.current?.abort(); }, []);
 
   return { ask, loading, error, cancel };
-};
-
-export const buildUserContext = (state) => {
-  const { profile, workouts, nutrition, recovery, bodyWeight, water, personalRecords, level, xp } = state;
-  const streak = calcStreak(workouts);
-  const weekVol = calcWeeklyVolume(workouts);
-  const todayStr = today();
-  const todayN = nutrition.find(n => n.date === todayStr);
-  const todayR = recovery.find(r => r.date === todayStr);
-  const latestW = bodyWeight.length > 0 ? bodyWeight[bodyWeight.length - 1] : null;
-  const topPRs = Object.entries(personalRecords || {}).slice(0, 5);
-
-  const parts = [
-    `## User Profile`,
-    `Name: ${profile?.name || "Unknown"}, Age: ${profile?.age || "N/A"}, Gender: ${profile?.gender || "N/A"}`,
-    `Weight: ${profile?.weight}kg, Height: ${profile?.height}cm, Body Fat: ${profile?.bodyFat || "N/A"}%`,
-    `Goal: ${(profile?.goal || "general").replace(/_/g, " ")}, Experience: ${profile?.experience || "intermediate"}`,
-    `TDEE: ${profile?.tdee || "N/A"} kcal, Target Calories: ${profile?.calories || "N/A"} kcal, Target Protein: ${profile?.protein || "N/A"}g`,
-    `Level: ${level}, XP: ${xp}, Streak: ${streak} days`,
-    ``,
-    `## Today's Data (${todayStr})`,
-    `Nutrition: ${todayN ? `${todayN.calories || 0} kcal, ${todayN.protein || 0}g protein, ${todayN.carbs || 0}g carbs, ${todayN.fat || 0}g fat` : "Not logged"}`,
-    `Recovery: ${todayR ? `Score ${todayR.score}/10, Sleep ${todayR.sleep}h, Quality ${todayR.quality}/10, Stress ${todayR.stress}/10` : "Not logged"}`,
-    `Water: ${(water || {})[todayStr] || 0} glasses`,
-  ];
-
-  if (workouts.length > 0) {
-    const recent = workouts.slice(-5).reverse();
-    parts.push(``, `## Recent Workouts (last ${recent.length})`);
-    recent.forEach(w => {
-      parts.push(`${w.date}: ${w.name || "Workout"} — ${w.exercises?.length || 0} exercises, ${Math.round(w.totalVolume)}kg volume, ${w.duration || "?"}min`);
-      w.exercises?.forEach(e => { parts.push(`  • ${e.name}: ${e.sets?.filter(s => s.done).length || 0} working sets`); });
-    });
-    parts.push(``, `Weekly Volume: ${Math.round(weekVol)}kg, Total Workouts: ${workouts.length}`);
-  }
-
-  if (bodyWeight.length > 1) {
-    const first = bodyWeight[0];
-    const last = bodyWeight[bodyWeight.length - 1];
-    const change = last.weight - first.weight;
-    parts.push(``, `## Body Weight Trend`, `Start: ${first.weight}kg (${first.date}) → Current: ${last.weight}kg (${last.date}), Change: ${change > 0 ? "+" : ""}${fmt(change, 1)}kg`);
-  }
-
-  if (topPRs.length > 0) {
-    parts.push(``, `## Personal Records`);
-    topPRs.forEach(([name, pr]) => { parts.push(`• ${name}: ${pr.weight}kg × ${pr.reps} reps (e1RM: ${fmt(pr.e1rm || 0, 0)}kg)`); });
-  }
-
-  if (recovery.length > 1) {
-    const avgSleep = recovery.slice(-7).reduce((s, r) => s + (r.sleep || 0), 0) / Math.min(recovery.length, 7);
-    const avgScore = recovery.slice(-7).reduce((s, r) => s + (r.score || 0), 0) / Math.min(recovery.length, 7);
-    parts.push(``, `## Recovery Averages (7-day)`, `Avg Sleep: ${fmt(avgSleep, 1)}h, Avg Recovery Score: ${fmt(avgScore, 1)}/10`);
-  }
-
-  return parts.join("\n");
-};
-
-export const buildSystemPrompt = (context) =>
-  `You are an elite AI personal trainer and nutrition coach with deep expertise in strength training, hypertrophy, powerlifting, sports nutrition, recovery optimization, and program design.
-
-You have FULL access to this user's training data, body metrics, nutrition logs, recovery data, and personal records. Use this data to give SPECIFIC, ACTIONABLE, and PERSONALIZED advice. Reference their actual numbers, exercises, and trends.
-
-Guidelines:
-- Be specific with numbers (sets, reps, weights, calories, macros)
-- Reference their actual data (workouts, PRs, recovery scores)
-- Keep responses concise but thorough (aim for 100-200 words)
-- Use bullet points and structure for readability
-- Be encouraging but honest
-- If data is missing, note it and suggest they log it
-- For workout programming, consider their experience level and recent training volume
-- For nutrition, reference their actual targets and today's intake
-- For recovery, consider their sleep, stress, and recent training load
-
-${context}`;
-
-export const renderMarkdown = (text) => {
-  if (!text) return "";
-  let html = text
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
-      `<pre class="chat-code-block"><code>${code.trim()}</code></pre>`)
-    .replace(/`([^`]+)`/g, '<code class="chat-inline-code">$1</code>')
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/^### (.+)$/gm, '<h4 class="chat-md-h">$1</h4>')
-    .replace(/^## (.+)$/gm, '<h3 class="chat-md-h">$1</h3>')
-    .replace(/^# (.+)$/gm, '<h2 class="chat-md-h">$1</h2>')
-    .replace(/^- (.+)$/gm, '<li class="chat-md-li">$1</li>')
-    .replace(/(<li class="chat-md-li">.*<\/li>\n?)+/g, m => `<ul class="chat-md-ul">${m}</ul>`)
-    .replace(/^(\d+)\. (.+)$/gm, '<li class="chat-md-oli">$2</li>')
-    .replace(/(<li class="chat-md-oli">.*<\/li>\n?)+/g, m => `<ol class="chat-md-ol">${m}</ol>`)
-    .replace(/\n{2,}/g, '<br/><br/>')
-    .replace(/\n/g, "<br/>");
-  return html;
 };

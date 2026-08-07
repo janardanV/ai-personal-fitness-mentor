@@ -1,36 +1,36 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
-import { Trophy, Zap, Medal, Flame, Dumbbell, Lock, Check } from 'lucide-react';
+import { Trophy, Zap, Medal, Flame, Dumbbell, Lock, Check, Gem, Sunrise, Moon, Salad, BarChart3, Beef, Target, Footprints, Route, Globe, Wind, Star, Sparkles } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Workout', 'Nutrition', 'Running', 'Social', 'Special'];
 
 const DAY_MS = 86400000;
 
 const ACHIEVEMENTS = [
-  { id: 'first_workout', category: 'Workout', icon: '🏋️', title: 'First Workout', description: 'Complete your first workout', xp: 50 },
-  { id: 'week_streak', category: 'Workout', icon: '🔥', title: 'Week Warrior', description: '7 consecutive active days', xp: 100 },
-  { id: 'month_streak', category: 'Workout', icon: '💎', title: 'Monthly Master', description: '30 consecutive active days', xp: 500 },
-  { id: 'ten_workouts', category: 'Workout', icon: '💪', title: 'Getting Stronger', description: 'Complete 10 workouts', xp: 100 },
-  { id: 'fifty_workouts', category: 'Workout', icon: '🦾', title: 'Iron Will', description: 'Complete 50 workouts', xp: 500 },
-  { id: 'hundred_workouts', category: 'Workout', icon: '🏆', title: 'Century Club', description: 'Complete 100 workouts', xp: 1000 },
-  { id: 'volume_1000', category: 'Workout', icon: '⚡', title: 'Power Lifter', description: '1000kg volume in single session', xp: 75 },
-  { id: 'volume_5000', category: 'Workout', icon: '🌋', title: 'Volcanic', description: '5000kg volume in single session', xp: 200 },
-  { id: 'early_bird', category: 'Workout', icon: '🌅', title: 'Early Bird', description: 'Workout before 7 AM', xp: 75 },
-  { id: 'night_owl', category: 'Workout', icon: '🦉', title: 'Night Owl', description: 'Workout after 10 PM', xp: 75 },
-  { id: 'first_meal', category: 'Nutrition', icon: '🥗', title: 'First Bite', description: 'Log your first meal', xp: 25 },
-  { id: 'nutrition_week', category: 'Nutrition', icon: '📊', title: 'Tracked Week', description: '7 days of nutrition tracking', xp: 100 },
-  { id: 'protein_hit', category: 'Nutrition', icon: '🥩', title: 'Protein Power', description: 'Hit protein target in a day', xp: 50 },
-  { id: 'calorie_master', category: 'Nutrition', icon: '🎯', title: 'Calorie Master', description: 'Stay within 100 cal of target for 7 days', xp: 150 },
-  { id: 'first_run', category: 'Running', icon: '🏃', title: 'First Steps', description: 'Complete your first run', xp: 25 },
-  { id: 'run_5k', category: 'Running', icon: '🏅', title: '5K Finisher', description: 'Run 5 km in a single session', xp: 100 },
-  { id: 'run_10k', category: 'Running', icon: '🥇', title: '10K Champion', description: 'Run 10 km in a single session', xp: 250 },
-  { id: 'total_100km', category: 'Running', icon: '🛣️', title: 'Road Runner', description: 'Run 100 km total', xp: 200 },
-  { id: 'total_500km', category: 'Running', icon: '🌍', title: 'Globe Trotter', description: 'Run 500 km total', xp: 1000 },
-  { id: 'speed_demon', category: 'Running', icon: '💨', title: 'Speed Demon', description: 'Pace faster than 4:30/km', xp: 300 },
-  { id: 'level_5', category: 'Special', icon: '⭐', title: 'Rising Star', description: 'Reach Level 5', xp: 100 },
-  { id: 'level_10', category: 'Special', icon: '🌟', title: 'Superstar', description: 'Reach Level 10', xp: 250 },
-  { id: 'level_25', category: 'Special', icon: '✨', title: 'Legend', description: 'Reach Level 25', xp: 500 },
-  { id: 'all_rounder', category: 'Special', icon: '🎖️', title: 'All-Rounder', description: 'Earn badges in 3+ categories', xp: 200 },
+  { id: 'first_workout', category: 'Workout', icon: Dumbbell, title: 'First Workout', description: 'Complete your first workout', xp: 50 },
+  { id: 'week_streak', category: 'Workout', icon: Flame, title: 'Week Warrior', description: '7 consecutive active days', xp: 100 },
+  { id: 'month_streak', category: 'Workout', icon: Gem, title: 'Monthly Master', description: '30 consecutive active days', xp: 500 },
+  { id: 'ten_workouts', category: 'Workout', icon: Dumbbell, title: 'Getting Stronger', description: 'Complete 10 workouts', xp: 100 },
+  { id: 'fifty_workouts', category: 'Workout', icon: Dumbbell, title: 'Iron Will', description: 'Complete 50 workouts', xp: 500 },
+  { id: 'hundred_workouts', category: 'Workout', icon: Trophy, title: 'Century Club', description: 'Complete 100 workouts', xp: 1000 },
+  { id: 'volume_1000', category: 'Workout', icon: Zap, title: 'Power Lifter', description: '1000kg volume in single session', xp: 75 },
+  { id: 'volume_5000', category: 'Workout', icon: Flame, title: 'Volcanic', description: '5000kg volume in single session', xp: 200 },
+  { id: 'early_bird', category: 'Workout', icon: Sunrise, title: 'Early Bird', description: 'Workout before 7 AM', xp: 75 },
+  { id: 'night_owl', category: 'Workout', icon: Moon, title: 'Night Owl', description: 'Workout after 10 PM', xp: 75 },
+  { id: 'first_meal', category: 'Nutrition', icon: Salad, title: 'First Bite', description: 'Log your first meal', xp: 25 },
+  { id: 'nutrition_week', category: 'Nutrition', icon: BarChart3, title: 'Tracked Week', description: '7 days of nutrition tracking', xp: 100 },
+  { id: 'protein_hit', category: 'Nutrition', icon: Beef, title: 'Protein Power', description: 'Hit protein target in a day', xp: 50 },
+  { id: 'calorie_master', category: 'Nutrition', icon: Target, title: 'Calorie Master', description: 'Stay within 100 cal of target for 7 days', xp: 150 },
+  { id: 'first_run', category: 'Running', icon: Footprints, title: 'First Steps', description: 'Complete your first run', xp: 25 },
+  { id: 'run_5k', category: 'Running', icon: Medal, title: '5K Finisher', description: 'Run 5 km in a single session', xp: 100 },
+  { id: 'run_10k', category: 'Running', icon: Trophy, title: '10K Champion', description: 'Run 10 km in a single session', xp: 250 },
+  { id: 'total_100km', category: 'Running', icon: Route, title: 'Road Runner', description: 'Run 100 km total', xp: 200 },
+  { id: 'total_500km', category: 'Running', icon: Globe, title: 'Globe Trotter', description: 'Run 500 km total', xp: 1000 },
+  { id: 'speed_demon', category: 'Running', icon: Wind, title: 'Speed Demon', description: 'Pace faster than 4:30/km', xp: 300 },
+  { id: 'level_5', category: 'Special', icon: Star, title: 'Rising Star', description: 'Reach Level 5', xp: 100 },
+  { id: 'level_10', category: 'Special', icon: Star, title: 'Superstar', description: 'Reach Level 10', xp: 250 },
+  { id: 'level_25', category: 'Special', icon: Sparkles, title: 'Legend', description: 'Reach Level 25', xp: 500 },
+  { id: 'all_rounder', category: 'Special', icon: Medal, title: 'All-Rounder', description: 'Earn badges in 3+ categories', xp: 200 },
 ];
 
 function calculateStreaks(workouts, runs) {
@@ -287,7 +287,7 @@ export default function Achievements({ state, dispatch }) {
             </div>
           </div>
           <div style={{ textAlign: "right", flexShrink: 0 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#C8FF00", fontFamily: "'JetBrains Mono',monospace", letterSpacing: "-0.02em", lineHeight: 1 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "#C8FF32", fontFamily: "'JetBrains Mono',monospace", letterSpacing: "-0.02em", lineHeight: 1 }}>
               {totalXP.toLocaleString()}<span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 500, fontFamily: "'Inter',sans-serif" }}> XP</span>
             </div>
             <div className="rd-metric-label">Total Earned</div>
@@ -299,7 +299,7 @@ export default function Achievements({ state, dispatch }) {
             initial={{ width: 0 }}
             animate={{ width: `${xpPercent}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            style={{ width: `${xpPercent}%`, background: 'linear-gradient(90deg, #A5E600, #C8FF00)', boxShadow: '0 0 10px rgba(200,255,0,0.3)' }}
+            style={{ width: `${xpPercent}%`, background: 'linear-gradient(90deg, #C8FF32, #C8FF32)', boxShadow: '0 0 10px rgba(200,255,50,0.3)' }}
           />
         </div>
       </div>
@@ -365,7 +365,7 @@ export default function Achievements({ state, dispatch }) {
               whileHover={{
                 scale: 1.02,
                 boxShadow: achievement.isEarned
-                  ? '0 0 24px rgba(200, 255, 0, 0.12)'
+                  ? '0 0 24px rgba(198, 255, 0, 0.12)'
                   : '0 8px 24px rgba(0, 0, 0, 0.22)',
               }}
               className="rd-card"
@@ -375,14 +375,14 @@ export default function Achievements({ state, dispatch }) {
                 flexDirection: 'column',
                 gap: '4px',
                 background: achievement.isEarned
-                  ? 'linear-gradient(180deg, rgba(200,255,0,0.05) 0%, rgba(19,19,19,0.6) 100%)'
+                  ? 'linear-gradient(180deg, rgba(200,255,50,0.05) 0%, rgba(19,19,19,0.6) 100%)'
                   : undefined,
-                border: achievement.isEarned ? '1px solid rgba(200,255,0,0.25)' : undefined,
+                border: achievement.isEarned ? '1px solid rgba(200,255,50,0.25)' : undefined,
                 opacity: achievement.isEarned ? 1 : 0.65,
               }}
             >
               {achievement.isEarned && (
-                <span style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #C8FF00, transparent)', opacity: 0.5 }} />
+                <span style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #C8FF32, transparent)', opacity: 0.5 }} />
               )}
 
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
@@ -393,13 +393,13 @@ export default function Achievements({ state, dispatch }) {
                     height: '44px',
                     borderRadius: '12px',
                     flexShrink: 0,
-                    background: achievement.isEarned ? 'rgba(200,255,0,0.12)' : 'rgba(255,255,255,0.04)',
-                    borderColor: achievement.isEarned ? 'rgba(200,255,0,0.25)' : 'rgba(255,255,255,0.07)',
-                    color: achievement.isEarned ? '#C8FF00' : 'rgba(255,255,255,0.35)',
+                    background: achievement.isEarned ? 'rgba(200,255,50,0.12)' : 'rgba(255,255,255,0.04)',
+                    borderColor: achievement.isEarned ? 'rgba(200,255,50,0.25)' : 'rgba(255,255,255,0.07)',
+                    color: achievement.isEarned ? '#C8FF32' : 'rgba(255,255,255,0.35)',
                     filter: achievement.isEarned ? 'none' : 'grayscale(1) brightness(0.6)',
                   }}
                 >
-                  {achievement.isEarned ? achievement.icon : <Lock size={20} />}
+                  {achievement.isEarned ? <achievement.icon size={20} /> : <Lock size={20} />}
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -429,7 +429,7 @@ export default function Achievements({ state, dispatch }) {
               </div>
 
               {achievement.isEarned && achievement.earnedAt && (
-                <div style={{ color: '#C8FF00', fontSize: '11px', opacity: 0.75, marginTop: '8px', fontFamily: "'JetBrains Mono',monospace" }}>
+                <div style={{ color: '#C8FF32', fontSize: '11px', opacity: 0.75, marginTop: '8px', fontFamily: "'JetBrains Mono',monospace" }}>
                   Earned {new Date(achievement.earnedAt).toLocaleDateString()}
                 </div>
               )}
@@ -445,7 +445,7 @@ export default function Achievements({ state, dispatch }) {
                       initial={{ width: 0 }}
                       animate={{ width: `${achievement.percentage}%` }}
                       transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.04 }}
-                      style={{ width: `${achievement.percentage}%`, height: '100%', borderRadius: 4, background: '#C8FF00' }}
+                      style={{ width: `${achievement.percentage}%`, height: '100%', borderRadius: 4, background: '#C8FF32' }}
                     />
                   </div>
                 </div>
@@ -466,12 +466,12 @@ export default function Achievements({ state, dispatch }) {
                   width: '22px',
                   height: '22px',
                   borderRadius: '50%',
-                  backgroundColor: '#C8FF00',
+                  backgroundColor: '#C8FF32',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0B0B0B',
-                  boxShadow: '0 4px 14px rgba(200, 255, 0, 0.35)',
+                  color: '#0B0F14',
+                  boxShadow: '0 4px 14px rgba(198, 255, 0, 0.35)',
                 }}>
                   <Check size={12} strokeWidth={3} />
                 </span>

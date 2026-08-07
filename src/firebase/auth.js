@@ -9,13 +9,32 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth, FIREBASE_CONFIG_ERROR, FIREBASE_ENV_VARS } from "./firebase";
 
 const requireAuth = () => {
-  if (!auth) throw new Error("Firebase is not configured. Set your Firebase credentials in .env");
+  if (!auth) {
+    throw new Error(
+      FIREBASE_CONFIG_ERROR ||
+        "Firebase is not configured. Check that all VITE_FIREBASE_* environment variables are set."
+    );
+  }
 };
 
 const googleProvider = new GoogleAuthProvider();
+
+const logGoogleSignInError = (error) => {
+  console.error("Google Sign-In Error", {
+    code: error?.code,
+    message: error?.message,
+    customData: error?.customData,
+    credential: error?.credential,
+    googleCredential: GoogleAuthProvider.credentialFromError(error) ?? null,
+    authDomain: FIREBASE_ENV_VARS.VITE_FIREBASE_AUTH_DOMAIN,
+    apiKeyConfigured: Boolean(FIREBASE_ENV_VARS.VITE_FIREBASE_API_KEY),
+    rawError: error,
+    stack: error?.stack,
+  });
+};
 
 export const signUpWithEmail = async (email, password) => {
   requireAuth();
@@ -30,9 +49,14 @@ export const signInWithEmail = async (email, password) => {
 };
 
 export const signInWithGoogle = async () => {
-  requireAuth();
-  await setPersistence(auth, browserLocalPersistence);
-  return signInWithPopup(auth, googleProvider);
+  try {
+    requireAuth();
+    await setPersistence(auth, browserLocalPersistence);
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error) {
+    logGoogleSignInError(error);
+    throw error;
+  }
 };
 
 export const resetPassword = (email) => {
@@ -61,13 +85,20 @@ export const AUTH_ERRORS = {
   "auth/too-many-requests": "Too many attempts. Please try again later.",
   "auth/popup-closed-by-user": "Sign-in cancelled. Please try again.",
   "auth/popup-blocked": "Pop-up was blocked. Please allow pop-ups for this site.",
+  "auth/cancelled-popup-request": "A new sign-in request was started before the previous popup finished. Try again.",
   "auth/network-request-failed": "Network error. Please check your connection.",
   "auth/invalid-credential": "Invalid email or password. Please try again.",
   "auth/user-disabled": "This account has been disabled. Contact support.",
-  "auth/operation-not-allowed": "This sign-in method is not enabled.",
+  "auth/operation-not-allowed": "This sign-in method is not enabled. Enable it in Firebase Console → Authentication → Sign-in method.",
   "auth/requires-recent-login": "Please log in again before retrying.",
+  "auth/unauthorized-domain": "This domain is not authorized for Firebase Authentication. Add it in Firebase Console → Authentication → Settings → Authorized domains.",
+  "auth/account-exists-with-different-credential": "An account already exists with the same email but a different sign-in method. Sign in with the original method first.",
+  "auth/credential-already-in-use": "This Google account is already linked to another sign-in method. Sign in with that method first.",
+  "auth/invalid-oauth-client-id": "The OAuth client ID for this provider is not configured. Check the authDomain in your Firebase config.",
+  "auth/invalid-oauth-provider": "The configured OAuth provider is not supported by this app.",
+  "auth/redirect-cancelled-by-user": "Sign-in cancelled. Please try again.",
 };
 
 export const getFriendlyError = (error) => {
-  return AUTH_ERRORS[error.code] || error.message || "An unexpected error occurred. Please try again.";
+  return AUTH_ERRORS[error.code] || error?.message || error?.code || String(error);
 };

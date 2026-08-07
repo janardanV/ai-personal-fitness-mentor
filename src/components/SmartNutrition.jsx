@@ -66,7 +66,7 @@ const FOOD_DATABASE = [
   { id: 'b60', name: 'Granola', calories: 471, protein: 10, carbs: 64, fat: 20 },
 ];
 
-const MACRO_COLORS = { calories: '#C8FF00', protein: '#4D9FFF', carbs: '#FF9F43', fat: '#A78BFA' };
+const MACRO_COLORS = { calories: '#C8FF32', protein: '#5AC8FA', carbs: '#FF9F0A', fat: '#8B5CF6' };
 
 function debounce(fn, ms) {
   let timer;
@@ -174,10 +174,10 @@ function AddMealModal({ food, onSave, onClose }) {
           background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 12, padding: 14, marginBottom: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 13,
         }}>
-          <div style={{ color: '#C8FF00', fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>{Math.round(food.calories * factor)} kcal</div>
-          <div style={{ color: '#4D9FFF' }}>Protein: {Math.round(food.protein * factor)}g</div>
-          <div style={{ color: '#FF9F43' }}>Carbs: {Math.round(food.carbs * factor)}g</div>
-          <div style={{ color: '#A78BFA' }}>Fat: {Math.round(food.fat * factor)}g</div>
+          <div style={{ color: '#C8FF32', fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>{Math.round(food.calories * factor)} kcal</div>
+          <div style={{ color: '#5AC8FA' }}>Protein: {Math.round(food.protein * factor)}g</div>
+          <div style={{ color: '#FF9F0A' }}>Carbs: {Math.round(food.carbs * factor)}g</div>
+          <div style={{ color: '#8B5CF6' }}>Fat: {Math.round(food.fat * factor)}g</div>
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
@@ -214,7 +214,7 @@ function FavoriteCard({ fav, onAdd, onRemove }) {
         </div>
       </div>
       <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-        <button className="rd-mini-btn" onClick={() => onAdd(fav)} style={{ color: '#C8FF00', borderColor: 'rgba(200,255,0,0.25)' }}><Plus size={13} /> Quick Add</button>
+        <button className="rd-mini-btn" onClick={() => onAdd(fav)} style={{ color: '#C8FF32', borderColor: 'rgba(200,255,50,0.25)' }}><Plus size={13} /> Quick Add</button>
         <button className="rd-mini-btn danger" onClick={() => onRemove(fav.id)}><Trash2 size={13} /></button>
       </div>
     </motion.div>
@@ -414,10 +414,10 @@ export default function SmartNutrition({ state, dispatch }) {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 18 }}>
                 {[
-                  { label: 'Calories', current: totals.calories, target: targets.calories, color: '#C8FF00' },
-                  { label: 'Protein', current: totals.protein, target: targets.protein, color: '#4D9FFF' },
-                  { label: 'Carbs', current: totals.carbs, target: targets.carbs, color: '#FF9F43' },
-                  { label: 'Fat', current: totals.fat, target: targets.fat, color: '#A78BFA' },
+                  { label: 'Calories', current: totals.calories, target: targets.calories, color: '#C8FF32' },
+                  { label: 'Protein', current: totals.protein, target: targets.protein, color: '#5AC8FA' },
+                  { label: 'Carbs', current: totals.carbs, target: targets.carbs, color: '#FF9F0A' },
+                  { label: 'Fat', current: totals.fat, target: targets.fat, color: '#8B5CF6' },
                 ].map((m) => (
                   <div key={m.label} style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m.label}</div>
@@ -501,7 +501,7 @@ export default function SmartNutrition({ state, dispatch }) {
             {search.trim().length >= 2 && usdaResults.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <div className="rd-legend" style={{ marginBottom: 10 }}>
-                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: '#C8FF00' }} /> USDA API Results</span>
+                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: '#C8FF32' }} /> USDA API Results</span>
                 </div>
                 {usdaResults.map((food) => (
                   <FoodCard key={food.id} food={food} onAdd={setModalFood} compact />
@@ -514,7 +514,7 @@ export default function SmartNutrition({ state, dispatch }) {
             )}
 
             <div className="rd-legend" style={{ marginBottom: 10 }}>
-              <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: '#4D9FFF' }} /> Built-in Database ({filteredDb.length})</span>
+              <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: '#5AC8FA' }} /> Built-in Database ({filteredDb.length})</span>
             </div>
             {filteredDb.map((food) => (
               <FoodCard key={food.id} food={food} onAdd={setModalFood} />
@@ -530,7 +530,7 @@ export default function SmartNutrition({ state, dispatch }) {
         {activeTab === 'favorites' && (
           <motion.div key="favorites" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
             {showSaveFav && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="rd-card" style={{ marginBottom: 16, border: '1px solid rgba(200,255,0,0.25)' }}>
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="rd-card" style={{ marginBottom: 16, border: '1px solid rgba(200,255,50,0.25)' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF', marginBottom: 10 }}>Save Today's Meals as Favorite</div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <input

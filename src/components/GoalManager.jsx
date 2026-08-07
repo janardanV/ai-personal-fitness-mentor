@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Pencil, Plus, Target, Trash2, Trophy, X } from "lucide-react";
+import { CheckCircle2, Pencil, Plus, Target, Trash2, Trophy, X, Scale, Dumbbell, Footprints, Droplets, Check } from "lucide-react";
 
 const GOAL_TYPES = [
-  { type: "Lose Weight", icon: "⚖️", color: "#FF6B6B" },
-  { type: "Gain Muscle", icon: "💪", color: "#C8FF00" },
-  { type: "Increase Strength", icon: "🏋️", color: "#FFA500" },
-  { type: "Run 5K", icon: "🏃", color: "#00C8FF" },
-  { type: "Drink Enough Water", icon: "💧", color: "#4FC3F7" },
-  { type: "Custom", icon: "🎯", color: "#C8FF00" },
+  { type: "Lose Weight", icon: Scale, color: "#FF6B6B" },
+  { type: "Gain Muscle", icon: Dumbbell, color: "#C8FF32" },
+  { type: "Increase Strength", icon: Dumbbell, color: "#FF9F0A" },
+  { type: "Run 5K", icon: Footprints, color: "#00C8FF" },
+  { type: "Drink Enough Water", icon: Droplets, color: "#4FC3F7" },
+  { type: "Custom", icon: Target, color: "#C8FF32" },
 ];
 
 const MILESTONES = [25, 50, 75, 100];
 
-function getGoalIcon(type) {
+function GoalIcon({ type, size = 18 }) {
   const found = GOAL_TYPES.find(g => g.type === type);
-  return found ? found.icon : "🎯";
+  const Icon = found ? found.icon : Target;
+  return <Icon size={size} />;
 }
 
 function getGoalColor(type) {
   const found = GOAL_TYPES.find(g => g.type === type);
-  return found ? found.color : "#C8FF00";
+  return found ? found.color : "#C8FF32";
 }
 
 function getProgressPercent(currentValue, targetValue) {
@@ -142,7 +143,7 @@ export default function GoalManager({ state, dispatch }) {
 
       {activeGoals.length === 0 && archivedGoals.length === 0 && (
         <motion.div className="rd-card rd-empty" style={{ padding: "48px 16px" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Target size={30} style={{ color: "rgba(200,255,0,0.3)", marginBottom: 4 }} />
+          <Target size={30} style={{ color: "rgba(200,255,50,0.3)", marginBottom: 4 }} />
           <div className="rd-empty-title">No goals yet</div>
           <div className="rd-empty-sub">Create your first goal to start tracking progress</div>
         </motion.div>
@@ -169,7 +170,7 @@ export default function GoalManager({ state, dispatch }) {
                   <div className="rd-card-head" style={{ marginBottom: 0, flexWrap: "wrap" }}>
                     <div className="rd-card-title" style={{ minWidth: 0, flex: 1 }}>
                       <div className="rd-card-title-ico" style={{ background: `${color}15`, color, borderColor: `${color}30` }}>
-                        {getGoalIcon(goal.type)}
+                        <GoalIcon type={goal.type} />
                       </div>
                       <div style={{ minWidth: 0 }}>
                         <div className="rd-card-name" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{goal.title}</div>
@@ -203,7 +204,7 @@ export default function GoalManager({ state, dispatch }) {
                           className={`rd-ex-tag ${percent >= m ? "" : "muted"}`}
                           style={percent >= m ? { color, background: `${color}10`, borderColor: `${color}30` } : {}}
                         >
-                          {m === 100 ? "✓" : `${m}%`}
+                          {m === 100 ? <Check size={13} /> : `${m}%`}
                         </span>
                       ))}
                     </div>
@@ -296,10 +297,10 @@ export default function GoalManager({ state, dispatch }) {
                         onClick={() => setForm({ ...form, type: g.type })}
                         style={{
                           display: "flex", flexDirection: "column", alignItems: "center", gap: 5, padding: "12px 8px", borderRadius: 12, lineHeight: 1,
-                          ...(isActive ? { background: "rgba(200,255,0,0.1)", borderColor: "rgba(200,255,0,0.3)", color: "#C8FF00" } : {}),
+                          ...(isActive ? { background: "rgba(200,255,50,0.1)", borderColor: "rgba(200,255,50,0.3)", color: "#C8FF32" } : {}),
                         }}
                       >
-                        <span style={{ fontSize: 20 }}>{g.icon}</span>
+                        <span style={{ color: isActive ? "#C8FF32" : "#A7B1C2", display: "flex" }}><g.icon size={20} /></span>
                         <span style={{ fontSize: 10, fontWeight: 600, lineHeight: 1.25 }}>{g.type}</span>
                       </motion.button>
                     );
@@ -400,7 +401,7 @@ export default function GoalManager({ state, dispatch }) {
             <div className="rd-card-head" style={{ marginBottom: 18 }}>
               <div className="rd-card-title" style={{ minWidth: 0 }}>
                 <div className="rd-card-title-ico" style={{ width: 40, height: 40, borderRadius: 12, background: `${getGoalColor(editingGoal.type)}15`, color: getGoalColor(editingGoal.type), borderColor: `${getGoalColor(editingGoal.type)}30` }}>
-                  {getGoalIcon(editingGoal.type)}
+                  <GoalIcon type={editingGoal.type} />
                 </div>
                 <div style={{ minWidth: 0 }}>
                   <div className="rd-card-name">{editingGoal.title}</div>
@@ -433,7 +434,7 @@ export default function GoalManager({ state, dispatch }) {
                       className={`rd-ex-tag ${reached ? "" : "muted"}`}
                       style={reached ? { color: getGoalColor(editingGoal.type), background: `${getGoalColor(editingGoal.type)}10`, borderColor: `${getGoalColor(editingGoal.type)}30` } : {}}
                     >
-                      {m === 100 ? "✓" : `${m}%`}
+                      {m === 100 ? <Check size={13} /> : `${m}%`}
                     </span>
                   );
                 })}
@@ -515,9 +516,9 @@ export default function GoalManager({ state, dispatch }) {
                 animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
                 transition={{ duration: 0.6 }}
               >
-                <Trophy size={64} style={{ color: "#C8FF00" }} />
+                <Trophy size={64} style={{ color: "#C8FF32" }} />
               </motion.div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#C8FF00" }}>Goal Completed!</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#C8FF32" }}>Goal Completed!</div>
               <div className="rd-tmpl-desc" style={{ margin: "8px 0 20px" }}>{completedGoal.title} — amazing work!</div>
               <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                 {MILESTONES.map(m => (

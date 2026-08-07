@@ -82,10 +82,10 @@ const WorkoutHistory = ({ state }) => {
           <ResponsiveContainer width="100%" height={170}>
             <BarChart data={weeklyVolume.map(([week, vol]) => ({ week: week.slice(5), volume: Math.round(vol) }))}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#A0A0A0" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#A0A0A0" }} axisLine={false} tickLine={false} width={44} />
+              <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#A7B1C2" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#A7B1C2" }} axisLine={false} tickLine={false} width={44} />
               <Tooltip contentStyle={{ background: "rgba(15,15,15,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 12 }} />
-              <Bar dataKey="volume" fill="#C8FF00" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="volume" fill="#C8FF32" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -135,8 +135,8 @@ const WorkoutHistory = ({ state }) => {
                   <div className="rd-vs-box">
                     <div className="l"><Trophy size={11} /> vs Previous ({prev.date})</div>
                     <div>
-                      Volume: <b style={{ color: (w.totalVolume || 0) > (prev.totalVolume || 0) ? "#C8FF00" : "#FF4757" }}>{fmt(w.totalVolume)}</b> vs {fmt(prev.totalVolume)}{" "}
-                      <span style={{ color: (w.totalVolume || 0) > (prev.totalVolume || 0) ? "#A5E600" : "#FF4757" }}>
+                      Volume: <b style={{ color: (w.totalVolume || 0) > (prev.totalVolume || 0) ? "#C8FF32" : "#FF5A5F" }}>{fmt(w.totalVolume)}</b> vs {fmt(prev.totalVolume)}{" "}
+                      <span style={{ color: (w.totalVolume || 0) > (prev.totalVolume || 0) ? "#C8FF32" : "#FF5A5F" }}>
                         ({(w.totalVolume || 0) > (prev.totalVolume || 0) ? "+" : ""}{fmt(((w.totalVolume || 0) / Math.max(prev.totalVolume || 1, 1) - 1) * 100, 1)}%)
                       </span>
                     </div>

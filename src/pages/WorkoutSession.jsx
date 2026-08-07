@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EXERCISE_DB, fmt, calcE1RM, showToast } from "../utils/helpers";
@@ -62,7 +62,7 @@ const RestTimer = ({ duration, onDone, onSkip }) => {
         <div style={{ marginBottom: 16 }}>
           <svg width={220} height={220}>
             <circle cx={110} cy={110} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
-            <circle cx={110} cy={110} r={r} fill="none" stroke="#C8FF00" strokeWidth={8} strokeDasharray={`${dash} `} strokeLinecap="round" transform="rotate(-90 110 110)" style={{ transition: "stroke-dasharray 0.5s linear" }} />
+            <circle cx={110} cy={110} r={r} fill="none" stroke="#C8FF32" strokeWidth={8} strokeDasharray={`${dash} `} strokeLinecap="round" transform="rotate(-90 110 110)" style={{ transition: "stroke-dasharray 0.5s linear" }} />
           </svg>
           <div style={{ position: "relative", marginTop: -164, textAlign: "center" }}>
             <div className="rd-timer-display">{mins}:{secs.toString().padStart(2, "0")}</div>
@@ -136,7 +136,7 @@ const FinishWorkoutSummary = ({ session, duration, onClose, onDiscard }) => {
           ))}
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button className="rd-btn-secondary" onClick={onDiscard} style={{ flex: 1, color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}>Discard</button>
+          <button className="rd-btn-secondary" onClick={onDiscard} style={{ flex: 1, color: "#FF5A5F", borderColor: "rgba(255,90,95,0.3)" }}>Discard</button>
           <button className="rd-btn-primary" onClick={() => onClose(calories)} style={{ flex: 2 }}><CheckCircle2 size={15} /> Save +50 XP</button>
         </div>
       </motion.div>
@@ -340,7 +340,7 @@ const WorkoutSession = ({ state, dispatch }) => {
                         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{ex.primary} · {ex.equip}</div>
                       </div>
                     </div>
-                    <Plus size={16} style={{ color: "#C8FF00", flexShrink: 0 }} />
+                    <Plus size={16} style={{ color: "#C8FF32", flexShrink: 0 }} />
                   </div>
                 );
               })}

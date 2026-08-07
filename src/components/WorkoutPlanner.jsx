@@ -390,8 +390,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
               cursor: "grab",
               userSelect: "none",
               gap: 10,
-              borderColor: dragItem?.uid === ex.uid ? "rgba(200,255,0,0.3)" : undefined,
-              background: dragItem?.uid === ex.uid ? "rgba(200,255,0,0.05)" : undefined,
+              borderColor: dragItem?.uid === ex.uid ? "rgba(200,255,50,0.3)" : undefined,
+              background: dragItem?.uid === ex.uid ? "rgba(200,255,50,0.05)" : undefined,
             }}
             draggable
             onDragStart={(e) => handleDragStart(e, ex.uid, day)}
@@ -513,9 +513,9 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     style={{ position: "relative", minWidth: 58, flexDirection: "column", gap: 3, flexShrink: 0 }}
                     onClick={() => setActiveDay(d)}
                   >
-                    {isToday && <span style={{ position: "absolute", top: 5, right: 7, width: 6, height: 6, borderRadius: "50%", background: "#C8FF00", boxShadow: "0 0 8px rgba(200,255,0,0.4)" }} />}
+                    {isToday && <span style={{ position: "absolute", top: 5, right: 7, width: 6, height: 6, borderRadius: "50%", background: "#C8FF32", boxShadow: "0 0 8px rgba(200,255,50,0.4)" }} />}
                     <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: isToday && !isActive ? "#E8E8E8" : undefined }}>{d}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: has ? "#C8FF00" : "rgba(255,255,255,0.25)" }}>{week[d].length}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: has ? "#C8FF32" : "rgba(255,255,255,0.25)" }}>{week[d].length}</span>
                   </button>
                 );
               })}
@@ -525,8 +525,8 @@ export default function WorkoutPlanner({ state, dispatch }) {
           <motion.div
             className="rd-card"
             style={{
-              borderColor: dragOverDay === activeDay ? "rgba(200,255,0,0.3)" : undefined,
-              boxShadow: dragOverDay === activeDay ? "0 0 24px rgba(200,255,0,0.08)" : undefined,
+              borderColor: dragOverDay === activeDay ? "rgba(200,255,50,0.3)" : undefined,
+              boxShadow: dragOverDay === activeDay ? "0 0 24px rgba(200,255,50,0.08)" : undefined,
             }}
             onDragOver={(e) => handleDragOver(e, activeDay)}
             onDrop={(e) => handleDrop(e, activeDay)}
@@ -580,7 +580,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     className="rd-card"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ borderColor: "rgba(200,255,0,0.16)" }}
+                    whileHover={{ borderColor: "rgba(200,255,50,0.16)" }}
                   >
                     <div className="rd-card-head" style={{ marginBottom: 10 }}>
                       <div className="rd-card-title">
@@ -651,7 +651,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                       <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{ex.name}</div>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{ex.primary} · {ex.sets}×{ex.reps}</div>
                     </div>
-                    <Plus size={16} style={{ color: "rgba(200,255,0,0.4)", flexShrink: 0 }} />
+                    <Plus size={16} style={{ color: "rgba(200,255,50,0.4)", flexShrink: 0 }} />
                   </div>
                 ))}
                 {pickerResults.length === 0 && (
@@ -695,7 +695,7 @@ export default function WorkoutPlanner({ state, dispatch }) {
                     <motion.div
                       key={key}
                       className="rd-tmpl-card"
-                      whileHover={{ borderColor: "rgba(200,255,0,0.25)", transform: "translateY(-2px)" }}
+                      whileHover={{ borderColor: "rgba(200,255,50,0.25)", transform: "translateY(-2px)" }}
                       onClick={() => applyTemplate(key)}
                     >
                       <div className="rd-tmpl-name">{tmpl.name}</div>

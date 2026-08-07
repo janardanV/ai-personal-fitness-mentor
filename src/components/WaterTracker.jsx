@@ -60,14 +60,14 @@ const ProgressRing = ({ progress, size = 220, stroke = 12 }) => {
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="#C8FF00"
+        stroke="#C8FF32"
         strokeWidth={stroke}
         strokeLinecap="round"
         strokeDasharray={circumference}
         initial={{ strokeDashoffset: circumference }}
         animate={{ strokeDashoffset: offset }}
         transition={{ duration: 1, ease: "easeOut" }}
-        style={{ filter: progress > 0 ? "drop-shadow(0 0 8px rgba(200,255,0,0.55))" : "none" }}
+        style={{ filter: progress > 0 ? "drop-shadow(0 0 8px rgba(200,255,50,0.55))" : "none" }}
       />
     </svg>
   );
@@ -78,7 +78,7 @@ const CustomTooltip = ({ active, payload }) => {
     return (
       <div style={{
         background: "rgba(15,15,15,0.98)",
-        border: "1px solid rgba(200,255,0,0.3)",
+        border: "1px solid rgba(200,255,50,0.3)",
         borderRadius: 10,
         padding: "8px 12px",
         fontSize: 12,
@@ -150,7 +150,6 @@ export default function WaterTracker({ state, dispatch }) {
       if (Notification.permission === "granted") {
         new Notification("Stay Hydrated!", {
           body: `You've had ${todayTotal}ml today. Goal: ${goal}ml. Time for a drink!`,
-          icon: "💧",
         });
       }
     }, ms);
@@ -212,7 +211,7 @@ export default function WaterTracker({ state, dispatch }) {
             <span style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>
               / {goal} ml
             </span>
-            <span style={{ fontSize: 12, color: "#C8FF00", marginTop: 8, fontWeight: 700 }}>
+            <span style={{ fontSize: 12, color: "#C8FF32", marginTop: 8, fontWeight: 700 }}>
               {Math.round(progress * 100)}%
             </span>
           </div>
@@ -220,7 +219,7 @@ export default function WaterTracker({ state, dispatch }) {
 
         <p style={{
           fontSize: 13,
-          color: progress >= 1 ? "#C8FF00" : "rgba(255,255,255,0.45)",
+          color: progress >= 1 ? "#C8FF32" : "rgba(255,255,255,0.45)",
           textAlign: "center",
           marginBottom: 4,
           fontWeight: 500,
@@ -335,7 +334,7 @@ export default function WaterTracker({ state, dispatch }) {
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
                   {entry.time}
                 </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#C8FF00", fontFamily: "'JetBrains Mono',monospace" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#C8FF32", fontFamily: "'JetBrains Mono',monospace" }}>
                   +{entry.amount} ml
                 </span>
               </motion.div>
@@ -417,13 +416,13 @@ export default function WaterTracker({ state, dispatch }) {
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#A0A0A0", fontSize: 11 }}
+                tick={{ fill: "#A7B1C2", fontSize: 11 }}
               />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} cursor={false} />
               <Bar
                 dataKey="amount"
-                fill="#C8FF00"
+                fill="#C8FF32"
                 radius={[5, 5, 0, 0]}
                 maxBarSize={36}
               />
@@ -452,7 +451,7 @@ export default function WaterTracker({ state, dispatch }) {
               cursor: "pointer",
               position: "relative",
               flexShrink: 0,
-              background: reminderEnabled ? "#C8FF00" : "rgba(255,255,255,0.08)",
+              background: reminderEnabled ? "#C8FF32" : "rgba(255,255,255,0.08)",
               transition: "background 0.2s",
             }}
           >
@@ -463,7 +462,7 @@ export default function WaterTracker({ state, dispatch }) {
                 width: 22,
                 height: 22,
                 borderRadius: "50%",
-                background: reminderEnabled ? "#0B0B0B" : "#FFFFFF",
+                background: reminderEnabled ? "#0B0F14" : "#FFFFFF",
                 position: "absolute",
                 top: 2,
               }}

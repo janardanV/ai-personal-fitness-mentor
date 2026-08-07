@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef, useCallback, useReducer, lazy, Suspense } from "react";
+import { useState, useEffect, useRef, useReducer, lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Flame } from "lucide-react";
 import RunningMode from "./RunningMode";
 import { useAuth } from "./hooks/useAuth";
-import { getUserData, saveUserData, createUserDocument } from "./services/profileService";
-import { logOut as firebaseLogOut } from "./firebase/auth";
+import { loadOrMigrateUserData, readLocalData, saveLocalData, saveUserData } from "./services/profileService";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import AuthModal from "./components/AuthModal";
-import { fmt, today, weekAgo, uid, EXERCISE_DB, EXERCISES, MUSCLE_GROUPS, EQUIPMENT_TYPES, EXERCISE_CATEGORIES, GOAL_LABELS, BADGE_DEFS, COLORS, SAVE_ACTIONS, GUEST_PROFILE, USDA_API_KEY, USDA_BASE, usdaSearch, usdaDebouncedSearch, ACTIVITY_MULTIPLIERS, mkInitial, calcE1RM, calcVolume, calcWeeklyVolume, calcStreak, G_STYLE, GlobalStyles, MOCK_DELAY, pick, MOCK_COACHING, generateMockResponse, callAIProvider, useAICoach, buildUserContext, buildSystemPrompt, renderMarkdown, formatChatTime, PAGES, SIDEBAR_GROUPS, reducer, showToast, showConfirm, Toast, ConfirmDialog } from "./utils/helpers";
+import { GUEST_PROFILE, mkInitial, calcStreak, GlobalStyles, PAGES, reducer, showToast, Toast, ConfirmDialog } from "./utils/helpers";
 
 import Dashboard from "./pages/Dashboard";
 import Sidebar from "./components/Sidebar";
@@ -41,25 +41,38 @@ export default function App() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [appState, appDispatch] = useReducer(reducer, null, mkInitial);
+  const [appState, appDispatch] = useReducer(reducer, null, () =>
+    reducer(mkInitial(), { type: "LOAD_DATA", payload: readLocalData() })
+  );
   const [dataLoaded, setDataLoaded] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     try { const v = localStorage.getItem("ai_fitness_sidebar"); return v !== null ? JSON.parse(v) : true; } catch { return true; }
   });
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const pendingActionRef = useRef(null);
   const prevLevelRef = useRef(appState.level);
   const saveTimerRef = useRef(null);
+  const guestSaveTimerRef = useRef(null);
 
-  // ── Load user data from Firestore on auth ──
+  // ── Load user data from Firestore on auth, migrating guest data ──
   useEffect(() => {
     if (!user) { setDataLoaded(false); return; }
     let cancelled = false;
     const loadData = async () => {
       try {
-        const data = await getUserData(user.uid);
+        let data = await loadOrMigrateUserData(user.uid);
         if (!cancelled && data) {
+          if (!data.profile) {
+            data = {
+              ...data,
+              profile: {
+                ...GUEST_PROFILE,
+                name: user.displayName || "Guest",
+                email: user.email || "",
+                photoURL: user.photoURL || "",
+              },
+            };
+          }
           appDispatch({ type: "LOAD_DATA", payload: data });
         }
       } catch (err) {
@@ -84,14 +97,19 @@ export default function App() {
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   }, [appState, user, dataLoaded]);
 
-  // Execute pending action after auth + data loaded
+  // ── Persist guest state to localStorage ──
   useEffect(() => {
-    if (user && dataLoaded && pendingActionRef.current) {
-      const action = pendingActionRef.current;
-      pendingActionRef.current = null;
-      appDispatch(action);
-    }
-  }, [user, dataLoaded]);
+    if (user) return;
+    if (guestSaveTimerRef.current) clearTimeout(guestSaveTimerRef.current);
+    guestSaveTimerRef.current = setTimeout(() => {
+      try {
+        saveLocalData({ ...appState, profile: appState.profile || GUEST_PROFILE });
+      } catch (err) {
+        console.error("Failed to save guest data:", err);
+      }
+    }, 500);
+    return () => { if (guestSaveTimerRef.current) clearTimeout(guestSaveTimerRef.current); };
+  }, [appState, user]);
 
   // Expose setPage for Dashboard quick actions
   useEffect(() => {
@@ -128,25 +146,8 @@ export default function App() {
     prevLevelRef.current = appState.level;
   }, [appState.level]);
 
-  // Guarded dispatch for guest mode
-  const guardedDispatch = useCallback((action) => {
-    if (!user && SAVE_ACTIONS.has(action.type)) {
-      pendingActionRef.current = action;
-      setAuthModalOpen(true);
-      return;
-    }
-    appDispatch(action);
-  }, [user, appDispatch]);
-
-  const handleAuthSuccess = useCallback(() => {
-    setAuthModalOpen(false);
-  }, []);
-
-  // ── All hooks above this line ──
-
   const authPages = ["/login", "/signup", "/forgot-password"];
 
-  // Auth loading
   if (authLoading) return null;
 
   // Guest mode — user is not authenticated
@@ -168,9 +169,8 @@ export default function App() {
       );
     }
 
-    // Guest dashboard — use local-only state, guest profile
-    const guestProfile = GUEST_PROFILE;
-    const guestState = { ...appState, profile: guestProfile };
+    // Guest dashboard — local-only state persisted to localStorage
+    const guestState = { ...appState, profile: appState.profile || GUEST_PROFILE };
   const validPageIds = [...PAGES.map(p => p.id), "session", "templates", "library", "history", "prs"];
     const rawPage = location.pathname.slice(1) || "dashboard";
     const page = validPageIds.includes(rawPage) ? rawPage : "dashboard";
@@ -197,42 +197,51 @@ export default function App() {
       <>
         <GlobalStyles />
         <Toast />
-        <AuthModal open={authModalOpen} onClose={() => { setAuthModalOpen(false); }} onAuthSuccess={handleAuthSuccess} />
-        <div style={{ display: "flex", minHeight: "100vh", background: "#0B0B0B" }}>
+        <AuthModal open={authModalOpen} onClose={() => { setAuthModalOpen(false); }} onAuthSuccess={() => setAuthModalOpen(false)} />
+        <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)" }}>
           <Sidebar
             sidebarOpen={sidebarOpen}
             onToggle={() => setSidebarOpen(p => !p)}
             page={page}
             onNavigate={(id) => navigate("/" + id)}
             footer={(
-              <div style={{ padding: "16px 14px", borderTop: "1px solid rgba(200,255,0,0.06)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,255,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#C8FF00" }}>G</div>
+              <div style={{ padding: "16px 14px", borderTop: "1px solid var(--line)" }}>
+                <button
+                  onClick={() => setAuthModalOpen(true)}
+                  style={{
+                    width: "100%", background: "transparent", border: "none", padding: 0,
+                    display: "flex", alignItems: "center", gap: 10, marginBottom: 10,
+                    cursor: "pointer", textAlign: "left", fontFamily: "var(--font)",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.querySelector(".guest-signin-label").style.color = "var(--text)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.querySelector(".guest-signin-label").style.color = "var(--muted)"; }}
+                >
+                  <div style={{ width: 32, height: 32, borderRadius: 9, background: "var(--accent-soft)", border: "1px solid var(--accent-line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--accent)" }}>G</div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>Guest</div>
-                    <div style={{ fontSize: 11, color: "#A0A0A0" }}>Sign in to save</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Guest</div>
+                    <div className="guest-signin-label" style={{ fontSize: 11, color: "var(--muted)", transition: "color 0.15s" }}>Sign in to save</div>
                   </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.1)" }}>
-                  <span style={{ fontSize: 14 }}>🔥</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#C8FF00" }}>{streak} day streak</span>
+                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "var(--accent-soft)", border: "1px solid var(--accent-line)" }}>
+                  <Flame size={14} style={{ color: "var(--accent)", flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>{streak} day streak</span>
                 </div>
               </div>
             )}
           />
 
           {/* Main content */}
-          <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
             <div className="topbar">
               <span className="topbar-title">{PAGES.find(p => p.id === page)?.label || "Dashboard"}</span>
               <div className="topbar-right">
                 <button onClick={() => setAuthModalOpen(true)} style={{
-                  background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.1)",
-                  color: "#A0A0A0", borderRadius: 10, padding: "6px 14px", fontSize: 12, fontWeight: 500,
-                  cursor: "pointer", fontFamily: "'Inter', sans-serif", transition: "all 0.2s",
+                  background: "var(--surface-2)", border: "1px solid var(--line)",
+                  color: "var(--muted)", borderRadius: 10, padding: "7px 14px", fontSize: 12, fontWeight: 600,
+                  cursor: "pointer", fontFamily: "var(--font)", transition: "all 0.2s",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(200,255,0,0.1)"; e.currentTarget.style.color = "#C8FF00"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(200,255,0,0.06)"; e.currentTarget.style.color = "#A0A0A0"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--accent-soft)"; e.currentTarget.style.borderColor = "var(--accent-line)"; e.currentTarget.style.color = "var(--accent)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "var(--surface-2)"; e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.color = "var(--muted)"; }}
                 >
                   Sign in to sync
                 </button>
@@ -255,7 +264,7 @@ export default function App() {
                   {PageComponent && (
                     <motion.div key={page} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
                       <ErrorBoundary key={page}>
-                        <PageComponent state={guestState} dispatch={guardedDispatch} page={page} />
+                        <PageComponent state={guestState} dispatch={appDispatch} page={page} />
                       </ErrorBoundary>
                     </motion.div>
                   )}
@@ -292,7 +301,7 @@ export default function App() {
         <GlobalStyles />
         <Toast />
         <ConfirmDialog />
-        <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "#A0A0A0" }}>Loading...</div>}>
+        <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>Loading...</div>}>
           <Onboarding onComplete={(profile) => appDispatch({ type: "COMPLETE_ONBOARDING", payload: profile })} />
         </Suspense>
       </>
@@ -326,33 +335,33 @@ export default function App() {
       <GlobalStyles />
       <Toast />
       <ConfirmDialog />
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0B0B0B" }}>
+      <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)" }}>
         <Sidebar
           sidebarOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(p => !p)}
           page={page}
           onNavigate={(id) => navigate("/" + id)}
           footer={(
-            <div style={{ padding: "16px 14px", borderTop: "1px solid rgba(200,255,0,0.06)" }}>
+            <div style={{ padding: "16px 14px", borderTop: "1px solid var(--line)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,255,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#C8FF00" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 9, background: "var(--accent-soft)", border: "1px solid var(--accent-line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--accent)" }}>
                   {(user?.displayName || appState.profile?.name || "U")[0].toUpperCase()}
                 </div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>{user?.displayName || appState.profile?.name}</div>
-                  <div style={{ fontSize: 11, color: "#A0A0A0" }}>Lv. {appState.level} · {appState.xp} XP</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{user?.displayName || appState.profile?.name}</div>
+                  <div style={{ fontSize: 11, color: "var(--muted)" }}>Lv. {appState.level} · {appState.xp} XP</div>
                 </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "rgba(200,255,0,0.06)", border: "1px solid rgba(200,255,0,0.1)" }}>
-                <span style={{ fontSize: 14 }}>🔥</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#C8FF00" }}>{streak} day streak</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, background: "var(--accent-soft)", border: "1px solid var(--accent-line)" }}>
+                <Flame size={14} style={{ color: "var(--accent)", flexShrink: 0 }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>{streak} day streak</span>
               </div>
             </div>
           )}
         />
 
         {/* Main content */}
-        <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
           <div className="topbar">
             <span className="topbar-title">{PAGES.find(p => p.id === page)?.label || "Dashboard"}</span>
             <div className="topbar-right">

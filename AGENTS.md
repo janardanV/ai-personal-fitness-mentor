@@ -7,6 +7,11 @@
 - `npm run lint` — Run ESLint (if configured)
 - `firebase deploy` — Deploy to Firebase
 
+## Deployment / Env Vars
+- Firebase is configured via `VITE_FIREBASE_*` env vars read in `src/firebase/firebase.js` (`VITE_FIREBASE_MEASUREMENT_ID` is optional/analytics-only).
+- Missing vars fall back to a built-in config in `src/firebase/firebase.js` (config is public, not secret) so auth/Firestore still initialize; a console warning names the exact missing vars.
+- See `DEPLOYMENT.md` for the full Vercel + Firebase Console setup checklist.
+
 ## Architecture
 - **State:** Single reducer (`src/utils/reducer.js`) + `mkInitial()` for factory
 - **Routing:** Flat page IDs mapped via `PAGES` in `src/utils/constants.js`; resolved in `App.jsx` via `PageComponent` lookup

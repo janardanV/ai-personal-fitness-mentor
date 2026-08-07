@@ -35,13 +35,13 @@ const getBodyFatCategory = (bf, gender) => {
   if (gender === 'male') {
     if (bf < 6) return { label: 'Essential Fat', color: '#FF6D00', bg: 'rgba(255, 109, 0, 0.15)' };
     if (bf < 14) return { label: 'Athletic', color: '#00E676', bg: 'rgba(0, 230, 118, 0.15)' };
-    if (bf < 18) return { label: 'Fitness', color: '#C8FF00', bg: 'rgba(200, 255, 0, 0.15)' };
+    if (bf < 18) return { label: 'Fitness', color: '#C8FF32', bg: 'rgba(198, 255, 0, 0.15)' };
     if (bf < 25) return { label: 'Average', color: '#FFB800', bg: 'rgba(255, 184, 0, 0.15)' };
     return { label: 'Above Average', color: '#FF1744', bg: 'rgba(255, 23, 68, 0.15)' };
   }
   if (bf < 14) return { label: 'Essential Fat', color: '#FF6D00', bg: 'rgba(255, 109, 0, 0.15)' };
   if (bf < 21) return { label: 'Athletic', color: '#00E676', bg: 'rgba(0, 230, 118, 0.15)' };
-  if (bf < 25) return { label: 'Fitness', color: '#C8FF00', bg: 'rgba(200, 255, 0, 0.15)' };
+  if (bf < 25) return { label: 'Fitness', color: '#C8FF32', bg: 'rgba(198, 255, 0, 0.15)' };
   if (bf < 32) return { label: 'Average', color: '#FFB800', bg: 'rgba(255, 184, 0, 0.15)' };
   return { label: 'Above Average', color: '#FF1744', bg: 'rgba(255, 23, 68, 0.15)' };
 };
@@ -178,7 +178,7 @@ export default function BodyCalculator({ state, dispatch }) {
     const macros = getMacros(goalCalories, formData.goal, gender);
 
     const macrosData = [
-      { name: 'Protein', value: macros.proteinRatio * 100, fill: '#C8FF00' },
+      { name: 'Protein', value: macros.proteinRatio * 100, fill: '#C8FF32' },
       { name: 'Carbs', value: macros.carbRatio * 100, fill: '#00E676' },
       { name: 'Fat', value: macros.fatRatio * 100, fill: '#FF6D00' },
     ];
@@ -340,8 +340,8 @@ export default function BodyCalculator({ state, dispatch }) {
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={results.bmiChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#A0A0A0' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A0A0A0' }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#A7B1C2' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A7B1C2' }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Bar dataKey="fullValue" radius={[4, 4, 0, 0]}>
                     {results.bmiChartData.map((entry, index) => (
@@ -368,15 +368,15 @@ export default function BodyCalculator({ state, dispatch }) {
             >
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
                 {[
-                  { label: 'Maintenance', value: results.maintenance, color: '#C8FF00', desc: 'Maintain current weight' },
-                  { label: 'Bulking', value: results.bulking, color: '#4D9FFF', desc: '+500 kcal surplus' },
-                  { label: 'Cutting', value: results.cutting, color: '#FF9F43', desc: '-500 kcal deficit' },
+                  { label: 'Maintenance', value: results.maintenance, color: '#C8FF32', desc: 'Maintain current weight' },
+                  { label: 'Bulking', value: results.bulking, color: '#5AC8FA', desc: '+500 kcal surplus' },
+                  { label: 'Cutting', value: results.cutting, color: '#FF9F0A', desc: '-500 kcal deficit' },
                 ].map((item) => (
                   <motion.div
                     key={item.label}
                     whileHover={{ scale: 1.02 }}
                     style={{
-                      background: 'linear-gradient(180deg, #131313 0%, #0F0F0F 100%)',
+                      background: 'linear-gradient(180deg, #1E242E 0%, #0F0F0F 100%)',
                       borderRadius: 14,
                       padding: 20,
                       textAlign: 'center',
@@ -407,7 +407,7 @@ export default function BodyCalculator({ state, dispatch }) {
                   </tr>
                   <tr>
                     <td>Selected Goal Calories</td>
-                    <td className="num cal" style={{ textAlign: 'right', color: '#C8FF00' }}>
+                    <td className="num cal" style={{ textAlign: 'right', color: '#C8FF32' }}>
                       {formData.goal === 'bulking' ? results.bulking : formData.goal === 'cutting' ? results.cutting : results.maintenance} kcal
                     </td>
                   </tr>
@@ -447,11 +447,11 @@ export default function BodyCalculator({ state, dispatch }) {
               </ResponsiveContainer>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
                 {[
-                  { label: 'Protein', value: results.macros.protein, ratio: results.macros.proteinRatio, color: '#C8FF00', unit: 'g' },
+                  { label: 'Protein', value: results.macros.protein, ratio: results.macros.proteinRatio, color: '#C8FF32', unit: 'g' },
                   { label: 'Carbs', value: results.macros.carbs, ratio: results.macros.carbRatio, color: '#00E676', unit: 'g' },
                   { label: 'Fat', value: results.macros.fat, ratio: results.macros.fatRatio, color: '#FF6D00', unit: 'g' },
                 ].map((macro) => (
-                  <div key={macro.label} style={{ background: 'linear-gradient(180deg, #131313 0%, #0F0F0F 100%)', border: '1px solid rgba(255,255,255,0.055)', borderRadius: 14, padding: 16 }}>
+                  <div key={macro.label} style={{ background: 'linear-gradient(180deg, #1E242E 0%, #0F0F0F 100%)', border: '1px solid rgba(255,255,255,0.055)', borderRadius: 14, padding: 16 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>{macro.label}</div>
                     <div style={{ fontSize: 26, fontWeight: 800, color: macro.color, fontFamily: "'JetBrains Mono', monospace", marginTop: 5, lineHeight: 1.1 }}>
                       {macro.value}{macro.unit}
@@ -486,9 +486,9 @@ export default function BodyCalculator({ state, dispatch }) {
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.08 }}
-                  style={{ background: 'linear-gradient(180deg, #131313 0%, #0F0F0F 100%)', border: '1px solid rgba(255,255,255,0.055)', borderLeft: '3px solid #C8FF00', borderRadius: 12, padding: '14px 16px' }}
+                  style={{ background: 'linear-gradient(180deg, #1E242E 0%, #0F0F0F 100%)', border: '1px solid rgba(255,255,255,0.055)', borderLeft: '3px solid #C8FF32', borderRadius: 12, padding: '14px 16px' }}
                 >
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#C8FF00', marginBottom: 4 }}>{rec.title}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#C8FF32', marginBottom: 4 }}>{rec.title}</div>
                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>{rec.text}</div>
                 </motion.div>
               ))}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { signInWithEmail, signInWithGoogle, signUpWithEmail, getFriendlyError } from "../firebase/auth";
 import { createUserDocument } from "../services/profileService";
-import { ChevronLeft, Eye, EyeOff, Lock, LogIn, Mail, Sparkles, User, UserPlus, X } from "lucide-react";
+import { ChevronLeft, Eye, EyeOff, Lock, LogIn, Mail, Sparkles, User, X } from "lucide-react";
 
 const MODES = { SELECT: 0, EMAIL: 1, SIGNUP: 2 };
 
@@ -85,23 +85,23 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
             exit={{ opacity: 0, scale: 0.95, y: 12 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: 400, background: "#131313", borderRadius: 18 }}
+            style={{ maxWidth: 400, background: "#1E242E", borderRadius: 18 }}
           >
             <button className="rd-modal-close" onClick={handleClose}><X size={16} /></button>
 
             <div style={{
               width: 52, height: 52, borderRadius: 16, margin: "0 auto 16px",
-              background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.2)",
-              display: "flex", alignItems: "center", justifyContent: "center", color: "#C8FF00",
+              background: "rgba(200,255,50,0.1)", border: "1px solid rgba(200,255,50,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center", color: "#C8FF32",
             }}>
               <Sparkles size={24} />
             </div>
 
             <h2 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", textAlign: "center", marginBottom: 6 }}>
-              Sign in to save your progress
+              Save Your Progress
             </h2>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", textAlign: "center", marginBottom: 24, lineHeight: 1.5 }}>
-              Your data will be securely saved to the cloud and synced across all your devices.
+              You&apos;re using Guest Mode. Sign in to securely save your workouts, nutrition, goals and progress across all your devices.
             </p>
 
             {mode === MODES.SELECT && (
@@ -110,14 +110,14 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                   <GoogleIcon /> Continue with Google
                 </button>
 
-                <div className="rd-tabbar" style={{ padding: 3, borderRadius: 12 }}>
-                  <button className="rd-tab" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setMode(MODES.EMAIL); setError(""); }}>
-                    <Mail size={15} /> Sign In
-                  </button>
-                  <button className="rd-tab" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setMode(MODES.SIGNUP); setError(""); }}>
-                    <UserPlus size={15} /> Create Account
-                  </button>
-                </div>
+                <button
+                  onClick={() => { setMode(MODES.EMAIL); setError(""); }}
+                  disabled={busy}
+                  className="rd-btn-secondary"
+                  style={{ opacity: busy ? 0.6 : 1 }}
+                >
+                  <Mail size={15} /> Continue with Email
+                </button>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "4px 0" }}>
                   <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }} />
@@ -147,7 +147,7 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                 </button>
 
                 {error && (
-                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)", color: "#FF4757", fontSize: 13, fontWeight: 500 }}>{error}</div>
+                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(255,90,95,0.08)", border: "1px solid rgba(255,90,95,0.2)", color: "#FF5A5F", fontSize: 13, fontWeight: 500 }}>{error}</div>
                 )}
 
                 <div className="rd-field" style={{ marginBottom: 16 }}>
@@ -171,6 +171,13 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                 <button type="submit" disabled={busy} className="rd-btn-primary" style={{ width: "100%", padding: "14px", opacity: busy ? 0.6 : 1 }}>
                   {busy ? "Signing in..." : "Sign In"}
                 </button>
+
+                <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
+                  New here?{" "}
+                  <button type="button" className="rd-link-btn" onClick={() => { setMode(MODES.SIGNUP); setError(""); }} style={{ color: "#C8FF32", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>
+                    Create an account
+                  </button>
+                </p>
               </form>
             )}
 
@@ -181,7 +188,7 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                 </button>
 
                 {error && (
-                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)", color: "#FF4757", fontSize: 13, fontWeight: 500 }}>{error}</div>
+                  <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 20, background: "rgba(255,90,95,0.08)", border: "1px solid rgba(255,90,95,0.2)", color: "#FF5A5F", fontSize: 13, fontWeight: 500 }}>{error}</div>
                 )}
 
                 <div className="rd-field" style={{ marginBottom: 16 }}>
@@ -212,6 +219,13 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
                 <button type="submit" disabled={busy} className="rd-btn-primary" style={{ width: "100%", padding: "14px", opacity: busy ? 0.6 : 1 }}>
                   {busy ? "Creating account..." : "Create Account"}
                 </button>
+
+                <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
+                  Already have an account?{" "}
+                  <button type="button" className="rd-link-btn" onClick={() => { setMode(MODES.EMAIL); setError(""); }} style={{ color: "#C8FF32", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'Inter', sans-serif", fontSize: 13 }}>
+                    Sign in
+                  </button>
+                </p>
               </form>
             )}
           </motion.div>

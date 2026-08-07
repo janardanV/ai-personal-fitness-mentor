@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
   fmt, today, EXERCISE_DB, GOAL_LABELS,
   calcStreak, calcWeeklyVolume,
@@ -9,11 +9,26 @@ import {
 import {
   Bell, Dumbbell, Moon, Flame, Apple, Scale, Droplet, Bot, Target, Zap, Award,
   Sparkles, ChevronRight, Calendar, TrendingUp, Plus, Activity, ArrowRight, User,
+  X, Trash2, Play,
 } from "lucide-react";
+import HumanBody from "../components/HumanBody";
+import { PRIMARY_MUSCLE_IDS, MUSCLE_ID_LABEL } from "../data/muscleAtlas";
 
 const NAV = (page) => { window.__setPage?.(page); };
 
 const EXERCISE_LOOKUP = new Map((EXERCISE_DB || []).map(e => [e.name, e]));
+
+const Fade = ({ delay = 0, className, children, style }) => (
+  <motion.div
+    className={className}
+    style={style}
+    initial={{ opacity: 0, y: 18 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay }}
+  >
+    {children}
+  </motion.div>
+);
 
 const ChartFilter = ({ value, onChange }) => (
   <div className="rd-chart-filter">
@@ -40,6 +55,18 @@ const ChartTooltip = ({ active, payload, label }) => {
   );
 };
 
+const GlowDot = (props) => {
+  const { cx, cy, stroke } = props;
+  if (cx == null || cy == null) return null;
+  return (
+    <circle
+      cx={cx} cy={cy} r={5}
+      fill={stroke} stroke="rgba(255,255,255,0.75)" strokeWidth={2}
+      style={{ filter: `drop-shadow(0 0 9px ${stroke})` }}
+    />
+  );
+};
+
 const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profile, onClose }) => {
   const items = useMemo(() => {
     const notifs = [];
@@ -54,38 +81,38 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
     const todayProt = todayN.reduce((s, n) => s + (n.protein || 0), 0);
 
     if (todayW.length === 0 && hour >= 9) {
-      notifs.push({ id: "rem-workout", icon: Dumbbell, color: "#C8FF00", title: "Workout Reminder", desc: "You haven't trained today. Even 20 minutes counts!", time: "Reminder", page: "workout", type: "reminder" });
+      notifs.push({ id: "rem-workout", icon: Dumbbell, color: "#C8FF32", title: "Workout Reminder", desc: "You haven't trained today. Even 20 minutes counts!", time: "Reminder", page: "workout", type: "reminder" });
     }
     if (todayR && todayR.score < 5) {
-      notifs.push({ id: "rem-recovery", icon: Moon, color: "#FF4757", title: "Low Recovery", desc: `Score ${todayR.score}/10 — consider rest or light activity.`, time: "Reminder", page: "recovery", type: "reminder" });
+      notifs.push({ id: "rem-recovery", icon: Moon, color: "#FF5A5F", title: "Low Recovery", desc: `Score ${todayR.score}/10 — consider rest or light activity.`, time: "Reminder", page: "recovery", type: "reminder" });
     } else if (!todayR && hour >= 20) {
-      notifs.push({ id: "rem-recovery-log", icon: Moon, color: "#C8FF00", title: "Log Recovery", desc: "Don't forget to log your sleep and recovery for today.", time: "Reminder", page: "recovery", type: "reminder" });
+      notifs.push({ id: "rem-recovery-log", icon: Moon, color: "#C8FF32", title: "Log Recovery", desc: "Don't forget to log your sleep and recovery for today.", time: "Reminder", page: "recovery", type: "reminder" });
     }
     if (waterToday < 1000 && hour >= 12) {
-      notifs.push({ id: "rem-water", icon: Droplet, color: "#4D9FFF", title: "Hydration Reminder", desc: `Only ${fmt(waterToday / 1000, 1)}L today. Aim for 2.5L+.`, time: "Reminder", page: "water-tracker", type: "reminder" });
+      notifs.push({ id: "rem-water", icon: Droplet, color: "#5AC8FA", title: "Hydration Reminder", desc: `Only ${fmt(waterToday / 1000, 1)}L today. Aim for 2.5L+.`, time: "Reminder", page: "water-tracker", type: "reminder" });
     }
     if (todayCals > (profile?.calories || 2000) * 1.1) {
-      notifs.push({ id: "rem-overeat", icon: Flame, color: "#FF4757", title: "Calorie Over Target", desc: `${todayCals} kcal logged — ${Math.round((todayCals / (profile?.calories || 2000)) * 100)}% of target.`, time: "Alert", page: "nutrition", type: "reminder" });
+      notifs.push({ id: "rem-overeat", icon: Flame, color: "#FF5A5F", title: "Calorie Over Target", desc: `${todayCals} kcal logged — ${Math.round((todayCals / (profile?.calories || 2000)) * 100)}% of target.`, time: "Alert", page: "nutrition", type: "reminder" });
     }
     if (todayProt < (profile?.protein || 150) * 0.4 && hour >= 15) {
-      notifs.push({ id: "rem-protein", icon: Apple, color: "#C8FF00", title: "Protein Check", desc: `Only ${Math.round(todayProt)}g protein. Target: ${profile?.protein || 150}g.`, time: "Reminder", page: "nutrition", type: "reminder" });
+      notifs.push({ id: "rem-protein", icon: Apple, color: "#C8FF32", title: "Protein Check", desc: `Only ${Math.round(todayProt)}g protein. Target: ${profile?.protein || 150}g.`, time: "Reminder", page: "nutrition", type: "reminder" });
     }
 
     const recentW = workouts.slice(-3).reverse();
     recentW.forEach(w => notifs.push({
-      id: `w-${w.date}`, icon: Dumbbell, color: "#C8FF00",
+      id: `w-${w.date}`, icon: Dumbbell, color: "#C8FF32",
       title: "Workout Completed", desc: `${w.exercises?.length || 0} exercises · ${Math.round(w.totalVolume)}kg volume`,
       time: w.date, page: "workout", type: "activity",
     }));
     const recentN = nutrition.slice(-2).reverse();
     recentN.forEach(n => notifs.push({
-      id: `n-${n.date}`, icon: Apple, color: "#C8FF00",
+      id: `n-${n.date}`, icon: Apple, color: "#C8FF32",
       title: "Nutrition Logged", desc: `${n.calories || 0} kcal · ${n.protein || 0}g protein`,
       time: n.date, page: "nutrition", type: "activity",
     }));
     const recentR = recovery.slice(-2).reverse();
     recentR.forEach(r => notifs.push({
-      id: `r-${r.date}`, icon: Moon, color: "#C8FF00",
+      id: `r-${r.date}`, icon: Moon, color: "#C8FF32",
       title: "Recovery Logged", desc: `Score: ${r.score}/10 · Sleep: ${r.sleep}h`,
       time: r.date, page: "recovery", type: "activity",
     }));
@@ -108,11 +135,11 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
   return (
     <div className="dash-notif-panel" onClick={e => e.stopPropagation()}>
       <div style={{ padding: "8px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>Notifications</span>
-        <button onClick={onClose} style={{ background: "none", color: "#666", fontSize: 16, padding: 2, cursor: "pointer", border: "none" }} tabIndex={0} aria-label="Close notifications">✕</button>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>Notifications</span>
+        <button onClick={onClose} className="rd-icon-btn" style={{ width: 28, height: 28 }} tabIndex={0} aria-label="Close notifications"><X size={15} /></button>
       </div>
       {items.length === 0 ? (
-        <div style={{ padding: "24px 12px", textAlign: "center", color: "#666", fontSize: 13 }}>
+        <div style={{ padding: "24px 12px", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
           <Bell size={24} style={{ opacity: 0.3, marginBottom: 8 }} />
           No notifications yet
         </div>
@@ -120,7 +147,7 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
         <div>
           {reminders.length > 0 && (
             <div style={{ padding: "4px 8px" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(160,160,160,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>Reminders</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>Reminders</div>
               {reminders.map(n => {
                 const Icon = n.icon;
                 return (
@@ -131,8 +158,8 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
                       <Icon size={14} color={n.color} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#FFFFFF" }}>{n.title}</div>
-                      <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 1 }}>{n.desc}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{n.title}</div>
+                      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>{n.desc}</div>
                     </div>
                   </div>
                 );
@@ -141,7 +168,7 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
           )}
           {achievements.length > 0 && (
             <div style={{ padding: "4px 8px" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(160,160,160,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6, marginTop: reminders.length > 0 ? 8 : 0 }}>Achievements</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6, marginTop: reminders.length > 0 ? 8 : 0 }}>Achievements</div>
               {achievements.map(n => {
                 const Icon = n.icon;
                 return (
@@ -151,7 +178,7 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, color: "#FFD700" }}>{n.title}</div>
-                      <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 1 }}>{n.desc}</div>
+                      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>{n.desc}</div>
                     </div>
                   </div>
                 );
@@ -160,7 +187,7 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
           )}
           {activities.length > 0 && (
             <div style={{ padding: "4px 8px" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(160,160,160,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6, marginTop: (reminders.length > 0 || achievements.length > 0) ? 8 : 0 }}>Activity</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6, marginTop: (reminders.length > 0 || achievements.length > 0) ? 8 : 0 }}>Activity</div>
               {activities.map(n => {
                 const Icon = n.icon;
                 return (
@@ -171,10 +198,10 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
                       <Icon size={14} color={n.color} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#FFFFFF" }}>{n.title}</div>
-                      <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 1 }}>{n.desc}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{n.title}</div>
+                      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>{n.desc}</div>
                     </div>
-                    <span style={{ fontSize: 10, color: "rgba(160,160,160,0.3)", flexShrink: 0 }}>{n.time}</span>
+                    <span style={{ fontSize: 10, color: "var(--faint)", flexShrink: 0 }}>{n.time}</span>
                   </div>
                 );
               })}
@@ -190,17 +217,17 @@ const ProfileDropdown = ({ profile, dispatch, onClose }) => (
   <div className="dash-dropdown" onClick={e => e.stopPropagation()}>
     <div style={{ padding: "8px 12px 6px", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 4 }}>
       <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>{profile.name}</div>
-      <div style={{ fontSize: 12, color: "#A0A0A0" }}>{GOAL_LABELS[profile.goal] || profile.goal?.replace(/_/g, " ")}</div>
+      <div style={{ fontSize: 12, color: "#A7B1C2" }}>{GOAL_LABELS[profile.goal] || profile.goal?.replace(/_/g, " ")}</div>
     </div>
     <button className="dash-dropdown-item" onClick={() => { NAV("profile"); onClose(); }} tabIndex={0}>
       <User size={14} /><span>Profile</span>
     </button>
-    <button className="dash-dropdown-item" onClick={() => { NAV("profile"); onClose(); }} tabIndex={0}>
+    <button className="dash-dropdown-item" onClick={() => { NAV("settings"); onClose(); }} tabIndex={0}>
       <Target size={14} /><span>Settings</span>
     </button>
     <div className="dash-dropdown-divider" />
     <button className="dash-dropdown-item danger" onClick={async () => { onClose(); if (await showConfirm("Reset all data? This will permanently delete all workouts, nutrition logs, and progress. This cannot be undone.")) dispatch({ type: "RESET" }); }} tabIndex={0}>
-      <span>✕</span><span>Reset All Data</span>
+      <Trash2 size={14} /><span>Reset All Data</span>
     </button>
   </div>
 );
@@ -228,6 +255,9 @@ const Dashboard = ({ state, dispatch, page }) => {
   const todayRecovery = recovery.find(r => r.date === today()) || {};
   const waterLog = (water || {})[today()] || 0;
   const waterGoal = 2500;
+  const todayLogCount = workouts.filter(w => w.date === today()).length
+    + nutrition.filter(n => n.date === today()).length
+    + (recovery.find(r => r.date === today()) ? 1 : 0);
 
   const latestWeight = bodyWeight.length > 0 ? bodyWeight[bodyWeight.length - 1].weight : (profile.weight || 0);
   let weightChange = 0;
@@ -266,7 +296,7 @@ const Dashboard = ({ state, dispatch, page }) => {
 
   const filterDays = chartFilter === "7D" ? 7 : chartFilter === "90D" ? 90 : 30;
 
-  // ── Hero: Today's Workout ──
+  // â”€â”€ Hero: Today's Workout â”€â”€
   const todayWorkouts = workouts.filter(w => w.date === today());
   const progDays = currentProgram?.days || [];
   const nextIdx = workouts.length > 0 ? workouts.length % Math.max(progDays.length, 1) : 0;
@@ -284,6 +314,35 @@ const Dashboard = ({ state, dispatch, page }) => {
     return [...set].slice(0, 3).join(" • ");
   }, [heroExercises]);
 
+  const heroMuscles = useMemo(() => {
+    const set = new Set();
+    heroExercises.forEach(e => {
+      const name = e?.exerciseName || (typeof e === "string" ? e : e?.name);
+      const ex = EXERCISE_LOOKUP.get(name);
+      if (ex?.primary) set.add(ex.primary);
+    });
+    return [...set];
+  }, [heroExercises]);
+
+  const heroRegions = useMemo(() => {
+    const s = new Set();
+    heroMuscles.forEach(m => (PRIMARY_MUSCLE_IDS[m] || []).forEach(id => s.add(id)));
+    return [...s];
+  }, [heroMuscles]);
+
+  const heroRegionLabels = useMemo(() => {
+    const seen = new Set();
+    const labels = [];
+    heroRegions.forEach(id => {
+      const l = MUSCLE_ID_LABEL(id);
+      if (l && !seen.has(l)) {
+        seen.add(l);
+        labels.push(l);
+      }
+    });
+    return labels;
+  }, [heroRegions]);
+
   const startHero = () => {
     if (activeSession) { NAV("session"); return; }
     if (heroDay) {
@@ -294,11 +353,11 @@ const Dashboard = ({ state, dispatch, page }) => {
     }
   };
 
-  // ── Readiness ──
+  // â”€â”€ Readiness â”€â”€
   const recoveryScore = todayRecovery.score || 0;
   const recoveryPct = Math.round(recoveryScore * 10);
   const readinessStatus = recoveryPct >= 80 ? "Ready to train" : recoveryPct >= 60 ? "Moderate — manageable" : "Take it easy";
-  const readinessColor = recoveryPct >= 80 ? "#C8FF00" : recoveryPct >= 60 ? "#FF9F43" : "#FF4757";
+  const readinessColor = recoveryPct >= 80 ? "#C8FF32" : recoveryPct >= 60 ? "#FF9F0A" : "#FF5A5F";
   const subMetrics = [
     { label: "Sleep", pct: Math.round(Math.min((todayRecovery.sleep || 0) / 8 * 100, 100)) },
     { label: "Fatigue", pct: Math.max(0, Math.min(100 - (todayRecovery.quality || 5) * 10, 100)) },
@@ -306,7 +365,7 @@ const Dashboard = ({ state, dispatch, page }) => {
     { label: "Stress", pct: Math.max(0, Math.min((todayRecovery.stress || 5) * 10, 100)) },
   ];
 
-  // ── Consistency dots (last 7 days) ──
+  // â”€â”€ Consistency dots (last 7 days) â”€â”€
   const consistency = useMemo(() => {
     const dots = [];
     for (let i = 6; i >= 0; i--) {
@@ -317,7 +376,7 @@ const Dashboard = ({ state, dispatch, page }) => {
     return dots;
   }, [workouts]);
 
-  // ── Weekly overview chart ──
+  // â”€â”€ Weekly overview chart â”€â”€
   const chartData = useMemo(() => {
     const data = [];
     for (let i = filterDays - 1; i >= 0; i--) {
@@ -337,7 +396,7 @@ const Dashboard = ({ state, dispatch, page }) => {
 
   const recentWorkouts = useMemo(() => [...workouts].slice(-6).reverse(), [workouts]);
 
-  // ── Default AI insight (real data only) ──
+  // â”€â”€ Default AI insight (real data only) â”€â”€
   const defaultInsight = useMemo(() => {
     const parts = [];
     if (workouts.length) {
@@ -387,9 +446,9 @@ const Dashboard = ({ state, dispatch, page }) => {
   const fatGoal = Math.max(profile.fat || Math.round((profile.calories || 2000) * 0.035), 1);
 
   const macroGoals = [
-    { label: "Protein", val: todayNutrition.protein || 0, goal: profile.protein || 150, pct: proteinPct, color: "#C8FF00" },
-    { label: "Carbs", val: todayNutrition.carbs || 0, goal: carbGoal, pct: Math.min(((todayNutrition.carbs || 0) / carbGoal) * 100, 100), color: "#4D9FFF" },
-    { label: "Fat", val: todayNutrition.fat || 0, goal: fatGoal, pct: Math.min(((todayNutrition.fat || 0) / fatGoal) * 100, 100), color: "#FF9F43" },
+    { label: "Protein", val: todayNutrition.protein || 0, goal: profile.protein || 150, pct: proteinPct, color: "#C8FF32" },
+    { label: "Carbs", val: todayNutrition.carbs || 0, goal: carbGoal, pct: Math.min(((todayNutrition.carbs || 0) / carbGoal) * 100, 100), color: "#5AC8FA" },
+    { label: "Fat", val: todayNutrition.fat || 0, goal: fatGoal, pct: Math.min(((todayNutrition.fat || 0) / fatGoal) * 100, 100), color: "#FF9F0A" },
   ];
 
   const sparkData = useMemo(() => bodyWeight.slice(-7).map(b => b.weight), [bodyWeight]);
@@ -398,21 +457,12 @@ const Dashboard = ({ state, dispatch, page }) => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="rd-page">
 
-        {/* ═══ HEADER ═══ */}
+        {/* â•â•â• HEADER â•â•â• */}
         <div className="rd-header">
-          <div>
-            <div className="rd-greeting">
-              {greeting}, <span className="rd-greeting-name">{profile.name}</span>
-            </div>
-            <div className="rd-greeting-sub">
-              {dateStr}
-              {profile.goal && ` · Goal: ${GOAL_LABELS[profile.goal] || profile.goal.replace(/_/g, " ")}`}
-            </div>
-            <div className="rd-pills">
-              <span className="rd-pill"><Flame size={13} /><b>{streak}</b> day streak</span>
-              <span className="rd-pill"><Zap size={13} />Lv. <b>{level}</b></span>
-              <span className="rd-pill purple"><Award size={13} /><b>{xp}</b> XP</span>
-            </div>
+          <div className="rd-pills">
+            <span className="rd-pill"><Flame size={13} /><b>{streak}</b> day streak</span>
+            <span className="rd-pill"><Zap size={13} />Lv. <b>{level}</b></span>
+            <span className="rd-pill purple"><Award size={13} /><b>{xp}</b> XP</span>
           </div>
 
           <div className="rd-top-right">
@@ -423,8 +473,8 @@ const Dashboard = ({ state, dispatch, page }) => {
                 role="button" tabIndex={0} aria-label="Notifications" aria-expanded={notifOpen}
                 onKeyDown={e => { if (e.key === "Enter") { setNotifOpen(p => !p); setProfileOpen(false); } }}>
                 <Bell size={17} />
-                {(workouts.length + nutrition.length + recovery.length) > 0 && (
-                  <span className="rd-notif-badge">{Math.min(workouts.length + nutrition.length + recovery.length, 99)}</span>
+                {todayLogCount > 0 && (
+                  <span className="rd-notif-badge">{Math.min(todayLogCount, 99)}</span>
                 )}
               </button>
               {notifOpen && <NotificationPanel workouts={workouts} nutrition={nutrition} recovery={recovery} badges={badges} water={water} profile={profile} onClose={() => setNotifOpen(false)} />}
@@ -441,115 +491,113 @@ const Dashboard = ({ state, dispatch, page }) => {
           </div>
         </div>
 
-        {/* ═══ HERO ROW ═══ */}
+        {/* â•â•â• HERO ROW â•â•â• */}
         <div className="rd-grid">
-          {/* ── Today's Workout (span 4) ── */}
-          <div className="rd-span-4 rd-hero">
-            <Dumbbell size={200} strokeWidth={1} className="rd-hero-watermark" />
-            <span className="rd-hero-tag"><Zap size={12} />Today's Workout</span>
-            {heroDay || activeSession ? (
-              <>
+          <Fade className="rd-span-6 rd-hero" delay={0.02}>
+            <div className="rd-hero-grid">
+              <div className="rd-hero-copy">
+                <span className="rd-kicker"><Zap size={12} />Today's Workout</span>
                 <div>
-                  <div className="rd-hero-name">{activeSession ? activeSession.name || "Active Session" : heroDay.name}</div>
-                  <div className="rd-hero-focus">
-                    {activeSession
-                      ? `${activeSession.exercises?.length || 0} exercises in progress`
-                      : (heroFocus || "Full-body session")}
+                  <h1 className="rd-hero-title">{greeting}, <span className="accent">{profile.name}</span></h1>
+                  <div className="rd-hero-date">
+                    {dateStr}
+                    {profile.goal && ` · Goal: ${GOAL_LABELS[profile.goal] || profile.goal.replace(/_/g, " ")}`}
                   </div>
                 </div>
+                <p className="rd-hero-sub">
+                  {activeSession ? (
+                    <>Session in progress — <b>{activeSession.name || "Active workout"}</b>, {activeSession.exercises?.length || 0} exercises underway</>
+                  ) : heroDay ? (
+                    <>Next up: <b>{heroDay.name}</b> — {heroFocus || "Full-body session"}</>
+                  ) : (
+                    <>Pick a program or start a free workout to begin training</>
+                  )}
+                </p>
+                <div className="rd-hero-ai">
+                  <Bot size={16} />
+                  <span>{aiInsight || defaultInsight}</span>
+                </div>
                 <div className="rd-hero-stats">
-                  <div className="rd-hero-stat">
-                    <div className="v">{activeSession ? activeSession.exercises?.length || 0 : heroExercises.length}</div>
-                    <div className="l">Exercises</div>
+                  <div className="rd-hero-stat-chip">
+                    <div className="c-v">{activeSession ? activeSession.exercises?.length || 0 : heroExercises.length}</div>
+                    <div className="c-l">Exercises</div>
                   </div>
-                  <div className="rd-hero-stat">
-                    <div className="v">{activeSession
+                  <div className="rd-hero-stat-chip">
+                    <div className="c-v">{activeSession
                       ? (activeSession.exercises || []).reduce((s, e) => s + (e.sets?.length || 0), 0)
                       : heroSets}</div>
-                    <div className="l">Sets</div>
+                    <div className="c-l">Sets</div>
                   </div>
-                  <div className="rd-hero-stat">
-                    <div className="v">~{activeSession ? (activeSession.exercises?.length || 0) * 8 : heroMinutes}</div>
-                    <div className="l">Minutes</div>
+                  <div className="rd-hero-stat-chip">
+                    <div className="c-v"><span>~</span>{activeSession ? (activeSession.exercises?.length || 0) * 8 : heroMinutes}<span> min</span></div>
+                    <div className="c-l">Est. time</div>
                   </div>
                 </div>
                 <div className="rd-hero-actions">
-                  <button className="rd-btn-primary" onClick={startHero} tabIndex={0}>
-                    {activeSession ? "Continue Workout" : heroDay ? "Start Workout" : "Start Workout"}
+                  <button className="rd-btn-primary rd-btn-lg" onClick={startHero} tabIndex={0}>
+                    <Play size={16} />
+                    {activeSession ? "Continue Workout" : "Start Workout"}
                     <ChevronRight size={16} />
                   </button>
                   {!activeSession && (
-                    <button className="rd-btn-secondary" onClick={() => NAV("programs")} tabIndex={0}>
+                    <button className="rd-btn-secondary rd-btn-lg" onClick={() => NAV("programs")} tabIndex={0}>
                       View Program
                     </button>
                   )}
                 </div>
-              </>
-            ) : (
-              <EmptyState icon={Dumbbell} title="No active program"
-                subtitle="Pick a program or start a free workout to begin training"
-                action={() => NAV("programs")} actionLabel="Browse Programs" />
-            )}
-          </div>
+                {currentProgram && !activeSession && (
+                  <span className="rd-tip-chip" style={{ alignSelf: "flex-start" }}>
+                    <Calendar size={12} />
+                    Current program: <b style={{ color: "var(--text)", fontWeight: 700 }}>{currentProgram.name}</b>
+                  </span>
+                )}
+              </div>
 
-          {/* ── Readiness (span 2) ── */}
-          <div className="rd-span-2 rd-card rd-card-click"
-            onClick={() => NAV("recovery")} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === "Enter") NAV("recovery"); }}
-            style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div className="rd-card-head">
-              <div className="rd-card-title">
-                <div className="rd-card-title-ico lime"><Moon size={16} /></div>
-                <div>
-                  <div className="rd-card-kicker">Readiness</div>
-                  <div className="rd-card-name">Recovery Score</div>
-                </div>
-              </div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 20, flex: 1 }}>
-              <div className="rd-ring">
-                <svg width="100%" height="100%" viewBox="0 0 132 132">
-                  <circle className="rd-ring-bg" cx={66} cy={66} r={54} strokeWidth={8} />
-                  <circle className="rd-ring-fg" cx={66} cy={66} r={54} strokeWidth={8}
-                    stroke={readinessColor}
-                    strokeDasharray={`${(recoveryPct / 100) * (2 * Math.PI * 54)} ${2 * Math.PI * 54}`} />
-                </svg>
-                <div className="rd-ring-center">
-                  <div className="rd-ring-value">{recoveryScore || 0}<span>/10</span></div>
-                  <div className="rd-ring-label">Readiness</div>
-                </div>
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="rd-readiness-status" style={{ color: readinessColor }}>{readinessStatus}</div>
-                <div className="rd-readiness-sub">
-                  {todayRecovery.score
-                    ? `Based on your sleep, stress & soreness`
-                    : "Log recovery to see your score"}
-                </div>
-              </div>
-            </div>
-            <div className="rd-divider" style={{ margin: "0 0 4px" }} />
-            <div>
-              {subMetrics.map(m => {
-                const color = m.pct >= 70 ? "#C8FF00" : m.pct >= 40 ? "#888" : "#FF4757";
-                return (
-                  <div className="rd-recovery-row" key={m.label}>
-                    <span className="rd-recovery-label">{m.label}</span>
-                    <div className="rd-recovery-track">
-                      <div className="rd-recovery-fill" style={{ width: `${m.pct}%`, background: color }} />
+              <div className="rd-hero-visual">
+                <HumanBody activeMuscles={heroRegions} labels={heroRegionLabels} />
+                <div className="rd-hero-readiness" onClick={() => NAV("recovery")} role="button" tabIndex={0}
+                  onKeyDown={e => { if (e.key === "Enter") NAV("recovery"); }}
+                  style={{ cursor: "pointer" }}>
+                  <div className="rr-ring">
+                    <svg viewBox="0 0 76 76">
+                      <circle className="rr-bg" cx={38} cy={38} r={32} strokeWidth={6} />
+                      <circle className="rr-fg" cx={38} cy={38} r={32} strokeWidth={6}
+                        stroke={readinessColor}
+                        strokeDasharray={`${(recoveryPct / 100) * (2 * Math.PI * 32)} ${2 * Math.PI * 32}`} />
+                    </svg>
+                    <div className="rr-center">
+                      <b style={{ color: readinessColor }}>{recoveryScore || 0}</b>
+                      <span>Readiness</span>
                     </div>
-                    <span className="rd-recovery-val">{m.pct}%</span>
                   </div>
-                );
-              })}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="rr-status" style={{ color: readinessColor }}>
+                      {readinessStatus}
+                      <small>
+                        {todayRecovery.score
+                          ? "Based on your sleep, stress & soreness"
+                          : "Log recovery to see your score"}
+                      </small>
+                    </div>
+                    <div className="rr-bars">
+                      {subMetrics.slice(0, 3).map(m => {
+                        const color = m.pct >= 70 ? "var(--accent)" : m.pct >= 40 ? "#A7B1C2" : "var(--red)";
+                        return (
+                          <div className="rr-bar-row" key={m.label}>
+                            <span className="rr-l">{m.label}</span>
+                            <div className="rr-bar"><i style={{ width: `${m.pct}%`, background: color }} /></div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <button className="rd-card-link" onClick={(e) => { e.stopPropagation(); NAV("recovery"); }} tabIndex={0}>
-              View Recovery <ArrowRight size={13} />
-            </button>
-          </div>
+          </Fade>
 
-          {/* ── Nutrition (span 2) ── */}
-          <div className="rd-span-2 rd-card rd-card-click"
+          {/* â”€â”€ Nutrition (span 2) â”€â”€ */}
+          <Fade className="rd-span-2 rd-card rd-card-click" delay={0.08}
             onClick={() => NAV("nutrition")} role="button" tabIndex={0}
             onKeyDown={e => { if (e.key === "Enter") NAV("nutrition"); }}>
             <div className="rd-card-head">
@@ -566,7 +614,7 @@ const Dashboard = ({ state, dispatch, page }) => {
               <span className="rd-big-metric">{Math.round(todayNutrition.calories)}</span>
               <span className="rd-big-metric" style={{ fontSize: 16, color: "rgba(255,255,255,0.35)" }}>/ {profile.calories || 2000} kcal</span>
               <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                <div className="rd-trend" style={{ color: caloriePct > 90 ? "#FF4757" : "#C8FF00" }}>
+                <div className="rd-trend" style={{ color: caloriePct > 90 ? "#FF5A5F" : "#C8FF32" }}>
                   <Flame size={13} />{Math.round(caloriePct)}%
                 </div>
                 <div className="rd-metric-label">of target</div>
@@ -585,10 +633,10 @@ const Dashboard = ({ state, dispatch, page }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </Fade>
 
-          {/* ── Water (span 2) ── */}
-          <div className="rd-span-2 rd-card rd-card-click"
+          {/* â”€â”€ Water (span 2) â”€â”€ */}
+          <Fade className="rd-span-2 rd-card rd-card-click" delay={0.1}
             onClick={() => NAV("water-tracker")} role="button" tabIndex={0}
             onKeyDown={e => { if (e.key === "Enter") NAV("water-tracker"); }}>
             <div className="rd-card-head">
@@ -612,54 +660,68 @@ const Dashboard = ({ state, dispatch, page }) => {
             <div className="rd-metric-label" style={{ marginTop: 10 }}>
               {waterLog >= waterGoal ? "Daily goal reached!" : `${Math.round((waterLog / waterGoal) * 100)}% of daily goal`}
             </div>
-          </div>
+          </Fade>
 
-          {/* ── Body Weight (span 1) ── */}
-          <div className="rd-span-1 rd-card rd-card-click"
-            onClick={() => NAV("bodyweight")} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === "Enter") NAV("bodyweight"); }}>
+          {/* â”€â”€ Progress Snapshot (span 2) â”€â”€ */}
+          <Fade className="rd-span-2 rd-card" delay={0.12}>
             <div className="rd-card-head" style={{ marginBottom: 12 }}>
-              <div className="rd-card-title-ico"><Scale size={16} /></div>
-              <span className="rd-card-link"><ArrowRight size={13} /></span>
+              <div className="rd-card-title">
+                <div className="rd-card-title-ico lime"><Activity size={16} /></div>
+                <div>
+                  <div className="rd-card-kicker">Progress</div>
+                  <div className="rd-card-name">Snapshot</div>
+                </div>
+              </div>
             </div>
-            <span className="rd-big-metric">{latestWeight}<span> kg</span></span>
-            <div className="rd-metric-label">Body Weight</div>
-            <div style={{ marginTop: 10 }}>
-              <span className={`rd-trend ${weightChange > 0.05 ? "up" : weightChange < -0.05 ? "down" : "flat"}`}>
-                {weightChange > 0.05 ? <TrendingUp size={13} /> : weightChange < -0.05 ? <TrendingUp size={13} style={{ transform: "rotate(180deg)" }} /> : null}
-                {weightChange !== 0 ? `${weightChange > 0 ? "+" : ""}${fmt(weightChange, 1)} kg` : "No change"}
-              </span>
-              <div className="rd-metric-label">this week</div>
+            <div className="rd-snapshot">
+              <div className="rd-snapshot-sec rd-card-click" onClick={() => NAV("bodyweight")} role="button" tabIndex={0}
+                onKeyDown={e => { if (e.key === "Enter") NAV("bodyweight"); }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
+                  <span className="rd-big-metric">{latestWeight}<span> kg</span></span>
+                  <span className={`rd-trend ${weightChange > 0.05 ? "up" : weightChange < -0.05 ? "down" : "flat"}`}>
+                    {weightChange > 0.05 ? <TrendingUp size={13} /> : weightChange < -0.05 ? <TrendingUp size={13} style={{ transform: "rotate(180deg)" }} /> : null}
+                    {weightChange !== 0 ? `${weightChange > 0 ? "+" : ""}${fmt(weightChange, 1)} kg` : "No change"}
+                  </span>
+                </div>
+                <div className="rd-metric-label">Body weight · this week</div>
+                {sparkData.length >= 2 && (
+                  <svg width="100%" height="30" viewBox="0 0 100 30" preserveAspectRatio="none" style={{ marginTop: 4, display: "block" }}>
+                    <defs>
+                      <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(200,255,50,0.25)" />
+                        <stop offset="100%" stopColor="rgba(200,255,50,0)" />
+                      </linearGradient>
+                    </defs>
+                    <polyline
+                      points={`0,${30 - ((sparkData[0] - Math.min(...sparkData)) / Math.max(Math.max(...sparkData) - Math.min(...sparkData), 0.1)) * 26 - 2} ${sparkData.map((w, i) => `${(i / (sparkData.length - 1)) * 100},${30 - ((w - Math.min(...sparkData)) / Math.max(Math.max(...sparkData) - Math.min(...sparkData), 0.1)) * 26 - 2}`).join(" ")} 100,30 0,30`}
+                      fill="url(#sparkFill)" stroke="none" />
+                    <polyline
+                      points={sparkData.map((w, i) => `${(i / (sparkData.length - 1)) * 100},${30 - ((w - Math.min(...sparkData)) / Math.max(Math.max(...sparkData) - Math.min(...sparkData), 0.1)) * 26 - 2}`).join(" ")}
+                      fill="none" stroke="#C8FF32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              <div className="rd-snapshot-divider" />
+              <div className="rd-snapshot-sec rd-card-click" onClick={() => NAV("progress")} role="button" tabIndex={0}
+                onKeyDown={e => { if (e.key === "Enter") NAV("progress"); }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
+                  <span className="rd-big-metric">{streak}<span> days</span></span>
+                  <span className="rd-trend" style={{ color: streak >= 2 ? "var(--accent)" : "var(--muted)" }}>
+                    <Flame size={13} />{streak >= 2 ? "On fire" : streak === 1 ? "Day 1" : "No streak"}
+                  </span>
+                </div>
+                <div className="rd-dots" style={{ height: 14 }}>
+                  {consistency.map((on, i) => (
+                    <div key={i} className={`rd-dot ${on ? "on" : ""}`} style={{ height: "100%" }} title={on ? "Workout logged" : "Rest day"} />
+                  ))}
+                </div>
+                <div className="rd-metric-label">Last 7 days</div>
+              </div>
             </div>
-            {sparkData.length >= 2 && (
-              <svg width="100%" height="26" viewBox="0 0 100 26" preserveAspectRatio="none" style={{ marginTop: 10, display: "block" }}>
-                <polyline
-                  points={sparkData.map((w, i) => `${(i / (sparkData.length - 1)) * 100},${26 - ((w - Math.min(...sparkData)) / Math.max(Math.max(...sparkData) - Math.min(...sparkData), 0.1)) * 22 - 2}`).join(" ")}
-                  fill="none" stroke="#C8FF00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
-              </svg>
-            )}
-          </div>
+          </Fade>
 
-          {/* ── Streak (span 1) ── */}
-          <div className="rd-span-1 rd-card rd-card-click"
-            onClick={() => NAV("progress")} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === "Enter") NAV("progress"); }}>
-            <div className="rd-card-head" style={{ marginBottom: 12 }}>
-              <div className="rd-card-title-ico lime"><Flame size={16} /></div>
-              <span className="rd-card-link"><ArrowRight size={13} /></span>
-            </div>
-            <span className="rd-big-metric">{streak}<span> days</span></span>
-            <div className="rd-metric-label">Current Streak</div>
-            <div className="rd-dots" style={{ marginTop: 14, height: 18 }}>
-              {consistency.map((on, i) => (
-                <div key={i} className={`rd-dot ${on ? "on" : ""}`} style={{ height: "100%" }} title={on ? "Workout logged" : "Rest day"} />
-              ))}
-            </div>
-            <div className="rd-metric-label" style={{ marginTop: 8 }}>Last 7 days</div>
-          </div>
-
-          {/* ── Weekly Overview (span 4) ── */}
-          <div className="rd-span-4 rd-card" style={{ padding: 22 }}>
+          {/* â”€â”€ Weekly Overview (span 4) â”€â”€ */}
+          <Fade className="rd-span-4 rd-card" delay={0.14}>
             <div className="rd-card-head">
               <div className="rd-card-title">
                 <div className="rd-card-title-ico lime"><Activity size={16} /></div>
@@ -670,34 +732,44 @@ const Dashboard = ({ state, dispatch, page }) => {
               </div>
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                 <div className="rd-legend">
-                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#C8FF00" }} />Workouts</span>
-                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#4D9FFF" }} />Volume</span>
-                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#FF9F43" }} />Calories</span>
+                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#C8FF32" }} />Workouts</span>
+                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#5AC8FA" }} />Volume</span>
+                  <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#FF9F0A" }} />Calories</span>
                 </div>
                 <ChartFilter value={chartFilter} onChange={setChartFilter} />
               </div>
             </div>
             {hasChartData ? (
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={chartData} margin={{ top: 6, right: 6, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} axisLine={false} tickLine={false} minTickGap={28} />
-                  <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} axisLine={false} tickLine={false} width={42} />
-                  <YAxis yAxisId="right" orientation="right" allowDecimals={false} tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} axisLine={false} tickLine={false} width={22} />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Line yAxisId="left" type="monotone" dataKey="workouts" name="Workouts" stroke="#C8FF00" strokeWidth={2} dot={false} activeDot={{ r: 4 }} animationDuration={1000} />
-                  <Line yAxisId="left" type="monotone" dataKey="volume" name="Volume" stroke="#4D9FFF" strokeWidth={2} dot={false} activeDot={{ r: 4 }} animationDuration={1000} />
-                  <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" stroke="#FF9F43" strokeWidth={2} dot={false} activeDot={{ r: 4 }} animationDuration={1000} />
+                  <defs>
+                    <linearGradient id="volGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="rgba(90,200,250,0.30)" />
+                      <stop offset="100%" stopColor="rgba(90,200,250,0)" />
+                    </linearGradient>
+                    <linearGradient id="calGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="rgba(255,159,10,0.28)" />
+                      <stop offset="100%" stopColor="rgba(255,159,10,0)" />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="4 10" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: "rgba(167,177,194,0.5)" }} axisLine={false} tickLine={false} minTickGap={28} />
+                  <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "rgba(167,177,194,0.5)" }} axisLine={false} tickLine={false} width={42} />
+                  <YAxis yAxisId="right" orientation="right" allowDecimals={false} tick={{ fontSize: 10, fill: "rgba(167,177,194,0.5)" }} axisLine={false} tickLine={false} width={22} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: "rgba(255,255,255,0.12)", strokeWidth: 1, strokeDasharray: "4 6" }} />
+                  <Area yAxisId="left" type="monotone" dataKey="volume" name="Volume" stroke="#5AC8FA" strokeWidth={2.5} fill="url(#volGrad)" dot={false} activeDot={(p) => <GlowDot {...p} stroke="#5AC8FA" />} animationDuration={1000} />
+                  <Area yAxisId="right" type="monotone" dataKey="calories" name="Calories" stroke="#FF9F0A" strokeWidth={2.5} fill="url(#calGrad)" dot={false} activeDot={(p) => <GlowDot {...p} stroke="#FF9F0A" />} animationDuration={1000} />
+                  <Line yAxisId="left" type="monotone" dataKey="workouts" name="Workouts" stroke="#C8FF32" strokeWidth={3} dot={false} activeDot={(p) => <GlowDot {...p} stroke="#C8FF32" />} animationDuration={1000} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
               <EmptyState icon={Activity} title="No activity yet"
                 subtitle="Complete workouts or log meals to see your weekly overview" />
             )}
-          </div>
+          </Fade>
 
-          {/* ── Recent Workouts (span 2) ── */}
-          <div className="rd-span-2 rd-card">
+          {/* â”€â”€ Recent Workouts (span 2) â”€â”€ */}
+          <Fade className="rd-span-2 rd-card" delay={0.16}>
             <div className="rd-card-head">
               <div className="rd-card-title">
                 <div className="rd-card-title-ico lime"><Dumbbell size={16} /></div>
@@ -710,10 +782,13 @@ const Dashboard = ({ state, dispatch, page }) => {
             </div>
             {recentWorkouts.length > 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {recentWorkouts.map(w => {
+                {recentWorkouts.map((w, idx) => {
                   const sets = w.totalSets ?? (w.exercises || []).reduce((s, e) => s + (e.sets?.length || 0), 0);
                   return (
-                    <div key={w.id || w.date} className="rd-recent-item" onClick={() => NAV("workout")} role="button" tabIndex={0}
+                    <motion.div key={w.id || w.date} className="rd-recent-item" onClick={() => NAV("workout")} role="button" tabIndex={0}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 + idx * 0.05, duration: 0.4 }}
                       onKeyDown={e => { if (e.key === "Enter") NAV("workout"); }}>
                       <div className="rd-recent-icon"><Dumbbell size={15} /></div>
                       <div style={{ minWidth: 0, flex: 1 }}>
@@ -724,7 +799,7 @@ const Dashboard = ({ state, dispatch, page }) => {
                         <div className="rd-recent-dur">{w.duration ? `${w.duration}m` : `${sets || 0} sets`}</div>
                         <div className="rd-recent-date">{w.date}</div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -733,10 +808,10 @@ const Dashboard = ({ state, dispatch, page }) => {
                 subtitle="Start your first workout to see it here"
                 action={() => NAV("workout")} actionLabel="Start Workout" />
             )}
-          </div>
+          </Fade>
 
-          {/* ── AI COACH BANNER (span 6) ── */}
-          <div className="rd-span-6 rd-ai">
+          {/* â”€â”€ AI COACH BANNER (span 6) â”€â”€ */}
+          <Fade className="rd-span-6 rd-ai" delay={0.18}>
             <div className="rd-ai-icon"><Bot size={26} /></div>
             <div style={{ flex: 1, minWidth: 260 }}>
               <div className="rd-ai-kicker">AI Coach</div>
@@ -752,7 +827,7 @@ const Dashboard = ({ state, dispatch, page }) => {
               {aiLoading ? "Analyzing…" : "Ask AI Coach"}
               <ChevronRight size={15} />
             </button>
-          </div>
+          </Fade>
 
         </div>
       </div>

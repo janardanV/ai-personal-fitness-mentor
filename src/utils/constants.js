@@ -1,8 +1,3 @@
-export const fmt = (n, dec = 0) => Number(n).toFixed(dec);
-export const today = () => new Date().toISOString().split("T")[0];
-export const weekAgo = () => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split("T")[0]; };
-export const uid = () => Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
-
 export const EXERCISE_DB = [
   { id: "barbell_squat", name: "Barbell Squat", cat: "compound", primary: "Quadriceps", secondary: "Glutes, Hamstrings, Core", equip: "Barbell", type: "strength", defaultSets: 4, defaultReps: 8 },
   { id: "front_squat", name: "Front Squat", cat: "compound", primary: "Quadriceps", secondary: "Core, Upper Back", equip: "Barbell", type: "strength", defaultSets: 4, defaultReps: 6 },
@@ -106,7 +101,7 @@ export const BADGE_DEFS = [
   { id: "volume_1000", icon: "\u26A1", label: "1000kg Volume", desc: "1000kg in a single session" },
   { id: "nutrition_week", icon: "\u{1F957}", label: "Nutrition Week", desc: "7 days of nutrition tracking" },
 ];
-export const COLORS = { primary: "#C8FF00", cyan: "#C8FF00", green: "#A5E600", amber: "#D9FF4D", red: "#FF4757", surface: "rgba(200,255,0,0.05)", border: "rgba(200,255,0,0.12)" };
+export const COLORS = { primary: "#C8FF32", cyan: "#C8FF32", green: "#C8FF32", amber: "#D9FF66", red: "#FF5A5F", surface: "rgba(200,255,50,0.05)", border: "rgba(200,255,50,0.12)" };
 export const SAVE_ACTIONS = new Set([
   "ADD_WORKOUT", "FINISH_SESSION",
   "ADD_NUTRITION", "EDIT_NUTRITION", "DELETE_NUTRITION", "DUPLICATE_NUTRITION",

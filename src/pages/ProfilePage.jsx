@@ -47,12 +47,12 @@ const ProfilePage = ({ state, dispatch }) => {
               </div>
             </div>
           </div>
-          <div style={{ width: 96, height: 96, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF00, #A5E600)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'JetBrains Mono', monospace", fontSize: 40, fontWeight: 800, color: "#0B0B0B", boxShadow: "0 10px 32px rgba(200,255,0,0.22)" }}>
+          <div style={{ width: 96, height: 96, borderRadius: "50%", background: "linear-gradient(135deg, #C8FF32, #C8FF32)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'JetBrains Mono', monospace", fontSize: 40, fontWeight: 800, color: "#0B0F14", boxShadow: "0 10px 32px rgba(200,255,50,0.22)" }}>
             {profile.name?.[0]?.toUpperCase() || "?"}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF" }}>{profile.name}</div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-            Level <span style={{ color: "#C8FF00", fontWeight: 700 }}>{state.level}</span> · <span style={{ color: "#C8FF00", fontWeight: 700 }}>{state.xp}</span> XP
+            Level <span style={{ color: "#C8FF32", fontWeight: 700 }}>{state.level}</span> · <span style={{ color: "#C8FF32", fontWeight: 700 }}>{state.xp}</span> XP
           </div>
         </div>
 
@@ -88,10 +88,10 @@ const ProfilePage = ({ state, dispatch }) => {
         <StatCard label="Goal" value={GOAL_LABELS[profile.goal]} color="purple" />
       </div>
 
-      <div className="rd-card" style={{ borderColor: "rgba(255,71,87,0.14)" }}>
+      <div className="rd-card" style={{ borderColor: "rgba(255,90,95,0.14)" }}>
         <div className="rd-card-head">
           <div className="rd-card-title">
-            <div className="rd-card-title-ico" style={{ background: "rgba(255,71,87,0.1)", borderColor: "rgba(255,71,87,0.2)", color: "#FF4757" }}><Trash2 size={15} /></div>
+            <div className="rd-card-title-ico" style={{ background: "rgba(255,90,95,0.1)", borderColor: "rgba(255,90,95,0.2)", color: "#FF5A5F" }}><Trash2 size={15} /></div>
             <div>
               <div className="rd-card-kicker">Danger zone</div>
               <div className="rd-card-name">Reset All Data</div>

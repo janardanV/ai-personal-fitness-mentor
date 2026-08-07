@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { AlertTriangle } from "lucide-react";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -14,8 +15,8 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div style={{ padding: 40, textAlign: "center", color: "#A0A0A0" }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
+        <div style={{ padding: 40, textAlign: "center", color: "#A7B1C2" }}>
+          <AlertTriangle size={40} color="#FF9F0A" style={{ marginBottom: 16 }} />
           <h3 style={{ color: "#FFF", marginBottom: 8 }}>Something went wrong</h3>
           <p style={{ marginBottom: 20, fontSize: 13 }}>{this.state.error?.message || "An unexpected error occurred."}</p>
           <button

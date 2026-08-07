@@ -15,8 +15,8 @@ function Toggle({ on, onToggle }) {
         position: "relative",
         padding: 0,
         flexShrink: 0,
-        background: on ? "#C8FF00" : "#262626",
-        boxShadow: on ? "0 0 12px rgba(200,255,0,0.25)" : "none",
+        background: on ? "#C8FF32" : "#262626",
+        boxShadow: on ? "0 0 12px rgba(200,255,50,0.25)" : "none",
         transition: "background 0.25s ease",
       }}
       onClick={onToggle}
@@ -27,7 +27,7 @@ function Toggle({ on, onToggle }) {
           width: 18,
           height: 18,
           borderRadius: "50%",
-          background: on ? "#0B0B0B" : "#FFFFFF",
+          background: on ? "#0B0F14" : "#FFFFFF",
           position: "absolute",
           top: 2,
           left: on ? 20 : 2,
@@ -272,10 +272,10 @@ export default function Settings({ state, dispatch }) {
             icon={Sparkles}
             tone="purple"
             name="Accent Color"
-            desc={<span style={{ color: "#C8FF00" }}>#C8FF00</span>}
+            desc={<span style={{ color: "#C8FF32" }}>#C8FF32</span>}
             last={true}
           >
-            <span className="rd-chip active"><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#C8FF00" }} /> Lime</span>
+            <span className="rd-chip active"><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#C8FF32" }} /> Lime</span>
           </SettingRow>
         </div>
 
@@ -386,7 +386,7 @@ export default function Settings({ state, dispatch }) {
           </div>
           <div className="rd-break-row" style={{ borderBottom: "none" }}>
             <span className="n">Experience Points</span>
-            <span className="m" style={{ color: "#FFFFFF" }}><b style={{ color: "#C8FF00" }}>{xp} XP</b></span>
+            <span className="m" style={{ color: "#FFFFFF" }}><b style={{ color: "#C8FF32" }}>{xp} XP</b></span>
           </div>
         </div>
 
@@ -408,7 +408,7 @@ export default function Settings({ state, dispatch }) {
             />
             <button
               className="rd-btn-secondary"
-              style={{ width: "100%", color: "#FF4757", borderColor: "rgba(255,71,87,0.3)" }}
+              style={{ width: "100%", color: "#FF5A5F", borderColor: "rgba(255,90,95,0.3)" }}
               onClick={() => setShowResetModal(true)}
             >
               <RefreshCw size={15} /> Reset All Data
@@ -456,22 +456,22 @@ export default function Settings({ state, dispatch }) {
           </SettingRow>
         </div>
 
-        <div className="rd-card" style={{ border: "1px solid rgba(255,71,87,0.35)" }}>
+        <div className="rd-card" style={{ border: "1px solid rgba(255,90,95,0.35)" }}>
           <CardHead
             icon={Trash2}
-            iconStyle={{ background: "rgba(255,71,87,0.1)", borderColor: "rgba(255,71,87,0.2)", color: "#FF4757" }}
+            iconStyle={{ background: "rgba(255,90,95,0.1)", borderColor: "rgba(255,90,95,0.2)", color: "#FF5A5F" }}
             kicker="Irreversible"
             name="Danger Zone"
           />
-          <div style={{ background: "rgba(255,71,87,0.06)", border: "1px solid rgba(255,71,87,0.2)", borderRadius: 12, padding: 14, marginBottom: 16 }}>
-            <div style={{ fontSize: 13, color: "#FF9F43", lineHeight: 1.6 }}>
+          <div style={{ background: "rgba(255,90,95,0.06)", border: "1px solid rgba(255,90,95,0.2)", borderRadius: 12, padding: 14, marginBottom: 16 }}>
+            <div style={{ fontSize: 13, color: "#FF9F0A", lineHeight: 1.6 }}>
               Deleting your account is permanent. All your data, progress, and settings will be
               permanently removed. This action cannot be undone.
             </div>
           </div>
           <button
             className="rd-btn-secondary"
-            style={{ width: "100%", color: "#FF4757", borderColor: "rgba(255,71,87,0.35)" }}
+            style={{ width: "100%", color: "#FF5A5F", borderColor: "rgba(255,90,95,0.35)" }}
             onClick={() => setShowDeleteModal(true)}
           >
             <Trash2 size={15} /> Delete Account
@@ -511,8 +511,8 @@ export default function Settings({ state, dispatch }) {
                 This action is permanent and cannot be undone. To confirm, type your email address
                 below.
               </p>
-              <div style={{ background: "rgba(255,71,87,0.06)", border: "1px solid rgba(255,71,87,0.2)", borderRadius: 12, padding: 14, marginBottom: 18 }}>
-                <div style={{ fontSize: 13, color: "#FF9F43", lineHeight: 1.6 }}>
+              <div style={{ background: "rgba(255,90,95,0.06)", border: "1px solid rgba(255,90,95,0.2)", borderRadius: 12, padding: 14, marginBottom: 18 }}>
+                <div style={{ fontSize: 13, color: "#FF9F0A", lineHeight: 1.6 }}>
                   All your data including workouts, progress, achievements, and settings will be
                   permanently deleted.
                 </div>
@@ -523,7 +523,7 @@ export default function Settings({ state, dispatch }) {
                 </label>
                 <input
                   className="rd-input"
-                  style={{ borderColor: deleteEmail && deleteEmail !== profile.email ? "rgba(255,71,87,0.5)" : undefined }}
+                  style={{ borderColor: deleteEmail && deleteEmail !== profile.email ? "rgba(255,90,95,0.5)" : undefined }}
                   value={deleteEmail}
                   onChange={(e) => setDeleteEmail(e.target.value)}
                   placeholder="Type your email to confirm"
@@ -544,9 +544,9 @@ export default function Settings({ state, dispatch }) {
                   className="rd-btn-secondary"
                   style={{
                     flex: 1,
-                    background: deleteEmail === profile.email ? "rgba(255,71,87,0.12)" : "rgba(255,255,255,0.03)",
-                    color: deleteEmail === profile.email ? "#FF4757" : "rgba(255,255,255,0.3)",
-                    borderColor: deleteEmail === profile.email ? "rgba(255,71,87,0.4)" : "rgba(255,255,255,0.07)",
+                    background: deleteEmail === profile.email ? "rgba(255,90,95,0.12)" : "rgba(255,255,255,0.03)",
+                    color: deleteEmail === profile.email ? "#FF5A5F" : "rgba(255,255,255,0.3)",
+                    borderColor: deleteEmail === profile.email ? "rgba(255,90,95,0.4)" : "rgba(255,255,255,0.07)",
                     cursor: deleteEmail === profile.email ? "pointer" : "not-allowed",
                   }}
                   onClick={handleDelete}

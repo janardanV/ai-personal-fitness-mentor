@@ -1,7 +1,5 @@
 export const calcE1RM = (w, r) => r === 1 ? w : w * (1 + r / 30);
 
-export const calcVolume = (sets) => sets.reduce((sum, s) => sum + (s.weight || 0) * (s.reps || 0), 0);
-
 export const calcWeeklyVolume = (workouts) => {
   const d = new Date(); d.setDate(d.getDate() - 7);
   const wa = d.toISOString().split("T")[0];

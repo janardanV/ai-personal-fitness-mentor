@@ -256,7 +256,7 @@ const Programs = ({ state, dispatch }) => {
               {activeProg.days[dayIdx].map((ex, i) => (
                 <div key={i} className="rd-ex-row" style={{ cursor: "default" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-                    <span style={{ width: 22, height: 22, borderRadius: 7, background: "rgba(200,255,0,0.08)", border: "1px solid rgba(200,255,0,0.14)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#C8FF00", fontFamily: "'JetBrains Mono',monospace", flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ width: 22, height: 22, borderRadius: 7, background: "rgba(200,255,50,0.08)", border: "1px solid rgba(200,255,50,0.14)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#C8FF32", fontFamily: "'JetBrains Mono',monospace", flexShrink: 0 }}>{i + 1}</span>
                     <span style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", minWidth: 0 }}>{ex.name}</span>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -272,7 +272,7 @@ const Programs = ({ state, dispatch }) => {
 
       {!active && (
         <div className="rd-card rd-empty" style={{ padding: "52px 16px" }}>
-          <Dumbbell size={30} style={{ color: "rgba(200,255,0,0.3)", marginBottom: 4 }} />
+          <Dumbbell size={30} style={{ color: "rgba(200,255,50,0.3)", marginBottom: 4 }} />
           <div className="rd-empty-title">No program selected</div>
           <div className="rd-empty-sub">Select a program above to view details</div>
         </div>

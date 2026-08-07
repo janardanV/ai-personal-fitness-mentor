@@ -112,3 +112,134 @@ export const createUserDocument = async (uid, profileData) => {
   }
   return initial;
 };
+
+// ── Guest mode: local-only persistence ──
+
+export const readLocalData = () => readLocalFallback();
+
+export const saveLocalData = (data) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.error("Failed to save local data:", err);
+  }
+};
+
+export const clearLocalData = () => {
+  try {
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+};
+
+const hasLocalData = (data) => {
+  const d = data || readLocalFallback();
+  if (!d || typeof d !== "object") return false;
+  const has = (arr) => Array.isArray(arr) && arr.length > 0;
+  const hasObj = (o) => o && typeof o === "object" && Object.keys(o).length > 0;
+  return (
+    has(d.workouts) ||
+    has(d.nutrition) ||
+    has(d.recovery) ||
+    has(d.bodyWeight) ||
+    has(d.badges) ||
+    has(d.savedPrograms) ||
+    has(d.aiHistory) ||
+    has(d.aiConversations) ||
+    has(d.workoutTemplates) ||
+    has(d.customExercises) ||
+    has(d.runs) ||
+    has(d.runningBadges) ||
+    has(d.goals) ||
+    has(d.notifications) ||
+    has(d.favoriteMeals) ||
+    hasObj(d.water) ||
+    hasObj(d.personalRecords) ||
+    hasObj(d.runningPRs) ||
+    hasObj(d.settings) ||
+    Boolean(d.currentProgram) ||
+    Number(d.xp) > 0
+  );
+};
+
+const ARRAY_FIELDS = [
+  "workouts", "nutrition", "recovery", "bodyWeight", "badges", "savedPrograms",
+  "aiHistory", "aiConversations", "workoutTemplates", "customExercises", "runs",
+  "runningBadges", "goals", "notifications", "favoriteMeals",
+];
+const DATE_KEY_FIELDS = ["recovery", "bodyWeight"];
+const OBJECT_FIELDS = ["water", "personalRecords", "runningPRs", "runningGoals"];
+
+const mergeById = (cloudItems = [], guestItems = []) => {
+  const map = new Map();
+  [...cloudItems, ...guestItems].forEach((item) => {
+    if (!item) return;
+    const key = item.id !== undefined ? `id:${item.id}` : `json:${JSON.stringify(item)}`;
+    map.set(key, item);
+  });
+  return [...map.values()];
+};
+
+// Merge guest (local) data into a user's existing cloud doc without losing either.
+export const mergeData = (cloud, guest) => {
+  const result = { ...(cloud || {}) };
+  ARRAY_FIELDS.forEach((field) => {
+    const cloudItems = Array.isArray(cloud?.[field]) ? cloud[field] : [];
+    const guestItems = Array.isArray(guest?.[field]) ? guest[field] : [];
+    if (DATE_KEY_FIELDS.includes(field)) {
+      const byDate = new Map();
+      cloudItems.forEach((item) => item?.date && byDate.set(item.date, item));
+      guestItems.forEach((item) => item?.date && byDate.set(item.date, item));
+      result[field] = [...byDate.values()];
+    } else {
+      result[field] = mergeById(cloudItems, guestItems);
+    }
+  });
+  OBJECT_FIELDS.forEach((field) => {
+    result[field] = { ...(guest?.[field] || {}), ...(cloud?.[field] || {}) };
+  });
+  result.profile = { ...(guest?.profile || {}), ...(cloud?.profile || {}) };
+  result.settings = { ...(guest?.settings || {}), ...(cloud?.settings || {}) };
+  result.xp = Math.max(Number(cloud?.xp) || 0, Number(guest?.xp) || 0);
+  result.level = Math.max(Number(cloud?.level) || 1, Number(guest?.level) || 1);
+  result.currentProgram = cloud?.currentProgram || guest?.currentProgram || null;
+  result.pendingWorkout = cloud?.pendingWorkout || guest?.pendingWorkout || null;
+  result.activeSession = cloud?.activeSession || guest?.activeSession || null;
+  return result;
+};
+
+// Load a user's cloud data, migrating any local guest data into Firestore.
+export const loadOrMigrateUserData = async (uid) => {
+  const local = readLocalFallback();
+  const localHasData = hasLocalData(local);
+
+  if (!db) return local;
+
+  const ref = doc(db, "users", uid);
+  try {
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const cloud = snap.data();
+      if (!localHasData) return cloud;
+      const merged = mergeData(cloud, local);
+      try {
+        await setDoc(ref, merged, { merge: true });
+        clearLocalData();
+      } catch (err) {
+        console.error("Guest data migration write failed:", err);
+      }
+      return merged;
+    }
+
+    if (localHasData) {
+      await setDoc(ref, local, { merge: true });
+      clearLocalData();
+      return local;
+    }
+    return null;
+  } catch (err) {
+    console.error("Firestore read failed, using local fallback:", err);
+    return localHasData ? local : null;
+  }
+};

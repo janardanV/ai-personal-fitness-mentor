@@ -315,7 +315,7 @@ export default function NotificationCenter({ state, dispatch }) {
           <motion.div
             whileHover={{ translateY: -1 }}
             className="rd-card"
-            style={{ padding: "18px 20px", border: settings.workout.enabled ? "1px solid rgba(200,255,0,0.28)" : undefined, boxShadow: settings.workout.enabled ? "0 8px 24px rgba(200,255,0,0.07)" : undefined }}
+            style={{ padding: "18px 20px", border: settings.workout.enabled ? "1px solid rgba(200,255,50,0.28)" : undefined, boxShadow: settings.workout.enabled ? "0 8px 24px rgba(200,255,50,0.07)" : undefined }}
           >
             <div className="rd-card-head" style={{ marginBottom: 0 }}>
               <div className="rd-card-title">
@@ -326,11 +326,11 @@ export default function NotificationCenter({ state, dispatch }) {
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>Get reminded to exercise</div>
                 </div>
               </div>
-              <div onClick={() => toggleReminder("workout")} style={{ width: 46, height: 26, borderRadius: 13, background: settings.workout.enabled ? "#C8FF00" : "rgba(255,255,255,0.08)", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background-color 0.2s" }}>
+              <div onClick={() => toggleReminder("workout")} style={{ width: 46, height: 26, borderRadius: 13, background: settings.workout.enabled ? "#C8FF32" : "rgba(255,255,255,0.08)", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background-color 0.2s" }}>
                 <motion.div
                   animate={{ x: settings.workout.enabled ? 22 : 3 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  style={{ width: 20, height: 20, borderRadius: 10, background: settings.workout.enabled ? "#0B0B0B" : "#FFFFFF", position: "absolute", top: 3 }}
+                  style={{ width: 20, height: 20, borderRadius: 10, background: settings.workout.enabled ? "#0B0F14" : "#FFFFFF", position: "absolute", top: 3 }}
                 />
               </div>
             </div>
@@ -358,7 +358,7 @@ export default function NotificationCenter({ state, dispatch }) {
           <motion.div
             whileHover={{ translateY: -1 }}
             className="rd-card"
-            style={{ padding: "18px 20px", border: settings.water.enabled ? "1px solid rgba(200,255,0,0.28)" : undefined, boxShadow: settings.water.enabled ? "0 8px 24px rgba(200,255,0,0.07)" : undefined }}
+            style={{ padding: "18px 20px", border: settings.water.enabled ? "1px solid rgba(200,255,50,0.28)" : undefined, boxShadow: settings.water.enabled ? "0 8px 24px rgba(200,255,50,0.07)" : undefined }}
           >
             <div className="rd-card-head" style={{ marginBottom: 0 }}>
               <div className="rd-card-title">
@@ -369,11 +369,11 @@ export default function NotificationCenter({ state, dispatch }) {
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>Stay hydrated throughout the day</div>
                 </div>
               </div>
-              <div onClick={() => toggleReminder("water")} style={{ width: 46, height: 26, borderRadius: 13, background: settings.water.enabled ? "#C8FF00" : "rgba(255,255,255,0.08)", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background-color 0.2s" }}>
+              <div onClick={() => toggleReminder("water")} style={{ width: 46, height: 26, borderRadius: 13, background: settings.water.enabled ? "#C8FF32" : "rgba(255,255,255,0.08)", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background-color 0.2s" }}>
                 <motion.div
                   animate={{ x: settings.water.enabled ? 22 : 3 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  style={{ width: 20, height: 20, borderRadius: 10, background: settings.water.enabled ? "#0B0B0B" : "#FFFFFF", position: "absolute", top: 3 }}
+                  style={{ width: 20, height: 20, borderRadius: 10, background: settings.water.enabled ? "#0B0F14" : "#FFFFFF", position: "absolute", top: 3 }}
                 />
               </div>
             </div>
@@ -405,7 +405,7 @@ export default function NotificationCenter({ state, dispatch }) {
           <motion.div
             whileHover={{ translateY: -1 }}
             className="rd-card"
-            style={{ padding: "18px 20px", border: settings.goal.enabled ? "1px solid rgba(200,255,0,0.28)" : undefined, boxShadow: settings.goal.enabled ? "0 8px 24px rgba(200,255,0,0.07)" : undefined }}
+            style={{ padding: "18px 20px", border: settings.goal.enabled ? "1px solid rgba(200,255,50,0.28)" : undefined, boxShadow: settings.goal.enabled ? "0 8px 24px rgba(200,255,50,0.07)" : undefined }}
           >
             <div className="rd-card-head" style={{ marginBottom: 0 }}>
               <div className="rd-card-title">
@@ -416,11 +416,11 @@ export default function NotificationCenter({ state, dispatch }) {
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>Review your fitness goals</div>
                 </div>
               </div>
-              <div onClick={() => toggleReminder("goal")} style={{ width: 46, height: 26, borderRadius: 13, background: settings.goal.enabled ? "#C8FF00" : "rgba(255,255,255,0.08)", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background-color 0.2s" }}>
+              <div onClick={() => toggleReminder("goal")} style={{ width: 46, height: 26, borderRadius: 13, background: settings.goal.enabled ? "#C8FF32" : "rgba(255,255,255,0.08)", cursor: "pointer", position: "relative", flexShrink: 0, transition: "background-color 0.2s" }}>
                 <motion.div
                   animate={{ x: settings.goal.enabled ? 22 : 3 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  style={{ width: 20, height: 20, borderRadius: 10, background: settings.goal.enabled ? "#0B0B0B" : "#FFFFFF", position: "absolute", top: 3 }}
+                  style={{ width: 20, height: 20, borderRadius: 10, background: settings.goal.enabled ? "#0B0F14" : "#FFFFFF", position: "absolute", top: 3 }}
                 />
               </div>
             </div>
@@ -482,7 +482,7 @@ export default function NotificationCenter({ state, dispatch }) {
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div className="rd-card-kicker" style={{ marginBottom: 2 }}>Next</div>
-                      <div style={{ fontSize: 12, color: "#C8FF00", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>
+                      <div style={{ fontSize: 12, color: "#C8FF32", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>
                         {new Date(r.nextTrigger).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true })}
                       </div>
                     </div>
@@ -556,8 +556,8 @@ export default function NotificationCenter({ state, dispatch }) {
                       alignItems: "flex-start",
                       gap: 12,
                       cursor: n.read ? "default" : "pointer",
-                      background: n.read ? undefined : "linear-gradient(180deg, rgba(200,255,0,0.045) 0%, rgba(19,19,19,0.7) 100%)",
-                      border: n.read ? undefined : "1px solid rgba(200,255,0,0.2)",
+                      background: n.read ? undefined : "linear-gradient(180deg, rgba(200,255,50,0.045) 0%, rgba(19,19,19,0.7) 100%)",
+                      border: n.read ? undefined : "1px solid rgba(200,255,50,0.2)",
                       opacity: n.read ? 0.65 : 1,
                     }}
                   >
@@ -570,7 +570,7 @@ export default function NotificationCenter({ state, dispatch }) {
                     </div>
                     {!n.read && (
                       <span className="rd-ex-tag" style={{ flexShrink: 0, alignSelf: "flex-start" }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C8FF00", display: "inline-block" }} /> New
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C8FF32", display: "inline-block" }} /> New
                       </span>
                     )}
                   </motion.div>

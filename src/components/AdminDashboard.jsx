@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Users, Activity, TrendingUp, BarChart3, PieChart as PieIcon, Timer, Flame, Trophy, Zap, History } from 'lucide-react';
 
-const ACCENT = '#C8FF00';
-const SECONDARY = '#A0A0A0';
+const ACCENT = '#C8FF32';
+const SECONDARY = '#A7B1C2';
 
 const tooltipStyle = {
   background: 'rgba(15,15,15,0.95)',
@@ -13,7 +13,7 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
-const axisTick = { fontSize: 11, fill: '#A0A0A0' };
+const axisTick = { fontSize: 11, fill: '#A7B1C2' };
 
 function getWeekLabel(d) {
   const start = new Date(d);
@@ -337,7 +337,7 @@ export default function AdminDashboard({ state, dispatch }) {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="label" tick={axisTick} interval={1} angle={-30} textAnchor="end" height={50} axisLine={false} tickLine={false} />
               <YAxis tick={axisTick} allowDecimals={false} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(200,255,0,0.05)' }} />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(200,255,50,0.05)' }} />
               <Bar dataKey="count" name="Workouts" fill={ACCENT} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

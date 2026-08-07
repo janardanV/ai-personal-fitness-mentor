@@ -59,7 +59,7 @@ export default function Sidebar({ sidebarOpen, onToggle, page, onNavigate, foote
           onClick={onToggle}
           style={{
             position: "fixed", inset: 0, zIndex: 19,
-            background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+            background: "rgba(5,7,10,0.7)", backdropFilter: "blur(6px)",
           }}
         />
       )}
@@ -67,48 +67,43 @@ export default function Sidebar({ sidebarOpen, onToggle, page, onNavigate, foote
         <button
           onClick={onToggle}
           aria-label="Open menu"
+          className="rd-icon-btn"
           style={{
             position: "fixed", top: 12, left: 12, zIndex: 18,
-            width: 38, height: 38, borderRadius: 12,
-            background: "#111111", border: "1px solid rgba(255,255,255,0.08)",
-            color: "#C8FF00", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+            background: "var(--surface-2)", color: "var(--accent)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           <Menu size={18} />
         </button>
       )}
       <div style={{
-        width: sidebarWidth, flexShrink: 0, background: "#0D0D0D",
-        borderRight: "1px solid rgba(255,255,255,0.05)", display: "flex", flexDirection: "column",
+        width: sidebarWidth, flexShrink: 0,
+        background: "linear-gradient(180deg, rgba(28,36,48,0.78) 0%, rgba(20,26,34,0.88) 100%)",
+        backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+        borderRight: "1px solid rgba(255,255,255,0.07)",
+        boxShadow: "inset -1px 0 0 rgba(255,255,255,0.03), 12px 0 44px rgba(0,0,0,0.18)",
+        display: "flex", flexDirection: "column",
         transition: "width 0.3s cubic-bezier(0.4,0,0.2,1)", overflow: "hidden",
         position: isMobile ? "fixed" : "relative", zIndex: 20, top: 0, left: 0, bottom: 0,
       }}>
 
         {/* Brand */}
-        <div style={{ padding: "18px 14px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 10, minHeight: 64 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(200,255,0,0.1)", border: "1px solid rgba(200,255,0,0.22)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#C8FF00" }}>
-            <Activity size={20} />
+        <div style={{ padding: "18px 14px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10, minHeight: 64 }}>
+          <div style={{ width: 38, height: 38, borderRadius: 12, background: "var(--accent)", color: "#0B0F14", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 6px 20px rgba(200,255,50,0.25)" }}>
+            <Activity size={20} strokeWidth={2.4} />
           </div>
           {sidebarOpen && (
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#FFFFFF", whiteSpace: "nowrap", letterSpacing: "-0.02em", lineHeight: 1.2 }}>AI Fitness</div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "#C8FF00", letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 1 }}>Mentor</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)", whiteSpace: "nowrap", letterSpacing: "-0.02em", lineHeight: 1.2 }}>AI Fitness</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 1 }}>Mentor</div>
             </div>
           )}
         </div>
 
         {/* Collapse toggle */}
         <div style={{ padding: "6px 12px", display: "flex", justifyContent: sidebarOpen ? "flex-end" : "center" }}>
-          <button onClick={onToggle} title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"} aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"} style={{
-            background: "transparent", color: "rgba(255,255,255,0.35)", fontSize: 14,
-            padding: 4, borderRadius: 8, border: "none", cursor: "pointer", transition: "all 0.2s",
-            width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center",
-          }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#C8FF00"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.35)"; }}
-          >
+          <button onClick={onToggle} title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"} aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"} className="rd-icon-btn" style={{ width: 26, height: 26, background: "transparent", border: "none" }}>
             {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
           </button>
         </div>
@@ -116,9 +111,9 @@ export default function Sidebar({ sidebarOpen, onToggle, page, onNavigate, foote
         {/* Navigation */}
         <nav style={{ flex: 1, padding: "4px 10px 12px", display: "flex", flexDirection: "column", overflowY: "auto" }}>
           {NAV.map(group => (
-            <div key={group.label || "main"} style={{ marginBottom: 14 }}>
+            <div key={group.label || "main"} className="dash-sidebar-group" style={{ marginBottom: 14 }}>
               {sidebarOpen && group.label && (
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.32)", textTransform: "uppercase", letterSpacing: "0.12em", padding: "6px 10px 6px", }}>
+                <div className="dash-sidebar-label">
                   {group.label}
                 </div>
               )}
@@ -129,30 +124,19 @@ export default function Sidebar({ sidebarOpen, onToggle, page, onNavigate, foote
                   return (
                     <button
                       key={p.id}
-                      className="dash-sidebar-btn"
+                      className={`dash-sidebar-btn${isActive ? " active" : ""}`}
                       onClick={() => handleNavigate(p.id)}
-                      title={sidebarOpen ? p.label : p.label}
+                      title={p.label}
                       aria-label={p.label}
                       aria-current={isActive ? "page" : undefined}
                       style={{
-                        display: "flex", alignItems: "center", gap: 11,
-                        width: "100%", padding: "9px 12px",
-                        borderRadius: 10, position: "relative",
-                        background: isActive ? "rgba(200,255,0,0.07)" : "transparent",
-                        border: isActive ? "1px solid rgba(200,255,0,0.14)" : "1px solid transparent",
-                        color: isActive ? "#C8FF00" : "rgba(255,255,255,0.55)",
-                        fontSize: 13, fontWeight: isActive ? 600 : 500,
-                        cursor: "pointer", textAlign: "left",
-                        transition: "all 0.15s ease",
+                        position: "relative",
                         justifyContent: sidebarOpen ? "flex-start" : "center",
                       }}
-                      onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.color = "#FFFFFF"; } }}
-                      onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.55)"; } }}
                     >
-                      {isActive && (
-                        <span style={{ position: "absolute", left: -10, top: "50%", transform: "translateY(-50%)", width: 3, height: 20, borderRadius: 2, background: "#C8FF00", boxShadow: "0 0 10px rgba(200,255,0,0.6)" }} />
-                      )}
-                      <Icon size={17} style={{ flexShrink: 0 }} />
+                      <span className="nav-pill" />
+                      <span className="nav-accent" />
+                      <Icon size={18} strokeWidth={isActive ? 2.4 : 2} style={{ flexShrink: 0 }} />
                       {sidebarOpen && <span style={{ whiteSpace: "nowrap", overflow: "hidden" }}>{p.label}</span>}
                     </button>
                   );

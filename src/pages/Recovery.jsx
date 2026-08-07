@@ -1,19 +1,29 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { BatteryCharging, Brain, Dumbbell, HeartPulse, Moon, Sparkles } from "lucide-react";
-import { today, useAICoach, calcWeeklyVolume, showToast } from "../utils/helpers";
+import { BatteryCharging, Brain, HeartPulse, Moon, Sparkles, Check, ChevronRight } from "lucide-react";
+import { today, useAICoach, calcWeeklyVolume, showToast, fmt } from "../utils/helpers";
 
 const FIELDS = [
-  { key: "sleep", label: "Sleep Duration", suffix: "h", min: 0, max: 12, step: 0.5, color: "#4D9FFF" },
-  { key: "quality", label: "Sleep Quality", suffix: "/10", min: 1, max: 10, step: 1, color: "#C8FF00" },
-  { key: "stress", label: "Stress Level", suffix: "/10", min: 1, max: 10, step: 1, color: "#FF9F43" },
-  { key: "heartRate", label: "Resting Heart Rate", suffix: " bpm", min: 40, max: 120, step: 1, color: "#A78BFA" },
+  { key: "sleep", label: "Sleep Duration", suffix: "h", min: 0, max: 12, step: 0.5, color: "#5AC8FA" },
+  { key: "quality", label: "Sleep Quality", suffix: "/10", min: 1, max: 10, step: 1, color: "#C8FF32" },
+  { key: "stress", label: "Stress Level", suffix: "/10", min: 1, max: 10, step: 1, color: "#FF9F0A" },
+  { key: "heartRate", label: "Resting Heart Rate", suffix: " bpm", min: 40, max: 120, step: 1, color: "#8B5CF6" },
 ];
+
+const Fade = ({ delay = 0, className, children }) => (
+  <motion.div className={className}
+    initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay }}>
+    {children}
+  </motion.div>
+);
 
 const Recovery = ({ state, dispatch }) => {
   const [form, setForm] = useState({ sleep: 7, quality: 7, stress: 3, heartRate: 60 });
   const [aiRec, setAiRec] = useState("");
   const { ask, loading } = useAICoach();
+  const logRef = useRef(null);
 
   const todayRec = state.recovery.find(r => r.date === today());
   const score = todayRec ? todayRec.score : null;
@@ -38,110 +48,195 @@ const Recovery = ({ state, dispatch }) => {
     [state.recovery]
   );
 
-  const scoreColor = score === null ? "rgba(255,255,255,0.35)" : score >= 7 ? "#C8FF00" : score >= 5 ? "#FF9F43" : "#FF4757";
+  const last7 = state.recovery.slice(-7);
+  const avgScore = last7.length ? fmt(last7.reduce((s, r) => s + r.score, 0) / last7.length, 1) : "—";
+  const avgSleep = last7.length ? fmt(last7.reduce((s, r) => s + (r.sleep || 0), 0) / last7.length, 1) : "—";
+
+  const scoreColor = score === null ? "rgba(255,255,255,0.35)" : score >= 7 ? "#C8FF32" : score >= 5 ? "#FF9F0A" : "#FF5A5F";
   const scoreText = score === null
     ? "Not logged yet"
-    : score >= 7 ? "High readiness — Train hard"
-    : score >= 5 ? "Moderate — Normal training"
-    : "Low — Consider deload";
+    : score >= 7 ? "High readiness — train hard"
+    : score >= 5 ? "Moderate — normal training"
+    : "Low — consider deload";
+
+  const scorePct = score === null ? 0 : (score / 10) * 100;
+  const ringR = 86;
+  const ringC = 2 * Math.PI * ringR;
+
+  const subMetrics = [
+    { label: "Sleep", display: todayRec?.sleep != null ? `${fmt(todayRec.sleep, 1)}h` : "—", pct: todayRec?.sleep != null ? Math.min((todayRec.sleep / 9) * 100, 100) : 0, color: "#5AC8FA" },
+    { label: "Quality", display: todayRec?.quality != null ? `${todayRec.quality}/10` : "—", pct: todayRec?.quality != null ? (todayRec.quality / 10) * 100 : 0, color: "#C8FF32" },
+    { label: "Stress", display: todayRec?.stress != null ? `${todayRec.stress}/10` : "—", pct: todayRec?.stress != null ? ((10 - todayRec.stress) / 10) * 100 : 0, color: "#FF9F0A" },
+    { label: "RHR", display: todayRec?.heartRate != null ? `${todayRec.heartRate} bpm` : "—", pct: todayRec?.heartRate != null ? Math.max(0, Math.min(1 - (todayRec.heartRate - 40) / 80, 1)) * 100 : 0, color: "#8B5CF6" },
+  ];
 
   return (
-    <div className="rd-page">
-      <div className="rd-page-head">
-        <div>
-          <span className="rd-kicker"><BatteryCharging size={13} /> Recovery</span>
-          <h1 className="rd-title">Recover Smarter</h1>
-          <p className="rd-sub">Log sleep, stress and heart rate to stay ahead of fatigue.</p>
-        </div>
-      </div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      <div className="rd-page">
 
-      <div className="rd-2col">
-        <div className="rd-card">
-          <div className="rd-card-head">
-            <div className="rd-card-title">
-              <div className="rd-card-title-ico blue"><Moon size={15} /></div>
+        {/* â•â•â• HERO â•â•â• */}
+        <div className="rd-hero">
+          <div className="rd-hero-grid">
+            <div className="rd-hero-copy">
+              <span className="rd-kicker"><BatteryCharging size={12} />Recovery</span>
               <div>
-                <div className="rd-card-kicker">Daily check-in</div>
-                <div className="rd-card-name">Log Today's Recovery</div>
+                <h1 className="rd-hero-title">Recover Smarter</h1>
+                <div className="rd-hero-date">
+                  {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                </div>
+              </div>
+              <p className="rd-hero-sub">
+                {score !== null
+                  ? <>Today's readiness is <b>{score >= 7 ? "strong" : score >= 5 ? "manageable" : "low"}</b> — {scoreText.toLowerCase()}</>
+                  : <>Log sleep, stress and heart rate to see your daily readiness score</>}
+              </p>
+              <div className="rd-hero-stats">
+                <div className="rd-hero-stat-chip">
+                  <div className="c-v">{avgScore}<span> /10</span></div>
+                  <div className="c-l">Avg score</div>
+                </div>
+                <div className="rd-hero-stat-chip">
+                  <div className="c-v">{avgSleep}<span> h</span></div>
+                  <div className="c-l">Avg sleep</div>
+                </div>
+                <div className="rd-hero-stat-chip">
+                  <div className="c-v">{Math.round(calcWeeklyVolume(state.workouts)).toLocaleString()}<span> kg</span></div>
+                  <div className="c-l">Volume / wk</div>
+                </div>
+              </div>
+              <div className="rd-hero-actions">
+                <button className="rd-btn-primary" onClick={() => logRef.current?.scrollIntoView({ behavior: "smooth" })}>
+                  {score !== null ? <><Check size={15} />Update Today's Log</> : <><HeartPulse size={15} />Log Today's Recovery</>}
+                  <ChevronRight size={15} />
+                </button>
+                <button className="rd-btn-secondary" onClick={getRecAdvice} disabled={loading}>
+                  <Sparkles size={15} /> {loading ? "Thinking…" : "AI Advice"}
+                </button>
+              </div>
+            </div>
+
+            <div className="rd-hero-visual" style={{ justifyContent: "center" }}>
+              <div className="rd-ring-big" style={{ filter: `drop-shadow(0 0 30px ${scoreColor}40)` }}>
+                <svg viewBox="0 0 200 200">
+                  <circle className="rr-bg" cx={100} cy={100} r={ringR} strokeWidth={14} />
+                  <circle className="rr-fg" cx={100} cy={100} r={ringR} strokeWidth={14}
+                    stroke={scoreColor}
+                    strokeDasharray={`${(scorePct / 100) * ringC} ${ringC}`} />
+                </svg>
+                <div className="rd-ring-big-center">
+                  <span className="rd-ring-big-score" style={{ color: scoreColor }}>
+                    {score !== null ? fmt(score, 1) : "—"}
+                  </span>
+                  <span className="rd-ring-big-label">Recovery</span>
+                  <span className="rd-ring-big-status" style={{ color: score === null ? "rgba(255,255,255,0.35)" : scoreColor }}>
+                    {scoreText.split("—")[0].trim()}
+                  </span>
+                </div>
+              </div>
+              <div className="rd-rec-bars">
+                {subMetrics.map(m => (
+                  <div className="rd-rec-row" key={m.label}>
+                    <span className="rr-l">{m.label}</span>
+                    <div className="rr-bar"><i style={{ width: `${m.pct}%`, background: m.color }} /></div>
+                    <span className="rd-rec-val">{m.display}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-
-          <div style={{ marginBottom: 18 }}>
-            {FIELDS.map(({ key, label, suffix, min, max, step, color }) => (
-              <div key={key} className="rd-slider-row">
-                <div className="rd-slider-head">
-                  <label className="rd-slider-label">{label}</label>
-                  <span className="rd-slider-val" style={{ color }}>{form[key]}<span>{suffix}</span></span>
-                </div>
-                <input className="rd-range" type="range" min={min} max={max} step={step} value={form[key]}
-                  onChange={e => setForm(p => ({ ...p, [key]: +e.target.value }))} />
-              </div>
-            ))}
-          </div>
-
-          <button className="rd-btn-primary" onClick={logRecovery} style={{ width: "100%" }}>
-            <HeartPulse size={16} /> Log Recovery
-          </button>
         </div>
 
-        <div className="rd-stack">
-          <div className="rd-card rd-score-center">
-            <div className="rd-metric-label">Today's Recovery Score</div>
-            <div className="rd-big-metric" style={{ fontSize: 56, color: scoreColor }}>
-              {score !== null ? score.toFixed(1) : "—"}
-            </div>
-            <div style={{ fontSize: 12, color: score === null ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.55)", fontWeight: 500 }}>{scoreText}</div>
-          </div>
-
-          <div className="rd-card">
+        {/* â•â•â• GRID â•â•â• */}
+        <div className="rd-grid">
+          <Fade className="rd-span-3 rd-card" delay={0.06}>
             <div className="rd-card-head">
               <div className="rd-card-title">
-                <div className="rd-card-title-ico purple"><Brain size={15} /></div>
-                <div className="rd-card-name">AI Recovery Coach</div>
+                <div className="rd-card-title-ico blue"><Moon size={16} /></div>
+                <div>
+                  <div className="rd-card-kicker">Daily check-in</div>
+                  <div className="rd-card-name">Log Recovery</div>
+                </div>
               </div>
-              <button className="rd-btn-secondary" onClick={getRecAdvice} disabled={loading} style={{ padding: "8px 14px", fontSize: 12 }}>
-                <Sparkles size={13} /> {loading ? "Thinking..." : "Advise"}
+              {score !== null && (
+                <span className="rd-ex-tag green"><Check size={10} /> Logged</span>
+              )}
+            </div>
+            <div ref={logRef} style={{ scrollMarginTop: 16 }}>
+              <div style={{ marginBottom: 18 }}>
+                {FIELDS.map(({ key, label, suffix, min, max, step, color }) => (
+                  <div key={key} className="rd-slider-row">
+                    <div className="rd-slider-head">
+                      <label className="rd-slider-label">{label}</label>
+                      <span className="rd-slider-val" style={{ color }}>{form[key]}<span>{suffix}</span></span>
+                    </div>
+                    <input className="rd-range" type="range" min={min} max={max} step={step} value={form[key]}
+                      onChange={e => setForm(p => ({ ...p, [key]: +e.target.value }))} />
+                  </div>
+                ))}
+              </div>
+              <button className="rd-btn-primary" onClick={logRecovery} style={{ width: "100%" }}>
+                <HeartPulse size={16} /> {score !== null ? "Update Recovery" : "Log Recovery"}
+              </button>
+            </div>
+          </Fade>
+
+          <Fade className="rd-span-3 rd-card" delay={0.1}>
+            <div className="rd-card-head">
+              <div className="rd-card-title">
+                <div className="rd-card-title-ico purple"><Brain size={16} /></div>
+                <div>
+                  <div className="rd-card-kicker">AI Coach</div>
+                  <div className="rd-card-name">Recovery Advice</div>
+                </div>
+              </div>
+              <button className="rd-btn-sm ghost" onClick={getRecAdvice} disabled={loading} tabIndex={0}>
+                <Sparkles size={13} /> {loading ? "Thinking…" : "Advise"}
               </button>
             </div>
             {aiRec ? (
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>{aiRec}</p>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", lineHeight: 1.7 }}>{aiRec}</p>
             ) : (
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Get AI-powered recovery recommendations based on your sleep, stress and training volume.</p>
+              <>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
+                  Get AI-powered recommendations based on your sleep, stress and training volume.
+                </p>
+                <div className="rd-ai-tips">
+                  <span>Sleep â‰¥ 7h</span>
+                  <span>Stress â†“ before bed</span>
+                  <span>Deload when score &lt; 5</span>
+                </div>
+              </>
             )}
-          </div>
+          </Fade>
 
-          <div className="rd-card" style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px" }}>
-            <Dumbbell size={15} style={{ color: "rgba(200,255,0,0.7)" }} />
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-              Recent training volume: <b style={{ color: "#FFFFFF", fontFamily: "'JetBrains Mono',monospace" }}>{Math.round(calcWeeklyVolume(state.workouts))} kg</b>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="rd-card">
-        <div className="rd-card-head">
-          <div className="rd-card-title">
-            <div className="rd-card-title-ico lime"><BatteryCharging size={15} /></div>
-            <div>
-              <div className="rd-card-kicker">Trend</div>
-              <div className="rd-card-name">Recovery Score & Sleep (14 days)</div>
+          <Fade className="rd-span-6 rd-card" delay={0.14}>
+            <div className="rd-card-head">
+              <div className="rd-card-title">
+                <div className="rd-card-title-ico lime"><BatteryCharging size={16} /></div>
+                <div>
+                  <div className="rd-card-kicker">Trend</div>
+                  <div className="rd-card-name">Recovery Score &amp; Sleep</div>
+                </div>
+              </div>
+              <div className="rd-legend">
+                <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#C8FF32" }} />Recovery</span>
+                <span className="rd-legend-item"><span className="rd-legend-dot" style={{ background: "#5AC8FA" }} />Sleep hrs</span>
+              </div>
             </div>
-          </div>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={recData.length ? recData : [{ date: today().slice(5), score: 0, sleep: 0 }]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} axisLine={false} tickLine={false} width={34} />
+                <Tooltip contentStyle={{ background: "rgba(18,22,28,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 12 }} />
+                <Line type="monotone" dataKey="score" stroke="#C8FF32" strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} name="Recovery" />
+                <Line type="monotone" dataKey="sleep" stroke="#5AC8FA" strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} name="Sleep hrs" />
+              </LineChart>
+            </ResponsiveContainer>
+          </Fade>
         </div>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={recData.length ? recData : [{ date: today().slice(5), score: 0, sleep: 0 }]}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#A0A0A0" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: "#A0A0A0" }} axisLine={false} tickLine={false} width={34} />
-            <Tooltip contentStyle={{ background: "rgba(15,15,15,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 12 }} />
-            <Line type="monotone" dataKey="score" stroke="#C8FF00" strokeWidth={2} dot={false} name="Recovery" />
-            <Line type="monotone" dataKey="sleep" stroke="#4D9FFF" strokeWidth={2} dot={false} name="Sleep hrs" />
-          </LineChart>
-        </ResponsiveContainer>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
