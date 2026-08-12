@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Droplets, Plus, Bell, Settings2, CalendarDays } from "lucide-react";
+import { getWaterTotal } from "../utils/helpers";
 
 const TODAY = () => new Date().toISOString().split("T")[0];
 
@@ -29,11 +30,9 @@ const getBarData = (water) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const key = d.toISOString().split("T")[0];
-    const entries = water[key] || [];
-    const total = entries.reduce((s, e) => s + e.amount, 0);
     days.push({
       day: d.toLocaleDateString("en", { weekday: "short" }),
-      amount: total,
+      amount: getWaterTotal(water, key),
       date: key,
     });
   }
@@ -95,18 +94,18 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 export default function WaterTracker({ state, dispatch }) {
-  const [goal, setGoal] = useState(getGoal);
+  const [goal, setGoal] = useState(state.settings?.waterGoal || getGoal());
   const [showCustom, setShowCustom] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderInterval, setReminderInterval] = useState(60);
   const [showGoalEdit, setShowGoalEdit] = useState(false);
-  const [goalInput, setGoalInput] = useState(String(goal));
+  const [goalInput, setGoalInput] = useState(String(state.settings?.waterGoal || getGoal()));
   const timerRef = useRef(null);
 
   const today = TODAY();
-  const todayEntries = state.water?.[today] || [];
-  const todayTotal = todayEntries.reduce((s, e) => s + e.amount, 0);
+  const todayEntries = Array.isArray(state.water?.[today]) ? state.water[today] : [];
+  const todayTotal = getWaterTotal(state.water, today);
   const progress = todayTotal / goal;
   const barData = getBarData(state.water || {});
 
@@ -132,6 +131,7 @@ export default function WaterTracker({ state, dispatch }) {
     if (val >= 500 && val <= 10000) {
       setGoal(val);
       localStorage.setItem("water_goal", String(val));
+      dispatch({ type: "UPDATE_SETTINGS", payload: { waterGoal: val } });
       setShowGoalEdit(false);
     }
   };
@@ -389,6 +389,7 @@ export default function WaterTracker({ state, dispatch }) {
               onClick={() => {
                 setGoal(g);
                 localStorage.setItem("water_goal", String(g));
+                dispatch({ type: "UPDATE_SETTINGS", payload: { waterGoal: g } });
               }}
               className={`rd-chip ${goal === g ? "active" : ""}`}
             >

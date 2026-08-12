@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { LineChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
   fmt, today, EXERCISE_DB, GOAL_LABELS,
-  calcStreak, calcWeeklyVolume,
+  calcStreak, calcWeeklyVolume, getWaterTotal,
   showToast, showConfirm, useAICoach,
 } from "../utils/helpers";
 import {
@@ -76,7 +76,7 @@ const NotificationPanel = ({ workouts, nutrition, recovery, badges, water, profi
     const todayW = workouts.filter(w => w.date === todayStr);
     const todayN = nutrition.filter(n => n.date === todayStr);
     const todayR = recovery.find(r => r.date === todayStr);
-    const waterToday = (water || {})[todayStr] || 0;
+    const waterToday = getWaterTotal(water, todayStr);
     const todayCals = todayN.reduce((s, n) => s + (n.calories || 0), 0);
     const todayProt = todayN.reduce((s, n) => s + (n.protein || 0), 0);
 
@@ -242,7 +242,7 @@ const EmptyState = ({ icon: Icon, title, subtitle, action, actionLabel }) => (
 );
 
 const Dashboard = ({ state, dispatch, page }) => {
-  const { profile = {}, workouts = [], nutrition = [], recovery = [], bodyWeight = [], water = {}, badges = [], xp = 0, level = 1, currentProgram = null, activeSession = null } = state || {};
+  const { profile = {}, workouts = [], nutrition = [], recovery = [], bodyWeight = [], water = {}, badges = [], xp = 0, level = 1, currentProgram = null, activeSession = null, settings = {} } = state || {};
   const { ask, loading: aiLoading } = useAICoach();
   const [aiInsight, setAiInsight] = useState("");
   const [notifOpen, setNotifOpen] = useState(false);
@@ -253,8 +253,8 @@ const Dashboard = ({ state, dispatch, page }) => {
   const streak = calcStreak(workouts);
   const todayNutrition = nutrition.find(n => n.date === today()) || { calories: 0, protein: 0, carbs: 0, fat: 0 };
   const todayRecovery = recovery.find(r => r.date === today()) || {};
-  const waterLog = (water || {})[today()] || 0;
-  const waterGoal = 2500;
+  const waterLog = getWaterTotal(water, today());
+  const waterGoal = settings?.waterGoal || 2500;
   const todayLogCount = workouts.filter(w => w.date === today()).length
     + nutrition.filter(n => n.date === today()).length
     + (recovery.find(r => r.date === today()) ? 1 : 0);

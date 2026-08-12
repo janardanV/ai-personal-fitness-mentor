@@ -80,7 +80,7 @@ function sendBrowserNotification(title, body, type) {
 }
 
 export default function NotificationCenter({ state, dispatch }) {
-  const [settings, setSettings] = useState(loadSettings);
+  const [settings, setSettings] = useState(() => state.settings?.notifications || loadSettings());
   const [permission, setPermission] = useState(getPermissionStatus);
   const [activeReminders, setActiveReminders] = useState([]);
   const [historyTab, setHistoryTab] = useState("all");
@@ -90,7 +90,8 @@ export default function NotificationCenter({ state, dispatch }) {
 
   useEffect(() => {
     saveSettings(settings);
-  }, [settings]);
+    dispatch({ type: "UPDATE_SETTINGS", payload: { notifications: settings } });
+  }, [settings, dispatch]);
 
   const clearIntervals = useCallback(() => {
     intervalsRef.current.forEach(clearInterval);

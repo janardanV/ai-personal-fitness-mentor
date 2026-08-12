@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
 const LOCAL_STORAGE_KEY = "ai_fitness_mentor_v1";
@@ -12,28 +12,11 @@ const readLocalFallback = () => {
 };
 
 export const getUserData = async (uid) => {
-  const local = readLocalFallback();
-
-  if (!db) {
-    return local;
-  }
-
-  try {
-    const ref = doc(db, "users", uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) return snap.data();
-
-    if (local && local.profile) {
-      await setDoc(ref, local, { merge: true });
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      return local;
-    }
-
-    return null;
-  } catch (err) {
-    console.error("Firestore read failed, using local fallback:", err);
-    return local;
-  }
+  if (!db) return readLocalFallback();
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) return snap.data();
+  return null;
 };
 
 export const saveUserData = async (uid, data) => {
@@ -52,6 +35,8 @@ export const saveUserData = async (uid, data) => {
     xp: data.xp,
     level: data.level,
     currentProgram: data.currentProgram,
+    pendingWorkout: data.pendingWorkout || null,
+    activeSession: data.activeSession || null,
     savedPrograms: data.savedPrograms,
     aiHistory: data.aiHistory,
     aiConversations: data.aiConversations || [],
@@ -68,6 +53,13 @@ export const saveUserData = async (uid, data) => {
     updatedAt: new Date().toISOString(),
   };
   await setDoc(ref, payload, { merge: true });
+};
+
+// Permanently delete a user's cloud document (used by Reset/Delete Account).
+export const deleteUserData = async (uid) => {
+  if (!db) return;
+  const ref = doc(db, "users", uid);
+  await deleteDoc(ref);
 };
 
 export const createUserDocument = async (uid, profileData) => {
@@ -217,29 +209,24 @@ export const loadOrMigrateUserData = async (uid) => {
   if (!db) return local;
 
   const ref = doc(db, "users", uid);
-  try {
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      const cloud = snap.data();
-      if (!localHasData) return cloud;
-      const merged = mergeData(cloud, local);
-      try {
-        await setDoc(ref, merged, { merge: true });
-        clearLocalData();
-      } catch (err) {
-        console.error("Guest data migration write failed:", err);
-      }
-      return merged;
-    }
-
-    if (localHasData) {
-      await setDoc(ref, local, { merge: true });
+  const snap = await getDoc(ref); // throws on read failure — never silently fall back
+  if (snap.exists()) {
+    const cloud = snap.data();
+    if (!localHasData) return cloud;
+    const merged = mergeData(cloud, local);
+    try {
+      await setDoc(ref, merged, { merge: true });
       clearLocalData();
-      return local;
+    } catch (err) {
+      console.error("Guest data migration write failed:", err);
     }
-    return null;
-  } catch (err) {
-    console.error("Firestore read failed, using local fallback:", err);
-    return localHasData ? local : null;
+    return merged;
   }
+
+  if (localHasData) {
+    await setDoc(ref, local, { merge: true });
+    clearLocalData();
+    return local;
+  }
+  return null;
 };

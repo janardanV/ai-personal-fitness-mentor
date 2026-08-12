@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import React from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { fmt, today, useAICoach, usdaDebouncedSearch, showToast, showConfirm } from "../utils/helpers";
+import { fmt, today, useAICoach, usdaDebouncedSearch, showToast, showConfirm, getWaterTotal } from "../utils/helpers";
 import { UtensilsCrossed, Sparkles, Flame, Droplet, Search, X, Plus, Minus, Pencil, Copy, Trash2, Check, ChevronDown, ChevronRight, Apple, Drumstick, Wheat } from "lucide-react";
 
 const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snacks"];
@@ -46,7 +46,7 @@ const Fade = ({ delay = 0, className, children }) => (
 );
 
 const Nutrition = ({ state, dispatch }) => {
-  const { profile, nutrition, water } = state;
+  const { profile, nutrition, water, settings = {} } = state;
   const { ask, loading: aiLoading } = useAICoach();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -60,14 +60,15 @@ const Nutrition = ({ state, dispatch }) => {
   const [editingId, setEditingId] = useState(null);
   const [editMealType, setEditMealType] = useState("");
   const [editServing, setEditServing] = useState(0);
-  const [waterIntake, setWaterIntake] = useState(() => (water || {})[today()] || 0);
+  const [waterIntake, setWaterIntake] = useState(() => getWaterTotal(water, today()));
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
   const logFoodRef = useRef(null);
 
   const todayStr = today();
+  const waterGoal = settings.waterGoal || 3000;
 
-  useEffect(() => { setWaterIntake((water || {})[todayStr] || 0); }, [water, todayStr]);
+  useEffect(() => { setWaterIntake(getWaterTotal(water, todayStr)); }, [water, todayStr]);
   const todayLog = useMemo(() => nutrition.filter(n => n.date === todayStr), [nutrition, todayStr]);
 
   const totals = useMemo(() => todayLog.reduce((acc, n) => ({
@@ -326,7 +327,7 @@ const Nutrition = ({ state, dispatch }) => {
             <StatCard label="Fiber" value={totals.fiber} unit="g" color="green" sub="Target: 30g" />
             <StatCard label="Sugar" value={totals.sugar} unit="g" color="orange" sub="Limit: 50g" />
             <StatCard label="Sodium" value={totals.sodium} unit="mg" color={totals.sodium > 2300 ? "red" : "green"} sub="Limit: 2300mg" />
-            <StatCard label="Water" value={waterIntake} unit="ml" color="blue" icon={Droplet} sub="Target: 3000ml" />
+            <StatCard label="Water" value={waterIntake} unit="ml" color="blue" icon={Droplet} sub={`Target: ${waterGoal}ml`} />
           </div>
         </Fade>
 
@@ -394,10 +395,10 @@ const Nutrition = ({ state, dispatch }) => {
               <div style={{ width: "100%" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <span className="rd-metric-label">Daily target</span>
-                  <span className="rd-big-metric" style={{ fontSize: 22 }}>{waterIntake}<span> / 3000 ml</span></span>
+                  <span className="rd-big-metric" style={{ fontSize: 22 }}>{waterIntake}<span> / {waterGoal} ml</span></span>
                 </div>
                 <div className="rd-water-track">
-                  <div className="rd-water-fill" style={{ width: `${Math.min((waterIntake / 3000) * 100, 100)}%` }} />
+                  <div className="rd-water-fill" style={{ width: `${Math.min((waterIntake / waterGoal) * 100, 100)}%` }} />
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>

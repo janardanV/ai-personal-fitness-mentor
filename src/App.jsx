@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useReducer, lazy, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, useReducer, lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flame } from "lucide-react";
@@ -53,15 +53,29 @@ export default function App() {
   const prevLevelRef = useRef(appState.level);
   const saveTimerRef = useRef(null);
   const guestSaveTimerRef = useRef(null);
+  const pendingSaveRef = useRef(null);
+  const saveErrorToastAtRef = useRef(0);
+
+  // Flush any pending Firestore save (used on logout and page unload).
+  const flushPendingSave = useCallback(() => {
+    const pending = pendingSaveRef.current;
+    if (!pending) return Promise.resolve();
+    pendingSaveRef.current = null;
+    return saveUserData(pending.uid, pending.data).catch((err) =>
+      console.error("Failed to flush pending save:", err)
+    );
+  }, []);
 
   // ── Load user data from Firestore on auth, migrating guest data ──
   useEffect(() => {
     if (!user) { setDataLoaded(false); return; }
+    console.log("[GOOGLE] App: user changed → loading cloud data for uid:", user.uid);
     let cancelled = false;
     const loadData = async () => {
       try {
         let data = await loadOrMigrateUserData(user.uid);
         if (!cancelled && data) {
+          console.log("[GOOGLE] App: data loaded, hasProfile:", Boolean(data.profile));
           if (!data.profile) {
             data = {
               ...data,
@@ -75,9 +89,12 @@ export default function App() {
           }
           appDispatch({ type: "LOAD_DATA", payload: data });
         }
-      } catch (err) {
-        console.error("Failed to load user data:", err);
-      } finally {
+        } catch (err) {
+          console.error("Failed to load user data:", err);
+          if (!cancelled) {
+            showToast("Couldn't load your cloud data. Check your connection and refresh.");
+          }
+        } finally {
         if (!cancelled) setDataLoaded(true);
       }
     };
@@ -88,14 +105,30 @@ export default function App() {
   // ── Debounce-save to Firestore on state changes ──
   useEffect(() => {
     if (!user || !dataLoaded || !appState.profile) return;
+    pendingSaveRef.current = { uid: user.uid, data: appState };
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      saveUserData(user.uid, appState).catch((err) =>
-        console.error("Failed to save user data:", err)
-      );
+      const pending = pendingSaveRef.current;
+      if (!pending) return;
+      pendingSaveRef.current = null;
+      saveUserData(pending.uid, pending.data).catch((err) => {
+        console.error("Failed to save user data:", err);
+        const now = Date.now();
+        if (now - saveErrorToastAtRef.current > 8000) {
+          saveErrorToastAtRef.current = now;
+          showToast("Couldn't save to the cloud. Check your connection.");
+        }
+      });
     }, 1500);
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   }, [appState, user, dataLoaded]);
+
+  // Flush pending saves when the tab is being hidden/closed (best effort).
+  useEffect(() => {
+    const flush = () => { flushPendingSave(); };
+    window.addEventListener("pagehide", flush);
+    return () => window.removeEventListener("pagehide", flush);
+  }, [flushPendingSave]);
 
   // ── Persist guest state to localStorage ──
   useEffect(() => {
@@ -376,7 +409,7 @@ export default function App() {
               >
                 {(user?.displayName || appState.profile?.name || "U")[0].toUpperCase()}
               </div>
-              {accountMenuOpen && (
+                  {accountMenuOpen && (
                 <Suspense fallback={null}>
                   <AccountMenu
                     user={user}
@@ -384,6 +417,7 @@ export default function App() {
                     level={appState.level}
                     xp={appState.xp}
                     dispatch={appDispatch}
+                    onFlushSave={flushPendingSave}
                     onClose={() => setAccountMenuOpen(false)}
                     onNavigate={(p) => navigate("/" + p)}
                   />
@@ -398,7 +432,7 @@ export default function App() {
                 {PageComponent && (
                     <motion.div key={page} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
                       <ErrorBoundary key={page}>
-                        <PageComponent state={appState} dispatch={appDispatch} page={page} />
+                        <PageComponent state={appState} dispatch={appDispatch} page={page} user={user} />
                       </ErrorBoundary>
                     </motion.div>
                   )}

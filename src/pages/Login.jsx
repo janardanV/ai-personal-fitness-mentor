@@ -32,11 +32,13 @@ export default function Login() {
   };
 
   const handleGoogleLogin = async () => {
+    console.log("[GOOGLE] button clicked (Login)");
     setError("");
     setLoading(true);
     try {
       const result = await signInWithGoogle();
       const user = result.user;
+      console.log("[GOOGLE] auth succeeded uid:", user?.uid, "email:", user?.email);
       await createUserDocument(user.uid, {
         name: user.displayName || "",
         email: user.email || "",

@@ -4,21 +4,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Settings, HelpCircle, Info, ChevronRight, LogOut, DoorOpen } from "lucide-react";
 import { logOut as firebaseLogOut } from "../firebase/auth";
 import { showToast } from "../utils/helpers";
+import { clearLocalData } from "../services/profileService";
 
 const Tile = ({ danger, children }) => (
   <span className="menu-icon" style={{ color: danger ? "var(--red)" : "var(--muted)" }}>{children}</span>
 );
 
-const AccountMenu = ({ user, profile, level, xp, dispatch, onClose, onNavigate }) => {
+const AccountMenu = ({ user, profile, level, xp, dispatch, onFlushSave, onClose, onNavigate }) => {
   const navigate = useNavigate();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const handleLogout = () => { setLogoutOpen(true); };
 
   const confirmLogout = async () => {
-    try { await firebaseLogOut(); } catch (err) { console.error("Logout failed:", err); }
-    try { localStorage.removeItem("ai_fitness_mentor_v1"); } catch {}
+    try { await onFlushSave?.(); } catch (err) { console.error("Save flush on logout failed:", err); }
     dispatch({ type: "LOGOUT" });
+    try { await firebaseLogOut(); } catch (err) { console.error("Logout failed:", err); }
+    try { clearLocalData(); } catch {}
     showToast("Signed out. Continuing as guest.");
   };
 

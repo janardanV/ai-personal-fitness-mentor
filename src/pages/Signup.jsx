@@ -43,11 +43,13 @@ export default function Signup() {
   };
 
   const handleGoogleSignup = async () => {
+    console.log("[GOOGLE] button clicked (Signup)");
     setError("");
     setLoading(true);
     try {
       const result = await signInWithGoogle();
       const user = result.user;
+      console.log("[GOOGLE] auth succeeded uid:", user?.uid, "email:", user?.email);
       await createUserDocument(user.uid, {
         name: user.displayName || "",
         email: user.email || "",

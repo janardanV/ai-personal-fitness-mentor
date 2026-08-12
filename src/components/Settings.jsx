@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings as SettingsIcon, User, Bell, Shield, Palette, Ruler, Droplets, Trash2, RefreshCw, Scale, Map, Trophy, Database, Download, Upload, Activity, Gauge, Sparkles } from "lucide-react";
+import { deleteUserData } from "../services/profileService";
+import { auth } from "../firebase/firebase";
+import { deleteUser } from "firebase/auth";
+import { showToast } from "../utils/helpers";
 
 function Toggle({ on, onToggle }) {
   return (
@@ -135,7 +139,7 @@ function ConfirmModal({ open, title, message, confirmLabel, onConfirm, onCancel,
   );
 }
 
-export default function Settings({ state, dispatch }) {
+export default function Settings({ state, dispatch, user }) {
   const { profile = {}, settings = {}, xp = 0, level = 1 } = state || {};
   const fileInputRef = useRef(null);
 
@@ -226,17 +230,34 @@ export default function Settings({ state, dispatch }) {
     e.target.value = "";
   };
 
-  const handleDelete = () => {
-    if (deleteEmail === profile.email) {
-      setShowDeleteModal(false);
-      setDeleteEmail("");
+  const handleDelete = async () => {
+    if (deleteEmail !== profile.email) return;
+    setShowDeleteModal(false);
+    setDeleteEmail("");
+    try {
+      if (user?.uid) await deleteUserData(user.uid);
+      if (auth?.currentUser) await deleteUser(auth.currentUser);
       dispatch({ type: "RESET" });
+      showToast("Account and all cloud data deleted.");
+    } catch (err) {
+      console.error("Delete account failed:", err);
+      showToast("Couldn't delete account. Please try again.");
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setShowResetModal(false);
+    if (user?.uid) {
+      try {
+        await deleteUserData(user.uid);
+      } catch (err) {
+        console.error("Reset failed:", err);
+        showToast("Couldn't clear cloud data. Check your connection.");
+        return;
+      }
+    }
     dispatch({ type: "RESET" });
+    showToast("All data reset.");
   };
 
   const memberSince = profile.createdAt

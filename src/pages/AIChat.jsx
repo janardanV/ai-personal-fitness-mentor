@@ -13,14 +13,24 @@ const CAPABILITIES = [
   { icon: Moon, label: "Recovery", tip: "Sleep, stress & readiness", prompt: "My recovery score is low — what should I change today?", accent: "purple" },
 ];
 
-const AIChat = ({ state }) => {
-  const { profile = {}, workouts = [], recovery = [] } = state || {};
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hey! I'm your AI fitness coach. I've reviewed your training logs and goals — ask me anything about training, form, nutrition, or recovery." }
-  ]);
+const AIChat = ({ state, dispatch }) => {
+  const { profile = {}, workouts = [], recovery = [], aiConversations = [] } = state || {};
+  const [messages, setMessages] = useState(() =>
+    Array.isArray(aiConversations) && aiConversations.length
+      ? aiConversations
+      : [{ role: "assistant", content: "Hey! I'm your AI fitness coach. I've reviewed your training logs and goals — ask me anything about training, form, nutrition, or recovery." }]
+  );
+  const messagesRef = useRef(messages);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
   const [input, setInput] = useState("");
   const { ask, loading } = useAICoach();
   const endRef = useRef(null);
+
+  const commit = (next) => {
+    messagesRef.current = next;
+    setMessages(next);
+    dispatch({ type: "SET_AI_CONVERSATIONS", payload: next });
+  };
 
   const streak = calcStreak(workouts);
   const goal = profile.goal;
@@ -32,7 +42,8 @@ const AIChat = ({ state }) => {
   const send = async (text) => {
     const q = (text ?? input).trim();
     if (!q || loading) return;
-    setMessages(p => [...p, { role: "user", content: q }]);
+    const userMsg = { role: "user", content: q };
+    commit([...messagesRef.current, userMsg]);
     setInput("");
 
     const rec = recovery.slice(-3);
@@ -43,7 +54,7 @@ const AIChat = ({ state }) => {
       "You are an expert fitness coach with deep knowledge of exercise science, nutrition, and recovery. Give specific, actionable advice. Be concise but thorough. Max 150 words. Use plain text, no markdown.",
       `${context}\n\nUser: ${q}`
     );
-    if (reply) setMessages(p => [...p, { role: "assistant", content: reply }]);
+    if (reply) commit([...messagesRef.current, { role: "assistant", content: reply }]);
   };
 
   const suggestions = ["How should I warm up for leg day?", "What's the best way to progress on bench press?", "How much protein do I need?", "Should I do cardio on rest days?", "How do I fix my squat form?", "What should I eat post-workout?"];

@@ -107,15 +107,25 @@ export function reducer(state, action) {
     }
     case "LOG_WATER": {
       const w = state.water || {};
-      const water = { ...w, [action.payload.date]: Math.max(0, (w[action.payload.date] || 0) + action.payload.amount) };
-      const newState = { ...state, water };
-      return newState;
+      const date = action.payload.date;
+      const prev = w[date];
+      const prevEntries = Array.isArray(prev)
+        ? prev
+        : typeof prev === "number" && Number.isFinite(prev) && prev > 0
+          ? [{ amount: prev }]
+          : [];
+      const amount = Number(action.payload.amount);
+      const entry = action.payload.entry && typeof action.payload.entry === "object"
+        ? { ...action.payload.entry, amount: Math.max(0, Number(action.payload.entry.amount) || 0) }
+        : { time: new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", hour12: true }), amount: Math.max(0, amount || 0) };
+      const water = { ...w, [date]: [...prevEntries, entry] };
+      return { ...state, water };
     }
     case "SET_WATER": {
       const w = state.water || {};
-      const water = { ...w, [action.payload.date]: Math.max(0, action.payload.amount) };
-      const newState = { ...state, water };
-      return newState;
+      const amount = Math.max(0, Number(action.payload.amount) || 0);
+      const water = { ...w, [action.payload.date]: [{ amount }] };
+      return { ...state, water };
     }
     case "SET_PROGRAM": {
       const newState = { ...state, currentProgram: action.payload };

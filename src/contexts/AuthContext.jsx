@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log("[GOOGLE] onAuthStateChanged uid:", firebaseUser?.uid || null, "email:", firebaseUser?.email || null);
       setUser(firebaseUser);
       setLoading(false);
     });

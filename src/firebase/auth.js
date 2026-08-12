@@ -49,11 +49,18 @@ export const signInWithEmail = async (email, password) => {
 };
 
 export const signInWithGoogle = async () => {
+  console.log("[GOOGLE] auth:", auth);
+  console.log("[GOOGLE] starting popup");
   try {
     requireAuth();
     await setPersistence(auth, browserLocalPersistence);
-    return await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    console.log("[GOOGLE] success uid:", result.user?.uid, "email:", result.user?.email);
+    return result;
   } catch (error) {
+    console.error("[GOOGLE] code:", error?.code);
+    console.error("[GOOGLE] message:", error?.message);
+    console.error("[GOOGLE] stack:", error?.stack);
     logGoogleSignInError(error);
     throw error;
   }

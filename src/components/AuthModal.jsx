@@ -29,10 +29,12 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
   const handleClose = () => { reset(); onClose(); };
 
   const handleGoogle = async () => {
+    console.log("[GOOGLE] button clicked (AuthModal)");
     setError(""); setBusy(true);
     try {
       const result = await signInWithGoogle();
       const u = result.user;
+      console.log("[GOOGLE] auth succeeded uid:", u?.uid, "email:", u?.email);
       await createUserDocument(u.uid, { name: u.displayName || "", email: u.email || "", photoURL: u.photoURL || "" });
       reset();
       onAuthSuccess();

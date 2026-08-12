@@ -227,9 +227,7 @@ export default function SmartNutrition({ state, dispatch }) {
   const [usdaResults, setUsdaResults] = useState([]);
   const [loadingUsda, setLoadingUsda] = useState(false);
   const [modalFood, setModalFood] = useState(null);
-  const [favorites, setFavorites] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('nutrition_favorites') || '[]'); } catch { return []; }
-  });
+  const favorites = state.favoriteMeals || [];
   const [favName, setFavName] = useState('');
   const [showSaveFav, setShowSaveFav] = useState(false);
   const [todayMealSelection, setTodayMealSelection] = useState('all');
@@ -293,9 +291,17 @@ export default function SmartNutrition({ state, dispatch }) {
     debouncedSearch(search);
   }, [search, debouncedSearch]);
 
+  // One-time migration: legacy localStorage favorites → app state (persisted to Firestore/local).
   useEffect(() => {
-    localStorage.setItem('nutrition_favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    if ((state.favoriteMeals || []).length > 0) return;
+    try {
+      const legacy = JSON.parse(localStorage.getItem('nutrition_favorites') || '[]');
+      if (Array.isArray(legacy) && legacy.length) {
+        legacy.forEach((fav) => dispatch({ type: 'ADD_FAVORITE_MEAL', payload: fav }));
+        localStorage.removeItem('nutrition_favorites');
+      }
+    } catch {}
+  }, [dispatch, state.favoriteMeals]);
 
   const filteredDb = useMemo(() => {
     if (!search.trim()) return FOOD_DATABASE;
@@ -332,10 +338,10 @@ export default function SmartNutrition({ state, dispatch }) {
       totalCarbs: totals.carbs,
       totalFat: totals.fat,
     };
-    setFavorites((prev) => [...prev, fav]);
+    dispatch({ type: 'ADD_FAVORITE_MEAL', payload: fav });
     setFavName('');
     setShowSaveFav(false);
-  }, [favName, todayMeals, totals]);
+  }, [dispatch, favName, todayMeals, totals]);
 
   const handleQuickAddFav = useCallback((fav) => {
     fav.items.forEach((item) => {
@@ -357,8 +363,8 @@ export default function SmartNutrition({ state, dispatch }) {
   }, [dispatch, today]);
 
   const handleRemoveFavorite = useCallback((id) => {
-    setFavorites((prev) => prev.filter((f) => f.id !== id));
-  }, []);
+    dispatch({ type: 'REMOVE_FAVORITE_MEAL', payload: id });
+  }, [dispatch]);
 
   const tabs = [
     { key: 'today', label: 'Today', icon: CalendarDays },

@@ -36,6 +36,14 @@ export const calcCalories = (distanceKm, durationSeconds, weightKg = 70) => {
   return Math.round(0.0175 * met * weightKg * (durationSeconds / 60));
 };
 
+// Water intake for a date: supports new array-of-entries model and legacy number.
+export const getWaterTotal = (water, date) => {
+  const day = water?.[date];
+  if (Array.isArray(day)) return day.reduce((sum, e) => sum + (Number(e?.amount) || 0), 0);
+  if (typeof day === "number" && Number.isFinite(day) && day > 0) return day;
+  return 0;
+};
+
 export const haversine = (lat1, lon1, lat2, lon2) => {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
